@@ -25,13 +25,29 @@ point_1 = (23, 34)
 #       формула так же есть в интернете
 #       квадратный корень - это возведение в степень 0.5
 #       операции сравнения дают булевы константы True и False
-# TODO здесь ваш код
+
+
+def calculate_distance(cite1, cite2):
+    distance = ((cite1[0] - cite2[0]) ** 2 + (cite1[1] - cite2[1]) ** 2) ** 0.5
+    return distance
+
+
+origin = (0, 0)
+origin_point1 = calculate_distance(origin, point_1)
+if origin_point1 <= radius:         # если точка лежит на окружности, то считаем, что она принадлежит кругу
+    print(True)
+else:
+    print(False)
 
 # Аналогично для другой точки
 point_2 = (30, 30)
 # Если точка point_2 лежит внутри круга (radius = 42), то выведите на консоль True,
 # Или False, если точка лежит вовне круга.
-# TODO здесь ваш код
+origin_point2 = calculate_distance(origin, point_2)
+if origin_point2 <= radius:
+    print(True)
+else:
+    print(False)
 
 # Пример вывода на консоль:
 #
