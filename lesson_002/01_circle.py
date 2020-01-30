@@ -38,6 +38,7 @@ if origin_point1 <= radius:         # если точка лежит на окр
     print(True)
 else:
     print(False)
+# TODO Всё верно и хорошо, кроме if - он тут ну совсем оверхед. Достаточно вставить условие прямо в print
 
 # Аналогично для другой точки
 point_2 = (30, 30)
@@ -48,7 +49,7 @@ if origin_point2 <= radius:
     print(True)
 else:
     print(False)
-
+# TODO Аналогично
 # Пример вывода на консоль:
 #
 # 77777.7777
