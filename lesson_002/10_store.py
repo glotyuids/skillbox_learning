@@ -58,6 +58,13 @@ tables_cost = tables[0]['price'] * tables[0]['quantity'] \
              + tables[1]['price'] * tables[1]['quantity']
 print('Стол -', tables_quantity, 'шт, стоимость', tables_cost, 'руб')
 
+
+sofas = store[goods['Диван']]
+sofas_quantity = sofas[0]['quantity'] + sofas[1]['quantity']
+sofas_cost = sofas[0]['price'] * sofas[0]['quantity'] \
+             + sofas[1]['price'] * sofas[1]['quantity']
+print('Диван -', sofas_quantity, 'шт, стоимость', sofas_cost, 'руб')
+
 ##########################################################################################
 # ВНИМАНИЕ! После того как __ВСЯ__ домашняя работа сделана и запушена на сервер,         #
 # нужно зайти в ЛМС (LMS - Learning Management System ) по адресу http://go.skillbox.ru  #
