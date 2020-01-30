@@ -34,22 +34,15 @@ def calculate_distance(cite1, cite2):
 
 origin = (0, 0)
 origin_point1 = calculate_distance(origin, point_1)
-if origin_point1 <= radius:         # если точка лежит на окружности, то считаем, что она принадлежит кругу
-    print(True)
-else:
-    print(False)
-# TODO Всё верно и хорошо, кроме if - он тут ну совсем оверхед. Достаточно вставить условие прямо в print
+print(True if origin_point1 <= radius else False)   # не знал, что так можно делать. спасибо
 
 # Аналогично для другой точки
 point_2 = (30, 30)
 # Если точка point_2 лежит внутри круга (radius = 42), то выведите на консоль True,
 # Или False, если точка лежит вовне круга.
 origin_point2 = calculate_distance(origin, point_2)
-if origin_point2 <= radius:
-    print(True)
-else:
-    print(False)
-# TODO Аналогично
+print(True if origin_point2 <= radius else False)
+
 # Пример вывода на консоль:
 #
 # 77777.7777
