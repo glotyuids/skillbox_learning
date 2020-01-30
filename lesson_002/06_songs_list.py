@@ -23,7 +23,13 @@ violator_songs_list = [
 # Обратите внимание, что делать много вычислений внутри print() - плохой стиль.
 # Лучше заранее вычислить необходимое, а затем в print(xxx, yyy, zzz)
 
-# TODO здесь ваш код
+total_duration = 0
+playlist = ['Halo', 'Enjoy the Silence', 'Clean']
+for song in violator_songs_list:
+    if song[0] in playlist:
+        total_duration += song[1]
+total_duration = round(total_duration, 2)
+print(f'Три песни звучат {total_duration} минут')
 
 # Есть словарь песен группы Depeche Mode
 violator_songs_dict = {
