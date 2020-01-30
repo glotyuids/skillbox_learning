@@ -52,28 +52,46 @@ print('Лампа -', lamps_quantity, 'шт, стоимость', lamps_cost, '�
 # WARNING для знающих циклы: БЕЗ циклов. Да, с переменными; да, неэффективно; да, копипаста.
 # Это задание на ручное вычисление - что бы потом понять как работают циклы и насколько с ними проще жить.
 
-# TODO К расчёту и выводу в консоль вопросов нет - всё верно. Но код трудночитаемый, введите table_code, table_item_1
-#  и т.д.
-tables = store[goods['Стол']]
-tables_quantity = tables[0]['quantity'] + tables[1]['quantity']
-tables_cost = tables[0]['price'] * tables[0]['quantity'] \
-             + tables[1]['price'] * tables[1]['quantity']
-print('Стол -', tables_quantity, 'шт, стоимость', tables_cost, 'руб')
+# TODO попробую переносами разделять логические блоки. Это допустимо?
+table_code = goods['Стол']
+tables_item_1 = store[table_code][0]
+tables_item_2 = store[table_code][1]
+
+tables_quantity = tables_item_1['quantity'] + tables_item_2['quantity']
+
+tables_item_1_cost = tables_item_1['price'] * tables_item_1['quantity']
+tables_item_2_cost = tables_item_2['price'] * tables_item_2['quantity']
+total_tables_cost = tables_item_1_cost + tables_item_2_cost
+
+print('Стол -', tables_quantity, 'шт, стоимость', total_tables_cost, 'руб')
 
 
-sofas = store[goods['Диван']]
-sofas_quantity = sofas[0]['quantity'] + sofas[1]['quantity']
-sofas_cost = sofas[0]['price'] * sofas[0]['quantity'] \
-             + sofas[1]['price'] * sofas[1]['quantity']
-print('Диван -', sofas_quantity, 'шт, стоимость', sofas_cost, 'руб')
+sofa_code = goods['Диван']
+sofas_item_1 = store[sofa_code][0]
+sofas_item_2 = store[sofa_code][1]
+
+sofas_quantity = sofas_item_1['quantity'] + sofas_item_2['quantity']
+
+sofas_item_1_cost = sofas_item_1['price'] * sofas_item_1['quantity']
+sofas_item_2_cost = sofas_item_2['price'] * sofas_item_2['quantity']
+total_sofas_cost = sofas_item_1_cost + sofas_item_2_cost
+
+print('Диван -', sofas_quantity, 'шт, стоимость', total_sofas_cost, 'руб')
 
 
-chairs = store[goods['Стул']]
-chairs_quantity = chairs[0]['quantity'] + chairs[1]['quantity'] + chairs[2]['quantity']
-chairs_cost = chairs[0]['price'] * chairs[0]['quantity'] \
-             + chairs[1]['price'] * chairs[1]['quantity'] \
-             + chairs[2]['price'] * chairs[2]['quantity']
-print('Стул -', chairs_quantity, 'шт, стоимость', chairs_cost, 'руб')
+chair_code = goods['Стул']
+chairs_item_1 = store[chair_code][0]
+chairs_item_2 = store[chair_code][1]
+chairs_item_3 = store[chair_code][2]
+
+chairs_quantity = chairs_item_1['quantity'] + chairs_item_2['quantity'] + chairs_item_3['quantity']
+
+chairs_item_1_cost = chairs_item_1['price'] * chairs_item_1['quantity']
+chairs_item_2_cost = chairs_item_2['price'] * chairs_item_2['quantity']
+chairs_item_3_cost = chairs_item_3['price'] * chairs_item_3['quantity']
+total_chairs_cost = chairs_item_1_cost + chairs_item_2_cost + chairs_item_3_cost
+
+print('Стул -', chairs_quantity, 'шт, стоимость', total_chairs_cost, 'руб')
 
 ##########################################################################################
 # ВНИМАНИЕ! После того как __ВСЯ__ домашняя работа сделана и запушена на сервер,         #
