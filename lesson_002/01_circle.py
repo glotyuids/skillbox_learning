@@ -35,7 +35,7 @@ def calculate_distance(cite1, cite2):
 origin = (0, 0)
 origin_point1 = calculate_distance(origin, point_1)
 print(origin_point1 <= radius)
-# TODO Вот это меня переклинило вчера... Это же так очевидно(
+#  Вот это меня переклинило вчера... Это же так очевидно(
 #  Сделал не подумав и в итоге переусложнил( Ведь знал же и делал так раньше...
 
 # Аналогично для другой точки
@@ -51,4 +51,4 @@ print(origin_point2 <= radius)
 # False
 # False
 
-
+# зачет!
