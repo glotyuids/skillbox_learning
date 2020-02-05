@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from random import randint
 import simple_draw as sd
 
 sd.resolution = (1200, 600)
@@ -59,7 +60,23 @@ for _ in range(3):
     y += 50
 
 # Нарисовать 100 пузырьков в произвольных местах экрана случайными цветами
-# TODO здесь ваш код
+"""
+хотел здесь после пятисекундной паузы почистить экран, но кажется, что констукция
+sd.start_drawing() 
+...
+sd.finish_drawing()
+sd.sleep(5)
+sd.start_drawing() 
+...
+sd.finish_drawing()
+работает некорректно. Вместо того, чтобы вывести буфер и приостановить вывод на 5 секунд, 
+окно просто на эти 5 секунд подвисает без какого-либо вывода
+"""
+for _ in range(100):
+    bubble_center = sd.random_point()
+    color = sd.random_color()
+    bubble_radius = randint(10, 100)
+    draw_bubble(bubble_center, bubble_radius, line_width=1, step=3, color=color)
 
 sd.pause()
 
