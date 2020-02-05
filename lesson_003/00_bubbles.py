@@ -35,13 +35,18 @@ def draw_bubble(center, inner_radius=60, step=5, color=(255, 255, 0), line_width
         Circle line width
 
     """
+    # Вроде бы оверкилл, но я должен был попробовать запилить такой докстринг
     for _ in range(3):
         sd.circle(center, inner_radius, color, line_width)
         inner_radius += step
 
 
 # Нарисовать 10 пузырьков в ряд
-# TODO здесь ваш код
+x = 100
+for _ in range(10):
+    circle_center = sd.get_point(x, 500)
+    draw_bubble(circle_center)
+    x += 100
 
 # Нарисовать три ряда по 10 пузырьков
 # TODO здесь ваш код
