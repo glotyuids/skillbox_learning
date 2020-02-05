@@ -34,8 +34,8 @@ else:
 #
 # Определить, пройдет ли кирпич через отверстие (грани кирпича параллельны сторонам отверстия)
 
-# hole_x, hole_y = 8, 9
-# brick_x, brick_y, brick_z = 11, 10, 2
+hole_x, hole_y = 8, 9
+brick_x, brick_y, brick_z = 11, 10, 2
 # brick_x, brick_y, brick_z = 11, 2, 10
 # brick_x, brick_y, brick_z = 10, 11, 2
 # brick_x, brick_y, brick_z = 10, 2, 11
@@ -55,4 +55,18 @@ else:
 # brick_x, brick_y, brick_z = 3, 11, 6
 # (просто раскоментировать нужную строку и проверить свой код)
 
-# TODO здесь ваш код
+# Решение "в лоб", перебором
+if (brick_x <= hole_x) and (brick_y <= hole_y):     # Checking x-y
+    print('ДА')
+elif (brick_y <= hole_x) and (brick_x <= hole_y):   # Checking y-x
+    print('ДА')
+elif (brick_x <= hole_x) and (brick_z <= hole_y):     # Checking x-z
+    print('ДА')
+elif (brick_z <= hole_x) and (brick_x <= hole_y):   # Checking z-x
+    print('ДА')
+elif (brick_y <= hole_x) and (brick_z <= hole_y):     # Checking y-z
+    print('ДА')
+elif (brick_z <= hole_x) and (brick_y <= hole_y):   # Checking z-y
+    print('ДА')
+else:
+    print('НЕТ')
