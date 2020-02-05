@@ -5,7 +5,11 @@ import simple_draw as sd
 sd.resolution = (1200, 600)
 
 # Нарисовать пузырек - три вложенных окружностей с шагом 5 пикселей
-# TODO здесь ваш код
+circle_center = sd.get_point(100, 100)
+radius = 60
+for _ in range(3):
+    sd.circle(circle_center, radius, width=2)
+    radius += 5
 
 # Написать функцию рисования пузырька, принммающую 3 (или более) параметра: точка рисования, шаг и цвет
 # TODO здесь ваш код
