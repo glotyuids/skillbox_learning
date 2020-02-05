@@ -49,7 +49,14 @@ for _ in range(10):
     x += 100
 
 # Нарисовать три ряда по 10 пузырьков
-# TODO здесь ваш код
+y = 300
+for _ in range(3):
+    x = 300
+    for _ in range(10):
+        circle_center = sd.get_point(x, y)
+        draw_bubble(circle_center, 20, line_width=1, step=3)
+        x += 50
+    y += 50
 
 # Нарисовать 100 пузырьков в произвольных местах экрана случайными цветами
 # TODO здесь ваш код
