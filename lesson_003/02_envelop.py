@@ -70,3 +70,14 @@ elif (brick_z <= hole_x) and (brick_y <= hole_y):   # Checking z-y
     print('ДА')
 else:
     print('НЕТ')
+
+
+# Альтернативное решение
+hole = [hole_x, hole_y]
+brick = [brick_x, brick_y, brick_z]
+hole.sort()
+brick.sort()
+if (brick[0] <= hole[0]) and (brick[1] <= hole[1]):
+    print('ДА')
+else:
+    print('НЕТ')
