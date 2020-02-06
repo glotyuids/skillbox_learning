@@ -47,7 +47,7 @@ def draw_brick_line (x, y, count):
         next_x += 100
 
 
-wall_width = simple_draw.resolution[0] // 100 + 2   # +2 для того, чтобы при смещении на полкирпича всё было корректно
+wall_width = simple_draw.resolution[0] // 100 + 1   # +1 для того, чтобы при смещении на полкирпича всё было корректно
 wall_height = simple_draw.resolution[1] // 50 + 1   # +1 на случай, если размер окна не кратен размеру кирпича
 
 for i in range(wall_height):
