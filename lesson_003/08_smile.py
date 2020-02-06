@@ -10,8 +10,7 @@ import simple_draw
 # Вывести 10 смайликов в произвольных точках экрана.
 
 
-def draw_smile(x, y, color=simple_draw.COLOR_YELLOW):
-    scale = 5
+def draw_smile(x, y, color=simple_draw.COLOR_YELLOW, scale=1):
     draw_head(x, y + 13 * scale, scale, color)
     draw_eyes(x + 4 * scale, y + 22 * scale, scale)
     draw_beard(x, y, scale)
@@ -186,7 +185,7 @@ def draw_vertical_rectangle(x, y_top, y_bottom, color=simple_draw.COLOR_YELLOW, 
 
 def draw_beard(x, y, scale=1):
     beard = [5, 7, 8, 12, 16, 15, 18, 20, 19, 17, 14, 13, 10, 8, 7, 4]
-    hair_y_top = y + 20  * scale
+    hair_y_top = y + 20 * scale
     for i, hair in enumerate(beard):
         hair_x = x + i * scale
         hair_y_bottom = hair_y_top - hair * scale
@@ -195,8 +194,12 @@ def draw_beard(x, y, scale=1):
 
 simple_draw.resolution = (1200, 600)
 
-
-draw_smile(10, 10)
+scale = 5
+for _ in range(10):
+    smile_x = randint(0, simple_draw.resolution[0] - scale * 16)
+    smile_y = randint(0, simple_draw.resolution[1] - scale * 29)
+    smile_color = simple_draw.random_color()
+    draw_smile(smile_x, smile_y, smile_color, scale)
 
 
 simple_draw.pause()
