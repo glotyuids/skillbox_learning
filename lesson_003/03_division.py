@@ -11,4 +11,10 @@
 
 a, b = 179, 37
 
-# TODO здесь ваш код
+dividend, divisor = a, b
+result = 0
+while dividend > divisor:
+    dividend -= divisor
+    result += 1
+
+print(f'Целочисленное деление {a} на {b} дает {result}')
