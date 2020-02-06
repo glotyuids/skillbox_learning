@@ -11,4 +11,16 @@
 
 educational_grant, expenses = 10000, 12000
 
-# TODO здесь ваш код
+annual_grant = educational_grant * 10
+last_month_expenses = expenses
+total_expenses = last_month_expenses
+i = 1
+while i < 10:
+    last_month_expenses *= 1.03
+    total_expenses += last_month_expenses
+    i += 1
+
+borrow_from_parents = round(total_expenses - annual_grant, 2)
+print(f'Студенту надо попросить {borrow_from_parents} рублей')
+
+
