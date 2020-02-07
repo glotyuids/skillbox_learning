@@ -12,10 +12,22 @@
 a, b = 179, 37
 
 dividend, divisor = a, b
+
+if divisor == 0:
+    print('Делить на ноль нельзя')
+    quit()
+
+negative_result = False
+negative_result = not negative_result if dividend < 0 else negative_result
+negative_result = not negative_result if divisor < 0 else negative_result
+
 result = 0
-while dividend > divisor:
-    # TODO Хорошо! Но для случая когда числа делятся без остатка результат не верный - надо уточнить условие
+dividend, divisor = abs(dividend), abs(divisor)
+while dividend >= divisor:
+    # Хорошо! Но для случая когда числа делятся без остатка результат не верный - надо уточнить условие
+    # TODO Не подумал( Поправил условие. Попутно обработал ноль и отрицательные числа
     dividend -= divisor
     result += 1
+result = -result if negative_result else result
 
 print(f'Целочисленное деление {a} на {b} дает {result}')
