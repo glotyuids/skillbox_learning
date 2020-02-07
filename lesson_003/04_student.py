@@ -14,14 +14,15 @@ educational_grant, expenses = 10000, 12000
 annual_grant = educational_grant * 10
 last_month_expenses = expenses
 total_expenses = last_month_expenses
-i = 1
-# TODO Если бы не малоинформативное название переменной для номера текущего месяца "i", то зачёл бы. Но именование
+month = 1
+# Если бы не малоинформативное название переменной для номера текущего месяца "i", то зачёл бы. Но именование
 #  очень важно и к этому надо привыкать сразу. Потратить на поиск подходящего имени много времени не жаль. Конечно, в
 #  данном случае достаточно очевидно назначение i, но ради практики важно заостить на этом внимание
-while i < 10:
+#  TODO Фактически тут и цикл while не особо нужен. Достаточно было бы for _ in range(9)
+while month < 10:
     last_month_expenses *= 1.03
     total_expenses += last_month_expenses
-    i += 1
+    month += 1
 
 borrow_from_parents = round(total_expenses - annual_grant, 2)
 print(f'Студенту надо попросить {borrow_from_parents} рублей')
