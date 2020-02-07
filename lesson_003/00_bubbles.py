@@ -12,6 +12,9 @@ for _ in range(3):
     sd.circle(circle_center, radius, width=2)
     radius += 5
 
+sd.sleep(1)
+sd.clear_screen()
+
 
 # Написать функцию рисования пузырька, принммающую 3 (или более) параметра: точка рисования, шаг и цвет
 def draw_bubble(center, inner_radius=60, step=5, color=(255, 255, 0), line_width=2):
@@ -49,6 +52,10 @@ for _ in range(10):
     draw_bubble(circle_center)
     x += 100
 
+sd.sleep(1)
+sd.clear_screen()
+
+
 # Нарисовать три ряда по 10 пузырьков
 y = 300
 for _ in range(3):
@@ -58,6 +65,9 @@ for _ in range(3):
         draw_bubble(circle_center, 20, line_width=1, step=3)
         x += 50
     y += 50
+
+sd.sleep(1)
+sd.clear_screen()
 
 # Нарисовать 100 пузырьков в произвольных местах экрана случайными цветами
 """
@@ -72,6 +82,9 @@ sd.finish_drawing()
 работает некорректно. Вместо того, чтобы вывести буфер и приостановить вывод на 5 секунд, 
 окно просто на эти 5 секунд подвисает без какого-либо вывода
 """
+# Именно так и должна работать sd.sleep(5)!  А пара функций start/finish_drawing ускоряет вывод графики, но ни на
+#  очистку, ни на паузу никак не влияет. Паузы и очистку вставил сам при проверке.
+
 for _ in range(100):
     bubble_center = sd.random_point()
     color = sd.random_color()
@@ -80,4 +93,5 @@ for _ in range(100):
 
 sd.pause()
 
+# зачет! На вопрос ответил выше
 

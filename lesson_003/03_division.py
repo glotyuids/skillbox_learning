@@ -14,6 +14,7 @@ a, b = 179, 37
 dividend, divisor = a, b
 result = 0
 while dividend > divisor:
+    # TODO Хорошо! Но для случая когда числа делятся без остатка результат не верный - надо уточнить условие
     dividend -= divisor
     result += 1
 

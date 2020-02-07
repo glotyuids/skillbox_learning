@@ -32,3 +32,5 @@ for color in rainbow_colors:
     radius += line_width
 
 sd.pause()
+
+# зачет!

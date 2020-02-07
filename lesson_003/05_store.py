@@ -54,7 +54,8 @@ store = {
 #         подсчет стоимости товара
 #     вывод на консоль количества и стоимости товара на складе
 
-for product in goods:
+for product in goods:  # TODO Всё верно, но давайте используем тут распаковку, это очень удобно
+    # (for name, code in goods.items():)
     product_code = goods[product]
     total_quantity = 0
     total_cost = 0
