@@ -20,14 +20,14 @@ paper_x, paper_y = 8, 9
 # paper_x, paper_y = 9, 11
 # (просто раскоментировать нужную строку и проверить свой код)
 
-if (paper_x <= envelop_x) and (paper_y <= envelop_y):
-    print('ДА')
-elif (paper_y <= envelop_x) and (paper_x <= envelop_y):
+if ((paper_x <= envelop_x) and (paper_y <= envelop_y)) \
+        | ((paper_y <= envelop_x) and (paper_x <= envelop_y)):
     print('ДА')
 else:
     print('НЕТ')
 
-# TODO Для исключения дублирования кода вывода положительного ответа, объедините условия с помощью логического ИЛИ
+# Для исключения дублирования кода вывода положительного ответа, объедините условия с помощью логического ИЛИ
+# TODO А это на читаемости кода негативно не скажется?
 # Усложненное задание, решать по желанию.
 # Заданы размеры hole_x, hole_y прямоугольного отверстия и размеры brick_х, brick_у, brick_z кирпича (все размеры
 # могут быть в диапазоне от 1 до 1000)
@@ -56,22 +56,15 @@ brick_x, brick_y, brick_z = 11, 10, 2
 # (просто раскоментировать нужную строку и проверить свой код)
 
 # Решение "в лоб", перебором
-if (brick_x <= hole_x) and (brick_y <= hole_y):     # Checking x-y
-    print('ДА')
-elif (brick_y <= hole_x) and (brick_x <= hole_y):   # Checking y-x
-    print('ДА')
-elif (brick_x <= hole_x) and (brick_z <= hole_y):     # Checking x-z
-    print('ДА')
-elif (brick_z <= hole_x) and (brick_x <= hole_y):   # Checking z-x
-    print('ДА')
-elif (brick_y <= hole_x) and (brick_z <= hole_y):     # Checking y-z
-    print('ДА')
-elif (brick_z <= hole_x) and (brick_y <= hole_y):   # Checking z-y
+if ((brick_x <= hole_x) and (brick_y <= hole_y)) \
+        | ((brick_y <= hole_x) and (brick_x <= hole_y)) \
+        | ((brick_x <= hole_x) and (brick_z <= hole_y)) \
+        | ((brick_z <= hole_x) and (brick_x <= hole_y)) \
+        | ((brick_y <= hole_x) and (brick_z <= hole_y)) \
+        | ((brick_z <= hole_x) and (brick_y <= hole_y)):
     print('ДА')
 else:
     print('НЕТ')
-# TODO повторы кода с print тут тоже актуальны
-
 
 
 # Альтернативное решение
@@ -81,6 +74,15 @@ brick = [brick_x, brick_y, brick_z]
 hole.sort()
 brick.sort()
 if (brick[0] <= hole[0]) and (brick[1] <= hole[1]):
+    print('ДА')
+else:
+    print('НЕТ')
+
+# TODO Таким образом? :)
+brick = [brick_x, brick_y, brick_z]
+brick.remove(max(brick))
+if ((brick[0] <= hole_x) and (brick[1] <= hole_y)) \
+        | ((brick[1] <= hole_x) and (brick[0] <= hole_y)):
     print('ДА')
 else:
     print('НЕТ')
