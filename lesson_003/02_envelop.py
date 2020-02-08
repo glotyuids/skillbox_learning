@@ -22,12 +22,12 @@ paper_x, paper_y = 8, 9
 
 if (
         ((paper_x <= envelop_x) and (paper_y <= envelop_y))
-        | ((paper_y <= envelop_x) and (paper_x <= envelop_y))
+        or ((paper_y <= envelop_x) and (paper_x <= envelop_y))
 ):
     print('ДА')
 else:
     print('НЕТ')
-# TODO 1) Считается плохой практикой использовать бекслеши, хотя возможно это уже пофиксили, но раньше интерпретатор
+# 1) Считается плохой практикой использовать бекслеши, хотя возможно это уже пофиксили, но раньше интерпретатор
 #  "путался" в них. Поправил форматирование для того чтобы бекслеши исключить
 #  2) Операторы лучше использовать по назначению. Вы применили битовый оператор вместо логического, а это далеко не одно
 #  и тоже. Вот отличная статья со стека:
@@ -39,6 +39,8 @@ else:
 #       True
 # И это ещё не считая того, что логические операторы не будут считать всю конструкцию если сразу ясен результат,
 # а побитовые будут вычислять всё до упора
+# TODO Не задумывался раньше об этом. Считал, что |/or и &/and равноценны. Спасибо за ценную информацию.
+#  Также учёл и отметил для себя момент с бекслешами. Спасибо за объяснение причин такого к ним отношения :)
 
 # Для исключения дублирования кода вывода положительного ответа, объедините условия с помощью логического ИЛИ
 # Усложненное задание, решать по желанию.
@@ -69,12 +71,14 @@ brick_x, brick_y, brick_z = 9, 10, 8
 # (просто раскоментировать нужную строку и проверить свой код)
 
 # Решение "в лоб", перебором
-if ((brick_x <= hole_x) and (brick_y <= hole_y)) \
-        | ((brick_y <= hole_x) and (brick_x <= hole_y)) \
-        | ((brick_x <= hole_x) and (brick_z <= hole_y)) \
-        | ((brick_z <= hole_x) and (brick_x <= hole_y)) \
-        | ((brick_y <= hole_x) and (brick_z <= hole_y)) \
-        | ((brick_z <= hole_x) and (brick_y <= hole_y)):
+if (
+        ((brick_x <= hole_x) and (brick_y <= hole_y))
+        or ((brick_y <= hole_x) and (brick_x <= hole_y))
+        or ((brick_x <= hole_x) and (brick_z <= hole_y))
+        or ((brick_z <= hole_x) and (brick_x <= hole_y))
+        or ((brick_y <= hole_x) and (brick_z <= hole_y))
+        or ((brick_z <= hole_x) and (brick_y <= hole_y))
+):
     print('ДА')
 else:
     print('НЕТ')
@@ -95,8 +99,10 @@ else:
 # Like! But bitwise operators are not allowed here
 brick = [brick_x, brick_y, brick_z]
 brick.remove(max(brick))
-if ((brick[0] <= hole_x) and (brick[1] <= hole_y)) \
-        | ((brick[1] <= hole_x) and (brick[0] <= hole_y)):
+if (
+        ((brick[0] <= hole_x) and (brick[1] <= hole_y))
+        or ((brick[1] <= hole_x) and (brick[0] <= hole_y))
+):
     print('ДА')
 else:
     print('НЕТ')
