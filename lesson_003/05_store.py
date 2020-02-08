@@ -63,8 +63,4 @@ for product, product_code in goods.items():
         total_cost += record['price'] * record['quantity']
     print(f'{product} - {total_quantity} шт, стоимость {total_cost} руб')
 
-
-
-
-
-
+# зачет! Не забывайте про РЕР8 - в конце файла только одна пустая строка!

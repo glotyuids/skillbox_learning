@@ -56,14 +56,18 @@ def draw_brick_line(x, y, line_width, brick_width=100, brick_height=50):
         Height of brick
 
     """
-    # TODO Здесь к конечной точке (второй аргумент range) добавил ширину кирпича, чтобы был заполнен весь экран.
+    #  Здесь к конечной точке (второй аргумент range) добавил ширину кирпича, чтобы был заполнен весь экран.
     #  Если этого не сделать, то в смещённых по x строках не будет хватать одного кирпича. Можете проверить
+    # Согласен, у вас немного другая отрисовка кирпича, а когда их рисуют просто контуром, то эта "нехватка" не заметна
     for x in range(x, x + line_width + brick_width, brick_width):
         draw_brick(x, y, brick_width, brick_height)
 
 
 for y in range(0, simple_draw.resolution[1], BRICK_HEIGHT):
-    x = 0 if y % (BRICK_HEIGHT * 2) == 0 else -BRICK_WIDTH // 2
+    x = 0 if y % (BRICK_HEIGHT * 2) else -BRICK_WIDTH // 2
+    # Убрал сравнение с нулём, это избыточно, на практике так не делают
     draw_brick_line(x, y, simple_draw.resolution[0], BRICK_WIDTH, BRICK_HEIGHT)
 
 simple_draw.pause()
+
+# зачет!

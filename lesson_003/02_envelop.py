@@ -20,11 +20,25 @@ paper_x, paper_y = 8, 9
 # paper_x, paper_y = 9, 11
 # (просто раскоментировать нужную строку и проверить свой код)
 
-if ((paper_x <= envelop_x) and (paper_y <= envelop_y)) \
-        | ((paper_y <= envelop_x) and (paper_x <= envelop_y)):
+if (
+        ((paper_x <= envelop_x) and (paper_y <= envelop_y))
+        | ((paper_y <= envelop_x) and (paper_x <= envelop_y))
+):
     print('ДА')
 else:
     print('НЕТ')
+# TODO 1) Считается плохой практикой использовать бекслеши, хотя возможно это уже пофиксили, но раньше интерпретатор
+#  "путался" в них. Поправил форматирование для того чтобы бекслеши исключить
+#  2) Операторы лучше использовать по назначению. Вы применили битовый оператор вместо логического, а это далеко не одно
+#  и тоже. Вот отличная статья со стека:
+#  https://stackoverflow.com/questions/3845018/boolean-operators-vs-bitwise-operators
+#  Наиболее показательна эта часть:
+#       >>> 0 < 1 & 0 < 2
+#       False
+#       >>> 0 < 1 and 0 < 2
+#       True
+# И это ещё не считая того, что логические операторы не будут считать всю конструкцию если сразу ясен результат,
+# а побитовые будут вычислять всё до упора
 
 # Для исключения дублирования кода вывода положительного ответа, объедините условия с помощью логического ИЛИ
 # Усложненное задание, решать по желанию.
@@ -34,7 +48,7 @@ else:
 # Определить, пройдет ли кирпич через отверстие (грани кирпича параллельны сторонам отверстия)
 
 hole_x, hole_y = 8, 9
-brick_x, brick_y, brick_z = 11, 10, 2
+brick_x, brick_y, brick_z = 9, 10, 8
 # brick_x, brick_y, brick_z = 11, 2, 10
 # brick_x, brick_y, brick_z = 10, 11, 2
 # brick_x, brick_y, brick_z = 10, 2, 11
@@ -77,7 +91,8 @@ if (brick[0] <= hole[0]) and (brick[1] <= hole[1]):
 else:
     print('НЕТ')
 
-# TODO Таким образом? :)
+#  Таким образом? :)
+# Like! But bitwise operators are not allowed here
 brick = [brick_x, brick_y, brick_z]
 brick.remove(max(brick))
 if ((brick[0] <= hole_x) and (brick[1] <= hole_y)) \
