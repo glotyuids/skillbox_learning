@@ -88,13 +88,19 @@ def draw_hexagon(origin=None, angle=0, side_length=10):
     side_6.draw()
 
 
-sd.resolution = (1200, 600)
-common_origin = sd.get_point(300, 100)
+sd.resolution = (600, 600)
 
-draw_triangle(common_origin, 0, 200)
-draw_square(common_origin, 0, 200)
-draw_pentagon(common_origin, 0, 200)
-draw_hexagon(common_origin, 0, 200)
+triangle_origin = sd.get_point(50, 50)
+draw_triangle(origin=triangle_origin, angle=20, side_length=100)
+
+square_origin = sd.get_point(300, 50)
+draw_square(origin=square_origin, angle=0, side_length=100)
+
+pentagon_origin = sd.get_point(150, 300)
+draw_pentagon(origin=pentagon_origin, angle=45, side_length=100)
+
+hexagon_origin = sd.get_point(450, 300)
+draw_hexagon(origin=hexagon_origin, angle=74, side_length=100)
 
 # Часть 1-бис.
 # Попробуйте прикинуть обьем работы, если нужно будет внести изменения в этот код.
