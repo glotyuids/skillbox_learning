@@ -54,12 +54,28 @@ def draw_square(origin=None, angle=0, side_length=10):
     side_4.draw()
 
 
-sd.resolution = (1200, 600)
-triangle_origin = sd.get_point(100, 100)
-draw_triangle(triangle_origin, 0, 200)
+def draw_pentagon(origin=None, angle=0, side_length=10):
+    if not isinstance(origin, sd.Point):
+        print('Incorrect point')
+        return
+    side_1 = sd.get_vector(start_point=origin, angle=angle, length=side_length)
+    side_1.draw()
+    side_2 = sd.get_vector(start_point=side_1.end_point, angle=angle + 72, length=side_length)
+    side_2.draw()
+    side_3 = sd.get_vector(start_point=side_2.end_point, angle=angle + 144, length=side_length)
+    side_3.draw()
+    side_4 = sd.get_vector(start_point=side_3.end_point, angle=angle + 216, length=side_length)
+    side_4.draw()
+    side_5 = sd.get_vector(start_point=side_4.end_point, angle=angle + 288, length=side_length)
+    side_5.draw()
 
-square_origin = sd.get_point(450, 100)
-draw_square(square_origin, 0, 200)
+
+sd.resolution = (1200, 600)
+common_origin = sd.get_point(100, 100)
+
+draw_triangle(common_origin, 0, 200)
+draw_square(common_origin, 0, 200)
+draw_pentagon(common_origin, 0, 200)
 
 # Часть 1-бис.
 # Попробуйте прикинуть обьем работы, если нужно будет внести изменения в этот код.
