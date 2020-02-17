@@ -28,10 +28,15 @@ import simple_draw as sd
 
 
 def draw_branches(start_point, angle, length):
+    if length < 10:
+        return
     branch1 = sd.get_vector(start_point=start_point, angle=angle + 30, length=length)
     branch1.draw()
     branch2 = sd.get_vector(start_point=start_point, angle=angle - 30, length=length)
     branch2.draw()
+
+    draw_branches(start_point=branch1.end_point, angle=branch1.angle, length=length * .75)
+    draw_branches(start_point=branch2.end_point, angle=branch2.angle, length=length * .75)
 
 
 root_point = sd.get_point(300, 30)
