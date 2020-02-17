@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import simple_draw as sd
+import random
 
 # 1) Написать функцию draw_branches, которая должна рисовать две ветви дерева из начальной точки
 # Функция должна принимать параметры:
@@ -27,16 +28,26 @@ import simple_draw as sd
 # можно поиграть -шрифтами- цветами и углами отклонения
 
 
-def draw_branches(start_point, angle, length):
-    if length < 10:
+def draw_branches(start_point, angle, length, color=sd.COLOR_BLUE):
+    if length < random.randint(5, 10):
         return
-    branch1 = sd.get_vector(start_point=start_point, angle=angle + 30, length=length)
-    branch1.draw()
-    branch2 = sd.get_vector(start_point=start_point, angle=angle - 30, length=length)
-    branch2.draw()
+    angle_shift = random.uniform(0.6, 1.4)
+    branch1 = sd.get_vector(start_point=start_point, angle=angle + 30 * angle_shift, length=length)
+    branch1.draw(color)
+    angle_shift = random.uniform(0.6, 1.4)
+    branch2 = sd.get_vector(start_point=start_point, angle=angle - 30 * angle_shift, length=length)
+    branch2.draw(color)
 
-    draw_branches(start_point=branch1.end_point, angle=branch1.angle, length=length * .75)
-    draw_branches(start_point=branch2.end_point, angle=branch2.angle, length=length * .75)
+    next_color = []
+    for byte in color:
+        byte += random.randint(0, 25)
+        next_color.append(255 if byte > 255 else byte)
+    next_color = tuple(next_color)
+
+    next_length = length * .75 * random.uniform(0.8, 1.2)
+    draw_branches(start_point=branch1.end_point, angle=branch1.angle, length=next_length, color=next_color)
+    next_length = length * .75 * random.uniform(0.8, 1.2)
+    draw_branches(start_point=branch2.end_point, angle=branch2.angle, length=next_length, color=next_color)
 
 
 root_point = sd.get_point(300, 30)
