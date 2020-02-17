@@ -40,9 +40,26 @@ def draw_triangle(origin=None, angle=0, side_length=10):
     side_3.draw()
 
 
+def draw_square(origin=None, angle=0, side_length=10):
+    if not isinstance(origin, sd.Point):
+        print('Incorrect point')
+        return
+    side_1 = sd.get_vector(start_point=origin, angle=angle, length=side_length)
+    side_1.draw()
+    side_2 = sd.get_vector(start_point=side_1.end_point, angle=angle + 90, length=side_length)
+    side_2.draw()
+    side_3 = sd.get_vector(start_point=side_2.end_point, angle=angle + 180, length=side_length)
+    side_3.draw()
+    side_4 = sd.get_vector(start_point=side_3.end_point, angle=angle + 270, length=side_length)
+    side_4.draw()
+
+
 sd.resolution = (1200, 600)
 triangle_origin = sd.get_point(100, 100)
 draw_triangle(triangle_origin, 0, 200)
+
+square_origin = sd.get_point(450, 100)
+draw_square(square_origin, 0, 200)
 
 # Часть 1-бис.
 # Попробуйте прикинуть обьем работы, если нужно будет внести изменения в этот код.
