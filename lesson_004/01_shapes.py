@@ -70,12 +70,31 @@ def draw_pentagon(origin=None, angle=0, side_length=10):
     side_5.draw()
 
 
+def draw_hexagon(origin=None, angle=0, side_length=10):
+    if not isinstance(origin, sd.Point):
+        print('Incorrect point')
+        return
+    side_1 = sd.get_vector(start_point=origin, angle=angle, length=side_length)
+    side_1.draw()
+    side_2 = sd.get_vector(start_point=side_1.end_point, angle=angle + 60, length=side_length)
+    side_2.draw()
+    side_3 = sd.get_vector(start_point=side_2.end_point, angle=angle + 120, length=side_length)
+    side_3.draw()
+    side_4 = sd.get_vector(start_point=side_3.end_point, angle=angle + 180, length=side_length)
+    side_4.draw()
+    side_5 = sd.get_vector(start_point=side_4.end_point, angle=angle + 240, length=side_length)
+    side_5.draw()
+    side_6 = sd.get_vector(start_point=side_5.end_point, angle=angle + 300, length=side_length)
+    side_6.draw()
+
+
 sd.resolution = (1200, 600)
-common_origin = sd.get_point(100, 100)
+common_origin = sd.get_point(300, 100)
 
 draw_triangle(common_origin, 0, 200)
 draw_square(common_origin, 0, 200)
 draw_pentagon(common_origin, 0, 200)
+draw_hexagon(common_origin, 0, 200)
 
 # Часть 1-бис.
 # Попробуйте прикинуть обьем работы, если нужно будет внести изменения в этот код.
