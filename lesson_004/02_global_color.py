@@ -90,6 +90,14 @@ while not global_color:
     color_name_roots = ['красн', 'оранж', 'желт', 'жёлт', 'зелен', 'зелён', 'голуб', 'син', 'фиол', ]
     colors = [sd.COLOR_RED, sd.COLOR_ORANGE, sd.COLOR_YELLOW, sd.COLOR_YELLOW, sd.COLOR_GREEN,
               sd.COLOR_GREEN, sd.COLOR_CYAN, sd.COLOR_BLUE, sd.COLOR_PURPLE, ]
+    # TODO Это константы и они должны быть определены в начале модуля. Но ещё лучше, сделайте одну единственную
+    #  константу (список словарей) такого вида:
+    COLORS = [
+        {'name': 'Красный', 'code': sd.COLOR_RED},
+        {'name': 'Оранжевый', 'code': sd.COLOR_ORANGE},
+        ...
+    ]
+    # TODO Меню лучше сделайте цифровое (enumerate пригодится), "жестоко" заставлять пользователя писать цвета :)
     for root, color in zip(color_name_roots, colors):
         if root in user_answer:
             global_color = color

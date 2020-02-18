@@ -102,6 +102,8 @@ draw_pentagon(origin=pentagon_origin, angle=45, side_length=100)
 hexagon_origin = sd.get_point(450, 300)
 draw_hexagon(origin=hexagon_origin, angle=74, side_length=100)
 
+# зачет первой части
+
 # Часть 1-бис.
 # Попробуйте прикинуть обьем работы, если нужно будет внести изменения в этот код.
 # Скажем, связывать точки не линиями, а дугами. Или двойными линиями. Или рисовать круги в угловых точках. Или...

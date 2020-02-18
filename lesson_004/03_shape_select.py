@@ -99,6 +99,13 @@ while not polygon_sides_number:
     user_answer = input('Сколько сторон должно быть у фигуры: 3, 4, 5 или 6? > ')
 
     polygons = ['3', '4', '5', '6', ]
+    # TODO Оригинальное решение! Теперь реализуйте для тренировки такую структуру:
+    FIGURES = [
+        {'name': 'треугольник', 'function': draw_triangle},
+        ...
+    ]
+    # TODO Получайте выбранную пользователем функцию и вызывайте её с нужными параметрами (можно даже одинаковыми для
+    #  всех)
     if user_answer in polygons:
         polygon_sides_number = int(user_answer)
     else:
