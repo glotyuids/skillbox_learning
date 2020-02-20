@@ -28,79 +28,68 @@ import simple_draw as sd
 # Результат решения см lesson_004/results/exercise_01_shapes.jpg
 
 
-def draw_triangle(origin=None, angle=0, side_length=10):
-    if not isinstance(origin, sd.Point):
-        print('Incorrect point')
-        return
-    side_1 = sd.get_vector(start_point=origin, angle=angle, length=side_length)
-    side_1.draw()
-    side_2 = sd.get_vector(start_point=side_1.end_point, angle=angle + 120, length=side_length)
-    side_2.draw()
-    side_3 = sd.get_vector(start_point=side_2.end_point, angle=angle + 240, length=side_length)
-    side_3.draw()
+# def draw_triangle(origin=None, angle=0, side_length=10):
+#     if not isinstance(origin, sd.Point):
+#         print('Incorrect point')
+#         return
+#     side_1 = sd.get_vector(start_point=origin, angle=angle, length=side_length)
+#     side_1.draw()
+#     side_2 = sd.get_vector(start_point=side_1.end_point, angle=angle + 120, length=side_length)
+#     side_2.draw()
+#     side_3 = sd.get_vector(start_point=side_2.end_point, angle=angle + 240, length=side_length)
+#     side_3.draw()
 
 
-def draw_square(origin=None, angle=0, side_length=10):
-    if not isinstance(origin, sd.Point):
-        print('Incorrect point')
-        return
-    side_1 = sd.get_vector(start_point=origin, angle=angle, length=side_length)
-    side_1.draw()
-    side_2 = sd.get_vector(start_point=side_1.end_point, angle=angle + 90, length=side_length)
-    side_2.draw()
-    side_3 = sd.get_vector(start_point=side_2.end_point, angle=angle + 180, length=side_length)
-    side_3.draw()
-    side_4 = sd.get_vector(start_point=side_3.end_point, angle=angle + 270, length=side_length)
-    side_4.draw()
+# def draw_square(origin=None, angle=0, side_length=10):
+#     if not isinstance(origin, sd.Point):
+#         print('Incorrect point')
+#         return
+#     side_1 = sd.get_vector(start_point=origin, angle=angle, length=side_length)
+#     side_1.draw()
+#     side_2 = sd.get_vector(start_point=side_1.end_point, angle=angle + 90, length=side_length)
+#     side_2.draw()
+#     side_3 = sd.get_vector(start_point=side_2.end_point, angle=angle + 180, length=side_length)
+#     side_3.draw()
+#     side_4 = sd.get_vector(start_point=side_3.end_point, angle=angle + 270, length=side_length)
+#     side_4.draw()
 
 
-def draw_pentagon(origin=None, angle=0, side_length=10):
-    if not isinstance(origin, sd.Point):
-        print('Incorrect point')
-        return
-    side_1 = sd.get_vector(start_point=origin, angle=angle, length=side_length)
-    side_1.draw()
-    side_2 = sd.get_vector(start_point=side_1.end_point, angle=angle + 72, length=side_length)
-    side_2.draw()
-    side_3 = sd.get_vector(start_point=side_2.end_point, angle=angle + 144, length=side_length)
-    side_3.draw()
-    side_4 = sd.get_vector(start_point=side_3.end_point, angle=angle + 216, length=side_length)
-    side_4.draw()
-    side_5 = sd.get_vector(start_point=side_4.end_point, angle=angle + 288, length=side_length)
-    side_5.draw()
+# def draw_pentagon(origin=None, angle=0, side_length=10):
+#     if not isinstance(origin, sd.Point):
+#         print('Incorrect point')
+#         return
+#     side_1 = sd.get_vector(start_point=origin, angle=angle, length=side_length)
+#     side_1.draw()
+#     side_2 = sd.get_vector(start_point=side_1.end_point, angle=angle + 72, length=side_length)
+#     side_2.draw()
+#     side_3 = sd.get_vector(start_point=side_2.end_point, angle=angle + 144, length=side_length)
+#     side_3.draw()
+#     side_4 = sd.get_vector(start_point=side_3.end_point, angle=angle + 216, length=side_length)
+#     side_4.draw()
+#     side_5 = sd.get_vector(start_point=side_4.end_point, angle=angle + 288, length=side_length)
+#     side_5.draw()
 
 
-def draw_hexagon(origin=None, angle=0, side_length=10):
-    if not isinstance(origin, sd.Point):
-        print('Incorrect point')
-        return
-    side_1 = sd.get_vector(start_point=origin, angle=angle, length=side_length)
-    side_1.draw()
-    side_2 = sd.get_vector(start_point=side_1.end_point, angle=angle + 60, length=side_length)
-    side_2.draw()
-    side_3 = sd.get_vector(start_point=side_2.end_point, angle=angle + 120, length=side_length)
-    side_3.draw()
-    side_4 = sd.get_vector(start_point=side_3.end_point, angle=angle + 180, length=side_length)
-    side_4.draw()
-    side_5 = sd.get_vector(start_point=side_4.end_point, angle=angle + 240, length=side_length)
-    side_5.draw()
-    side_6 = sd.get_vector(start_point=side_5.end_point, angle=angle + 300, length=side_length)
-    side_6.draw()
+# def draw_hexagon(origin=None, angle=0, side_length=10):
+#     if not isinstance(origin, sd.Point):
+#         print('Incorrect point')
+#         return
+#     side_1 = sd.get_vector(start_point=origin, angle=angle, length=side_length)
+#     side_1.draw()
+#     side_2 = sd.get_vector(start_point=side_1.end_point, angle=angle + 60, length=side_length)
+#     side_2.draw()
+#     side_3 = sd.get_vector(start_point=side_2.end_point, angle=angle + 120, length=side_length)
+#     side_3.draw()
+#     side_4 = sd.get_vector(start_point=side_3.end_point, angle=angle + 180, length=side_length)
+#     side_4.draw()
+#     side_5 = sd.get_vector(start_point=side_4.end_point, angle=angle + 240, length=side_length)
+#     side_5.draw()
+#     side_6 = sd.get_vector(start_point=side_5.end_point, angle=angle + 300, length=side_length)
+#     side_6.draw()
 
 
 sd.resolution = (600, 600)
 
-triangle_origin = sd.get_point(50, 50)
-draw_triangle(origin=triangle_origin, angle=20, side_length=100)
-
-square_origin = sd.get_point(300, 50)
-draw_square(origin=square_origin, angle=0, side_length=100)
-
-pentagon_origin = sd.get_point(150, 300)
-draw_pentagon(origin=pentagon_origin, angle=45, side_length=100)
-
-hexagon_origin = sd.get_point(450, 300)
-draw_hexagon(origin=hexagon_origin, angle=74, side_length=100)
 
 # зачет первой части
 
@@ -114,7 +103,53 @@ draw_hexagon(origin=hexagon_origin, angle=74, side_length=100)
 # Надо сформировать функцию, параметризированную в местах где была "небольшая правка".
 # Это называется "Выделить общую часть алгоритма в отдельную функцию"
 # Потом надо изменить функции рисования конкретных фигур - вызывать общую функцию вместо "почти" одинакового кода.
-#
+
+
+def draw_polygon(origin=None, angle=0, side_length=10, sides_number=4):
+    if not isinstance(origin, sd.Point):
+        print('Incorrect point')
+        return
+    angle_step = 360 / sides_number
+    next_start_point = origin
+    next_angle = angle
+    for _ in range(sides_number - 1):
+        side = sd.get_vector(start_point=next_start_point, angle=next_angle, length=side_length)
+        side.draw()
+        next_start_point = side.end_point
+        next_angle += angle_step
+        print(next_angle)
+    sd.line(next_start_point, origin)       # небольшой хак для того, чтобы контур фигуры был замкнутым
+
+
+def draw_triangle(origin=None, angle=0, side_length=10):
+    draw_polygon(origin=origin, angle=angle, side_length=side_length, sides_number=3)
+
+
+def draw_square(origin=None, angle=0, side_length=10):
+    draw_polygon(origin=origin, angle=angle, side_length=side_length, sides_number=4)
+
+
+def draw_pentagon(origin=None, angle=0, side_length=10):
+    draw_polygon(origin=origin, angle=angle, side_length=side_length, sides_number=5)
+
+
+def draw_hexagon(origin=None, angle=0, side_length=10):
+    draw_polygon(origin=origin, angle=angle, side_length=side_length, sides_number=6)
+
+
+triangle_origin = sd.get_point(50, 50)
+draw_triangle(origin=triangle_origin, angle=20, side_length=100)
+
+square_origin = sd.get_point(300, 50)
+draw_square(origin=square_origin, angle=0, side_length=100)
+
+pentagon_origin = sd.get_point(150, 300)
+draw_pentagon(origin=pentagon_origin, angle=45, side_length=100)
+
+hexagon_origin = sd.get_point(450, 300)
+draw_hexagon(origin=hexagon_origin, angle=74, side_length=100)
+
+
 # В итоге должно получиться:
 #   - одна общая функция со множеством параметров,
 #   - все функции отрисовки треугольника/квадрата/етс берут 3 параметра и внутри себя ВЫЗЫВАЮТ общую функцию.
