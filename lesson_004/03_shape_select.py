@@ -85,36 +85,32 @@ while not global_color:
               'Подсказка:')
 
 # спрашиваем количество сторон
-polygon_sides_number = None
-while not polygon_sides_number:
+polygon_function = None
+while not polygon_function:
     user_answer = input('Сколько сторон должно быть у фигуры: 3, 4, 5 или 6? > ')
 
     polygons = ['3', '4', '5', '6', ]
     # TODO Оригинальное решение! Теперь реализуйте для тренировки такую структуру:
-    FIGURES = [
-        {'name': 'треугольник', 'function': draw_triangle},
-        ...
-    ]
-    # TODO Получайте выбранную пользователем функцию и вызывайте её с нужными параметрами (можно даже одинаковыми для
+    # FIGURES = [
+    #     {'name': 'треугольник', 'function': draw_triangle},
+    #     ...
+    # ]
+    # TODO Не совсем понимаю, зачем именно такую. Фактически достаточно списка.
+    #  Я правильно понял, здесь вы предлагаете разобраться, что функции - это тоже объекты с которыми можно работать?
+    FIGURES = [draw_triangle, draw_square, draw_pentagon, draw_hexagon, ]
+
+    # Получайте выбранную пользователем функцию и вызывайте её с нужными параметрами (можно даже одинаковыми для
     #  всех)
     if user_answer in polygons:
-        polygon_sides_number = int(user_answer)
+        polygon_function = FIGURES[int(user_answer) - 3]
+
     else:
         print('\nКажется, вы случайно ввели не тот номер. Попробуйте ещё раз.')
 
 sd.resolution = (600, 600)
 
-if polygon_sides_number == 3:
-    triangle_origin = sd.get_point(50, 50)
-    draw_triangle(origin=triangle_origin, angle=20, side_length=100, color=global_color)
-elif polygon_sides_number == 4:
-    square_origin = sd.get_point(300, 50)
-    draw_square(origin=square_origin, angle=0, side_length=100, color=global_color)
-elif polygon_sides_number == 5:
-    pentagon_origin = sd.get_point(150, 300)
-    draw_pentagon(origin=pentagon_origin, angle=45, side_length=100, color=global_color)
-elif polygon_sides_number == 6:
-    hexagon_origin = sd.get_point(450, 300)
-    draw_hexagon(origin=hexagon_origin, angle=74, side_length=100, color=global_color)
+polygon_origin = sd.get_point(100, 100)
+polygon_function(origin=polygon_origin, angle=20, side_length=100, color=global_color)
+
 
 sd.pause()
