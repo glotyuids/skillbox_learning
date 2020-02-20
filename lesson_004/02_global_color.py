@@ -27,7 +27,7 @@ COLORS = [
 ]
 
 
-def draw_polygon(origin=None, angle=0, side_length=10, sides_number=4):
+def draw_polygon(origin=None, angle=0, side_length=10, sides_number=4, color=sd.COLOR_YELLOW):
     if not isinstance(origin, sd.Point):
         print('Incorrect point')
         return
@@ -36,32 +36,31 @@ def draw_polygon(origin=None, angle=0, side_length=10, sides_number=4):
     next_angle = angle
     for _ in range(sides_number - 1):
         side = sd.get_vector(start_point=next_start_point, angle=next_angle, length=side_length)
-        side.draw()
+        side.draw(color=color)
         next_start_point = side.end_point
         next_angle += angle_step
-        print(next_angle)
-    sd.line(next_start_point, origin)       # небольшой хак для того, чтобы контур фигуры был замкнутым
+    sd.line(next_start_point, origin, color)       # небольшой хак для того, чтобы контур фигуры был замкнутым
 
 
-def draw_triangle(origin=None, angle=0, side_length=10):
-    draw_polygon(origin=origin, angle=angle, side_length=side_length, sides_number=3)
+def draw_triangle(origin=None, angle=0, side_length=10, color=sd.COLOR_YELLOW):
+    draw_polygon(origin=origin, angle=angle, side_length=side_length, sides_number=3, color=color)
 
 
-def draw_square(origin=None, angle=0, side_length=10):
-    draw_polygon(origin=origin, angle=angle, side_length=side_length, sides_number=4)
+def draw_square(origin=None, angle=0, side_length=10, color=sd.COLOR_YELLOW):
+    draw_polygon(origin=origin, angle=angle, side_length=side_length, sides_number=4, color=color)
 
 
-def draw_pentagon(origin=None, angle=0, side_length=10):
-    draw_polygon(origin=origin, angle=angle, side_length=side_length, sides_number=5)
+def draw_pentagon(origin=None, angle=0, side_length=10, color=sd.COLOR_YELLOW):
+    draw_polygon(origin=origin, angle=angle, side_length=side_length, sides_number=5, color=color)
 
 
-def draw_hexagon(origin=None, angle=0, side_length=10):
-    draw_polygon(origin=origin, angle=angle, side_length=side_length, sides_number=6)
+def draw_hexagon(origin=None, angle=0, side_length=10, color=sd.COLOR_YELLOW):
+    draw_polygon(origin=origin, angle=angle, side_length=side_length, sides_number=6, color=color)
 
 
 global_color = None
 while not global_color:
-    print('\n 0 - красный, \n'
+    print(' 0 - красный, \n'
           ' 1 - оранжевый, \n'
           ' 2 - жёлтый, \n'
           ' 3 - зелёный, \n'
@@ -72,14 +71,13 @@ while not global_color:
                         'которым вы хотите нарисовать фигуры > ')
     user_answer = user_answer.lower()
 
-    # узнаём цвет, который ввёл пользователь
-    # принцип: сопоставляем корень слова-названия цвета с константой цвета,
-    #   затем ищем корень в строке, которую ввёл пользователь и возвращаем соответствующий цвет
+    # Это константы и они должны быть определены в начале модуля. Но ещё лучше, сделайте одну единственную
+    #  константу (список словарей)
+    # TODO Сделано) Кстати, константы лучше выносить вверх,
+    #  или же оставлять недалеко от того места, где они используются?
 
-    # TODO Это константы и они должны быть определены в начале модуля. Но ещё лучше, сделайте одну единственную
-    #  константу (список словарей) такого вида:
-
-    # TODO Меню лучше сделайте цифровое (enumerate пригодится), "жестоко" заставлять пользователя писать цвета :)
+    # Меню лучше сделайте цифровое (enumerate пригодится), "жестоко" заставлять пользователя писать цвета :)
+    # TODO Реализовал оба варианта :)
 
     # если пользователь ввёл число, то просто дёргаем цвет по номеру из COLORS
     if user_answer.isnumeric():
@@ -88,21 +86,16 @@ while not global_color:
             global_color = COLORS[user_answer]['code']
 
     else:
+        # перебирая цвета ищем корень в строке, которую ввёл пользователь и возвращаем соответствующий цвет
         for color in COLORS:
             if color['name_root'] in user_answer:
                 global_color = color['code']
                 break
 
     if not global_color:
-        print('\nВы ввели некорректный цвет. Напишите на русском языке один из цветов радуги, либо введите его номер:\n'
-              'Подсказка: \n'
-              ' 0 - красный, \n'
-              ' 1 - оранжевый, \n'
-              ' 2 - жёлтый, \n'
-              ' 3 - зелёный, \n'
-              ' 4 - голубой, \n'
-              ' 5 - синий, \n'
-              ' 6 - фиолетовый')
+        print('\nВы ввели некорректный цвет. Напишите на русском языке один из цветов радуги, либо введите его номер.\n'
+              'Подсказка:')
+
 
 sd.resolution = (600, 600)
 triangle_origin = sd.get_point(50, 50)
