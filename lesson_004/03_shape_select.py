@@ -9,89 +9,80 @@ import simple_draw as sd
 # Код функций из упр lesson_004/02_global_color.py скопировать сюда
 # Результат решения см lesson_004/results/exercise_03_shape_select.jpg
 
-# TODO продолжаем мучиться с копипастом :D
+COLORS = [
+        {'name_root': 'красн', 'code': sd.COLOR_RED},
+        {'name_root': 'оранж', 'code': sd.COLOR_ORANGE},
+        {'name_root': 'желт', 'code': sd.COLOR_YELLOW},
+        {'name_root': 'зелен', 'code': sd.COLOR_GREEN},
+        {'name_root': 'голуб', 'code': sd.COLOR_CYAN},
+        {'name_root': 'син', 'code': sd.COLOR_BLUE},
+        {'name_root': 'фиол', 'code': sd.COLOR_PURPLE},
+        {'name_root': 'жёлт', 'code': sd.COLOR_YELLOW},
+        {'name_root': 'зелён', 'code': sd.COLOR_GREEN},
+]
+
+
+def draw_polygon(origin=None, angle=0, side_length=10, sides_number=4, color=sd.COLOR_YELLOW):
+    if not isinstance(origin, sd.Point):
+        print('Incorrect point')
+        return
+    angle_step = 360 / sides_number
+    next_start_point = origin
+    next_angle = angle
+    for _ in range(sides_number - 1):
+        side = sd.get_vector(start_point=next_start_point, angle=next_angle, length=side_length)
+        side.draw(color=color)
+        next_start_point = side.end_point
+        next_angle += angle_step
+    sd.line(next_start_point, origin, color)       # небольшой хак для того, чтобы контур фигуры был замкнутым
 
 
 def draw_triangle(origin=None, angle=0, side_length=10, color=sd.COLOR_YELLOW):
-    if not isinstance(origin, sd.Point):
-        print('Incorrect point')
-        return
-    side_1 = sd.get_vector(start_point=origin, angle=angle, length=side_length)
-    side_1.draw(color=color)
-    side_2 = sd.get_vector(start_point=side_1.end_point, angle=angle + 120, length=side_length)
-    side_2.draw(color=color)
-    side_3 = sd.get_vector(start_point=side_2.end_point, angle=angle + 240, length=side_length)
-    side_3.draw(color=color)
+    draw_polygon(origin=origin, angle=angle, side_length=side_length, sides_number=3, color=color)
 
 
 def draw_square(origin=None, angle=0, side_length=10, color=sd.COLOR_YELLOW):
-    if not isinstance(origin, sd.Point):
-        print('Incorrect point')
-        return
-    side_1 = sd.get_vector(start_point=origin, angle=angle, length=side_length)
-    side_1.draw(color=color)
-    side_2 = sd.get_vector(start_point=side_1.end_point, angle=angle + 90, length=side_length)
-    side_2.draw(color=color)
-    side_3 = sd.get_vector(start_point=side_2.end_point, angle=angle + 180, length=side_length)
-    side_3.draw(color=color)
-    side_4 = sd.get_vector(start_point=side_3.end_point, angle=angle + 270, length=side_length)
-    side_4.draw(color=color)
+    draw_polygon(origin=origin, angle=angle, side_length=side_length, sides_number=4, color=color)
 
 
 def draw_pentagon(origin=None, angle=0, side_length=10, color=sd.COLOR_YELLOW):
-    if not isinstance(origin, sd.Point):
-        print('Incorrect point')
-        return
-    side_1 = sd.get_vector(start_point=origin, angle=angle, length=side_length)
-    side_1.draw(color=color)
-    side_2 = sd.get_vector(start_point=side_1.end_point, angle=angle + 72, length=side_length)
-    side_2.draw(color=color)
-    side_3 = sd.get_vector(start_point=side_2.end_point, angle=angle + 144, length=side_length)
-    side_3.draw(color=color)
-    side_4 = sd.get_vector(start_point=side_3.end_point, angle=angle + 216, length=side_length)
-    side_4.draw(color=color)
-    side_5 = sd.get_vector(start_point=side_4.end_point, angle=angle + 288, length=side_length)
-    side_5.draw(color=color)
+    draw_polygon(origin=origin, angle=angle, side_length=side_length, sides_number=5, color=color)
 
 
 def draw_hexagon(origin=None, angle=0, side_length=10, color=sd.COLOR_YELLOW):
-    if not isinstance(origin, sd.Point):
-        print('Incorrect point')
-        return
-    side_1 = sd.get_vector(start_point=origin, angle=angle, length=side_length)
-    side_1.draw(color=color)
-    side_2 = sd.get_vector(start_point=side_1.end_point, angle=angle + 60, length=side_length)
-    side_2.draw(color=color)
-    side_3 = sd.get_vector(start_point=side_2.end_point, angle=angle + 120, length=side_length)
-    side_3.draw(color=color)
-    side_4 = sd.get_vector(start_point=side_3.end_point, angle=angle + 180, length=side_length)
-    side_4.draw(color=color)
-    side_5 = sd.get_vector(start_point=side_4.end_point, angle=angle + 240, length=side_length)
-    side_5.draw(color=color)
-    side_6 = sd.get_vector(start_point=side_5.end_point, angle=angle + 300, length=side_length)
-    side_6.draw(color=color)
+    draw_polygon(origin=origin, angle=angle, side_length=side_length, sides_number=6, color=color)
 
 
 # спрашиваем цвет
 global_color = None
 while not global_color:
-    user_answer = input('Назовите цвет радуги, которым вы хотите нарисовать фигуры? > ')
+    print(' 0 - красный, \n'
+          ' 1 - оранжевый, \n'
+          ' 2 - жёлтый, \n'
+          ' 3 - зелёный, \n'
+          ' 4 - голубой, \n'
+          ' 5 - синий, \n'
+          ' 6 - фиолетовый')
+    user_answer = input('Введите номер или назовите цвет радуги, '
+                        'которым вы хотите нарисовать фигуры > ')
     user_answer = user_answer.lower()
 
-    # узнаём цвет, который ввёл пользователь
-    # принцип: сопоставляем корень слова-названия цвета с константой цвета,
-    #   затем ищем корень в строке, которую ввёл пользователь и возвращаем соответствующий цвет
-    color_name_roots = ['красн', 'оранж', 'желт', 'жёлт', 'зелен', 'зелён', 'голуб', 'син', 'фиол', ]
-    colors = [sd.COLOR_RED, sd.COLOR_ORANGE, sd.COLOR_YELLOW, sd.COLOR_YELLOW, sd.COLOR_GREEN,
-              sd.COLOR_GREEN, sd.COLOR_CYAN, sd.COLOR_BLUE, sd.COLOR_PURPLE, ]
-    for root, color in zip(color_name_roots, colors):
-        if root in user_answer:
-            global_color = color
-            break
+    # если пользователь ввёл число, то просто дёргаем цвет по номеру из COLORS
+    if user_answer.isnumeric():
+        user_answer = int(user_answer)
+        if 0 <= user_answer <= 6:
+            global_color = COLORS[user_answer]['code']
+
+    else:
+        # перебирая цвета ищем корень в строке, которую ввёл пользователь и возвращаем соответствующий цвет
+        for color in COLORS:
+            if color['name_root'] in user_answer:
+                global_color = color['code']
+                break
 
     if not global_color:
-        print('\nВы ввели некорректный цвет. Напишите на русском языке один из цветов радуги:\n'
-              'Подсказка: красный, оранжевый, жёлтый, зелёный, голубой, синий, фиолетовый')
+        print('\nВы ввели некорректный цвет. Напишите на русском языке один из цветов радуги, либо введите его номер.\n'
+              'Подсказка:')
 
 # спрашиваем количество сторон
 polygon_sides_number = None
