@@ -117,7 +117,6 @@ def draw_polygon(origin=None, angle=0, side_length=10, sides_number=4):
         side.draw()
         next_start_point = side.end_point
         next_angle += angle_step
-        print(next_angle)
     sd.line(next_start_point, origin)       # небольшой хак для того, чтобы контур фигуры был замкнутым
 
 
