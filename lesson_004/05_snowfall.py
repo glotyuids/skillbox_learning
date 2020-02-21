@@ -21,8 +21,9 @@ N = 20
 
 
 def remap_range(value, in_min, in_max, out_min, out_max):
-    """Функция пропорционально переносит значение (value) из текущего диапазона значений (fromLow .. fromHigh)
-            в новый диапазон (toLow .. toHigh), заданный параметрами.
+    """Функция пропорционально переносит значение (value) из текущего диапазона значений (in_min .. in_max)
+            в новый диапазон (out_min .. out_max), заданный параметрами.
+            Конкретно здесь используется для создания эффекта параллакса
 
     """
     return (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
@@ -30,15 +31,17 @@ def remap_range(value, in_min, in_max, out_min, out_max):
 
 def generate_snowflake():
     sf_length = random.randint(MIN_LENGTH, MAX_LENGTH)
+    color_byte = round(remap_range(value=sf_length, in_min=MIN_LENGTH, in_max=MAX_LENGTH, out_min=64, out_max=255))
     return {
-            'x': random.randint(0, sd.resolution[0]),
+            'x': random.randint(-MAX_LENGTH * 2, sd.resolution[0]),
             'y': sd.resolution[1] + MAX_LENGTH,
             'length': sf_length,
             'factor_a': round(random.uniform(0.2, 1), 2),
             'factor_b': round(random.uniform(0.1, 1), 2),
             'factor_c': round(random.randint(20, 90), 2),
-            'h_speed': random.randint(0, 30),
-            'v_speed': round(remap_range(value=sf_length, in_min=MIN_LENGTH, in_max=MAX_LENGTH, out_min=2, out_max=60))
+            'h_speed': random.randint(0, 15),
+            'v_speed': round(remap_range(value=sf_length, in_min=MIN_LENGTH, in_max=MAX_LENGTH, out_min=2, out_max=30)),
+            'color': (color_byte, color_byte, color_byte)
         }
 
 
@@ -49,32 +52,48 @@ MIN_LENGTH = 10
 blizzard = []
 for _ in range(N):
     blizzard.append(generate_snowflake())
-# pprint(blizzard)
 
-# sd.resolution = (600, 1200)
-# while True:
-#     sd.clear_screen()
-#
-#     for snowflake in blizzard:
-#         point = sd.get_point(snowflake['x'], snowflake['y'])
-#         sd.snowflake(
-#             center=point,
-#             length=snowflake['length'],
-#             factor_a=snowflake['factor_a'],
-#             factor_b=snowflake['factor_b'],
-#             factor_c=snowflake['factor_c'],
-#         )
-#         snowflake['y'] -= snowflake['v_speed']
-#         if snowflake['y'] < snowflake['length']:
-#             blizzard
-#         x = x + 30
-#
-#
-#     sd.sleep(0.1)
-#     if sd.user_want_exit():
-#         break
-#
-# sd.pause()
+sd.resolution = (1200, 600)
+while True:
+    sd.start_drawing()
+
+    # проверяем положение снежинки. Если приземлилась, то удаляем её из списка и генерируем новую
+    for i, snowflake in enumerate(blizzard):
+        if snowflake['y'] < snowflake['length']:
+            del blizzard[i]
+            blizzard.append(generate_snowflake())
+            continue
+
+        # рисуем снежинку фоновым цветом, чтобы закрыть нарисованную в предыдущем шаге
+        point = sd.get_point(snowflake['x'], snowflake['y'])
+        sd.snowflake(
+            center=point,
+            length=snowflake['length'],
+            factor_a=snowflake['factor_a'],
+            factor_b=snowflake['factor_b'],
+            factor_c=snowflake['factor_c'],
+            color=sd.background_color
+        )
+
+        snowflake['h_speed'] = -snowflake['h_speed'] if random.randint(0, 100) < 2 else snowflake['h_speed']
+        snowflake['x'] += snowflake['h_speed']
+        snowflake['y'] -= snowflake['v_speed']
+        point = sd.get_point(snowflake['x'], snowflake['y'])
+        sd.snowflake(
+            center=point,
+            length=snowflake['length'],
+            factor_a=snowflake['factor_a'],
+            factor_b=snowflake['factor_b'],
+            factor_c=snowflake['factor_c'],
+            color=snowflake['color'],
+        )
+
+    sd.finish_drawing()
+    sd.sleep(0.042)
+    if sd.user_want_exit():
+        break
+
+sd.pause()
 
 # подсказка! для ускорения отрисовки можно
 #  - убрать clear_screen()
