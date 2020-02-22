@@ -32,15 +32,13 @@ def draw_polygon(origin=None, angle=0, side_length=10, sides_number=4, color=sd.
     if not isinstance(origin, sd.Point):
         print('Incorrect point')
         return
-    angle_step = 360 / sides_number
+    angle_step = round(360 / sides_number)
     next_start_point = origin
-    next_angle = angle
-    for _ in range(sides_number - 1):
-        side = sd.get_vector(start_point=next_start_point, angle=next_angle, length=side_length)
-        side.draw(color=color)
-        next_start_point = side.end_point
-        next_angle += angle_step
-    sd.line(next_start_point, origin, color)       # небольшой хак для того, чтобы контур фигуры был замкнутым
+
+    for next_angle in range(angle, 360 + angle - angle_step, angle_step):
+        next_start_point = sd.vector(start=next_start_point, angle=next_angle, length=side_length, color=color)
+
+    sd.line(next_start_point, origin, color=color)
 
 
 def draw_triangle(origin=None, angle=0, side_length=10, color=sd.COLOR_YELLOW):
