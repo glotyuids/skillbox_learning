@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from pprint import pprint
 
 import simple_draw as sd
 import random
@@ -11,6 +10,8 @@ import random
 # - создать список рандомных длинн лучей снежинок (от 10 до 100) и пусть все снежинки будут разные
 
 N = 20
+MAX_LENGTH = 40
+MIN_LENGTH = 5
 
 # Пригодятся функции
 # sd.get_point()
@@ -27,7 +28,8 @@ def remap_range(value, in_min, in_max, out_min, out_max):
 
     """
     return (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
-# TODO Вах! Тут челюсть моя немного отпала! :) Это очень оригинально и интересно!!
+# Вах! Тут челюсть моя немного отпала! :) Это очень оригинально и интересно!!
+# TODO Эта функция есть в стандартной библиотеке arduino. Очень удобная штука, которой в питоне мне очень не хватало)
 
 
 def generate_snowflake():
@@ -45,10 +47,6 @@ def generate_snowflake():
             'color': (color_byte, color_byte, color_byte)
         }
 
-
-MAX_LENGTH = 40
-MIN_LENGTH = 5
-# TODO Перенести в начало файла, там где N (позволил себе немного изменить параметры)
 
 # генерим первоначальный список снежинок
 blizzard = []
