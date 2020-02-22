@@ -51,6 +51,14 @@ def draw_hexagon(origin=None, angle=0, side_length=10, color=sd.COLOR_YELLOW):
     draw_polygon(origin=origin, angle=angle, side_length=side_length, sides_number=6, color=color)
 
 
+POLYGONS = [
+    {'name': 'треугольник', 'function': draw_triangle},
+    {'name': 'квадрат', 'function': draw_square},
+    {'name': 'пятиугольник', 'function': draw_pentagon},
+    {'name': 'шестиугольник', 'function': draw_hexagon},
+]
+
+
 # спрашиваем цвет
 global_color = None
 while not global_color:
@@ -63,7 +71,7 @@ while not global_color:
     # если пользователь ввёл число, то просто дёргаем цвет по номеру из COLORS
     if user_answer.isnumeric():
         user_answer = int(user_answer)
-        if 0 <= user_answer <= 6:
+        if 0 <= user_answer <= len(COLORS):
             global_color = COLORS[user_answer]['code']
 
     else:
@@ -79,26 +87,16 @@ while not global_color:
 
 # спрашиваем количество сторон
 polygon_function = None
+print()
 while not polygon_function:
-    user_answer = input('Сколько сторон должно быть у фигуры: 3, 4, 5 или 6? > ')
+    for number, polygon in enumerate(POLYGONS):
+        print(f' {number} - {polygon["name"]}')
+    user_answer = input('Какую фигуру вы хотите нарисовать? > ')
 
-    polygons = ['3', '4', '5', '6', ]
-    # TODO Оригинальное решение! Теперь реализуйте для тренировки такую структуру:
-    # FIGURES = [
-    #     {'name': 'треугольник', 'function': draw_triangle},
-    #     ...
-    # ]
-    #  Не совсем понимаю, зачем именно такую. Фактически достаточно списка.
-    #  Я правильно понял, здесь вы предлагаете разобраться, что функции - это тоже объекты с которыми можно работать?
-    # TODO Именно, что функции это данные, которые можно хранить, передавать и т.п. Не во всех языках это есть.
-    FIGURES = [draw_triangle, draw_square, draw_pentagon, draw_hexagon, ]
-    # TODO В таком виде, когда отдельно меню polygons и отдельно список функций, выходит, что при добавлении новой
-    #  фигуры это нужно делать согласовано в обоих константах, что не так удобно, когда структура данных одна
-
-    # Получайте выбранную пользователем функцию и вызывайте её с нужными параметрами (можно даже одинаковыми для
-    #  всех)
-    if user_answer in polygons:
-        polygon_function = FIGURES[int(user_answer) - 3]
+    if user_answer.isnumeric():
+        user_answer = int(user_answer)
+        if 0 <= user_answer <= len(POLYGONS):
+            polygon_function = POLYGONS[user_answer]['function']
 
     else:
         print('\nКажется, вы случайно ввели не тот номер. Попробуйте ещё раз.')
