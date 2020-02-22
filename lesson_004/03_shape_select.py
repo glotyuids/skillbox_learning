@@ -10,15 +10,13 @@ import simple_draw as sd
 # Результат решения см lesson_004/results/exercise_03_shape_select.jpg
 
 COLORS = [
-        {'name_root': 'красн', 'code': sd.COLOR_RED},
-        {'name_root': 'оранж', 'code': sd.COLOR_ORANGE},
-        {'name_root': 'желт', 'code': sd.COLOR_YELLOW},
-        {'name_root': 'зелен', 'code': sd.COLOR_GREEN},
-        {'name_root': 'голуб', 'code': sd.COLOR_CYAN},
-        {'name_root': 'син', 'code': sd.COLOR_BLUE},
-        {'name_root': 'фиол', 'code': sd.COLOR_PURPLE},
-        {'name_root': 'жёлт', 'code': sd.COLOR_YELLOW},
-        {'name_root': 'зелён', 'code': sd.COLOR_GREEN},
+        {'name': 'красный', 'name_root': 'красн', 'code': sd.COLOR_RED},
+        {'name': 'оранжевый', 'name_root': 'оранж', 'code': sd.COLOR_ORANGE},
+        {'name': 'жёлтый', 'name_root': 'желт', 'code': sd.COLOR_YELLOW},
+        {'name': 'зелёный', 'name_root': 'зелен', 'code': sd.COLOR_GREEN},
+        {'name': 'голубой', 'name_root': 'голуб', 'code': sd.COLOR_CYAN},
+        {'name': 'синий', 'name_root': 'син', 'code': sd.COLOR_BLUE},
+        {'name': 'фиолетовый', 'name_root': 'фиол', 'code': sd.COLOR_PURPLE},
 ]
 
 
@@ -56,16 +54,11 @@ def draw_hexagon(origin=None, angle=0, side_length=10, color=sd.COLOR_YELLOW):
 # спрашиваем цвет
 global_color = None
 while not global_color:
-    print(' 0 - красный, \n'
-          ' 1 - оранжевый, \n'
-          ' 2 - жёлтый, \n'
-          ' 3 - зелёный, \n'
-          ' 4 - голубой, \n'
-          ' 5 - синий, \n'
-          ' 6 - фиолетовый')
+    for number, color in enumerate(COLORS):
+        print(f' {number} - {color["name"]}')
     user_answer = input('Введите номер или назовите цвет радуги, '
                         'которым вы хотите нарисовать фигуры > ')
-    user_answer = user_answer.lower()
+    user_answer = user_answer.lower().replace('ё', 'е')
 
     # если пользователь ввёл число, то просто дёргаем цвет по номеру из COLORS
     if user_answer.isnumeric():
