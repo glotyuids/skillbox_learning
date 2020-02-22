@@ -109,16 +109,18 @@ def draw_polygon(origin=None, angle=0, side_length=10, sides_number=4):
     if not isinstance(origin, sd.Point):
         print('Incorrect point')
         return
-    angle_step = 360 / sides_number
+    angle_step = round(360 / sides_number)
     next_start_point = origin
-    next_angle = angle
-    for _ in range(sides_number - 1): # TOdO Хорошо, а теперь попробуйте "считать" текущий угол с помощью range, где
+    # конечный угол 360 + angle - angle_step, поскольку мне не нужно выводить последний вектор
+    for next_angle in range(angle, 360 + angle - angle_step, angle_step):
+        # Хорошо, а теперь попробуйте "считать" текущий угол с помощью range, где
         # укажите начальный угол, конечный и шаг угла
-        side = sd.get_vector(start_point=next_start_point, angle=next_angle, length=side_length)
-        side.draw()
-        next_start_point = side.end_point
-        # TODO Эти три строки выше можно заменить одной при использовании sd.vector (он возвращает end_point вектора)
-        next_angle += angle_step
+        # TODO Удобно, но мне кажется, что будет не совсем очевидно при чтении кода: при беглом чтении не сразу понятно,
+        #   что создание вектора одновременно и рисует его,
+        #   и возвращает не объект класса (кажется так это называется), а конечную его точку.
+        #   Само собой, это только мнение человека, который только учится и никогда не работал с кодом в продакшене :)
+        next_start_point = sd.vector(start=next_start_point, angle=next_angle, length=side_length)
+
     sd.line(next_start_point, origin)       # небольшой хак для того, чтобы контур фигуры был замкнутым
 
 
