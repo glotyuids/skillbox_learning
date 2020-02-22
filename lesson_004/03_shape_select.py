@@ -106,3 +106,5 @@ polygon_function(origin=polygon_origin, angle=20, side_length=100, color=global_
 
 
 sd.pause()
+
+# зачет!
