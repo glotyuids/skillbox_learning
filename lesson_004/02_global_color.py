@@ -83,7 +83,7 @@ while not global_color:
     # если пользователь ввёл число, то просто дёргаем цвет по номеру из COLORS
     if user_answer.isnumeric():
         user_answer = int(user_answer)
-        if 0 <= user_answer <= 6:
+        if 0 <= user_answer <= len(COLORS):
             global_color = COLORS[user_answer]['code']
 
     else:
