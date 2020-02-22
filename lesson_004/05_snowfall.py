@@ -27,6 +27,7 @@ def remap_range(value, in_min, in_max, out_min, out_max):
 
     """
     return (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+# TODO Вах! Тут челюсть моя немного отпала! :) Это очень оригинально и интересно!!
 
 
 def generate_snowflake():
@@ -45,8 +46,9 @@ def generate_snowflake():
         }
 
 
-MAX_LENGTH = 100
-MIN_LENGTH = 10
+MAX_LENGTH = 40
+MIN_LENGTH = 5
+# TODO Перенести в начало файла, там где N (позволил себе немного изменить параметры)
 
 # генерим первоначальный список снежинок
 blizzard = []

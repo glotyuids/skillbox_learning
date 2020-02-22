@@ -112,10 +112,12 @@ def draw_polygon(origin=None, angle=0, side_length=10, sides_number=4):
     angle_step = 360 / sides_number
     next_start_point = origin
     next_angle = angle
-    for _ in range(sides_number - 1):
+    for _ in range(sides_number - 1): # TOdO Хорошо, а теперь попробуйте "считать" текущий угол с помощью range, где
+        # укажите начальный угол, конечный и шаг угла
         side = sd.get_vector(start_point=next_start_point, angle=next_angle, length=side_length)
         side.draw()
         next_start_point = side.end_point
+        # TODO Эти три строки выше можно заменить одной при использовании sd.vector (он возвращает end_point вектора)
         next_angle += angle_step
     sd.line(next_start_point, origin)       # небольшой хак для того, чтобы контур фигуры был замкнутым
 
