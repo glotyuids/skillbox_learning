@@ -34,6 +34,8 @@ def remap_range(value, in_min, in_max, out_min, out_max):
 
 def generate_snowflake():
     sf_length = random.randint(MIN_LENGTH, MAX_LENGTH)
+    h_speed = round(remap_range(value=sf_length * random.uniform(0.7, 1),
+                                in_min=MIN_LENGTH, in_max=MAX_LENGTH, out_min=0, out_max=15))
     color_byte = round(remap_range(value=sf_length, in_min=MIN_LENGTH, in_max=MAX_LENGTH, out_min=64, out_max=255))
     return {
             'x': random.randint(-MAX_LENGTH * 2, sd.resolution[0]),
@@ -42,7 +44,7 @@ def generate_snowflake():
             'factor_a': round(random.uniform(0.2, 1), 2),
             'factor_b': round(random.uniform(0.1, 1), 2),
             'factor_c': round(random.randint(20, 90), 2),
-            'h_speed': random.randint(0, 15),
+            'h_speed': h_speed,
             'v_speed': round(remap_range(value=sf_length, in_min=MIN_LENGTH, in_max=MAX_LENGTH, out_min=2, out_max=30)),
             'color': (color_byte, color_byte, color_byte)
         }
