@@ -24,3 +24,15 @@ burger.add_cucumber()
 burger.add_sauce()
 burger.add_bun(top=True)
 
+print('\n\n')
+
+burger.add_beefsteak(my_burger=True)
+burger.add_sauce(my_burger=True)
+burger.add_cheese(my_burger=True)
+burger.add_cucumber(my_burger=True)
+burger.add_lettuce()
+burger.add_onion()
+burger.add_bun(my_burger=True)
+burger.pack()
+
+
