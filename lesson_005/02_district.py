@@ -26,8 +26,7 @@ district_rooms = [
 district_residents = []
 for room in district_rooms:
     district_residents.extend(room.folks)
-
+# Достаточно было импортировать всех folks явно (с псевдонимами) и просто сложить
 print('На районе живут', ', '.join(district_residents))
 
-
-
+# зачет!

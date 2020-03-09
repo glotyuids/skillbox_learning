@@ -23,6 +23,10 @@ import simple_draw as sd
 import cliparts.decorations as decorations
 import cliparts.particle_generator as pg
 
+# TODO Этот модуль должен состоять из вызовов функций импортированных из модулей отрисовки частей картины и главного
+#  цикла анимации. Все переменные необходимые для отрисовки частей картины должны находится в соответствующих модулях.
+#  Для инициализации переменных создайте функции init(). Статические части должны рисоваться вызовом функции draw(),
+#  анимированные - draw_step()
 
 pygame.init()
 sd.resolution = (1300, 900)
@@ -84,7 +88,7 @@ submarine = decorations.generate_submarine(200, 200, *sd.resolution, sprite.get_
 
 
 
-while True:
+while True:  # TODO Больше двух пустых строк не допускает РЕР8
     sd.start_drawing()
     sd.draw_background()
     # ----- рисуем радугу -----
