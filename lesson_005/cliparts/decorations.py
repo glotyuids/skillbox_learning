@@ -5,10 +5,10 @@ import simple_draw
 import random
 import pygame
 
-
+SPRITE_SCALE = 0.3
 BRICK_WIDTH = 100
 BRICK_HEIGHT = 50
-rainbow_colors = [simple_draw.COLOR_RED, simple_draw.COLOR_ORANGE, simple_draw.COLOR_YELLOW, simple_draw.COLOR_GREEN,
+RAINBOW_COLORS = [simple_draw.COLOR_RED, simple_draw.COLOR_ORANGE, simple_draw.COLOR_YELLOW, simple_draw.COLOR_GREEN,
                   simple_draw.COLOR_CYAN, simple_draw.COLOR_BLUE, simple_draw.COLOR_PURPLE]
 
 
@@ -135,8 +135,8 @@ def _draw_roof(center_x, y, width, height, color=simple_draw.COLOR_YELLOW):
     simple_draw.polygon(points, color=color, width=0)
 
 
-def draw_house(x=100, y=0, wall_width=500, wall_height=400,
-               roof_width=600, roof_height=200, brick_width=80, brick_height=40):
+def draw_house(x=100, y=0, wall_width=370, wall_height=350,
+               roof_width=450, roof_height=100, brick_width=60, brick_height=30):
     """Рисует кирпичный дом с окном и дымоходом
 
     Parameters
@@ -144,21 +144,20 @@ def draw_house(x=100, y=0, wall_width=500, wall_height=400,
     x, y: int, default=100, 0
         Координаты левого нижнего угла стены. Обратите внимание, что левый скат крыши может заходить левее
 
-    wall_width, wall_height: int, default=500, 400
+    wall_width, wall_height: int, default=370, 350
         Ширина и высота стены. Обратите внимание, что стена будет выше и шире указанных параметров,
         поскольку должна быть кратной размерам кирпичей
 
-    roof_width, roof_height: int, default=600, 200
+    roof_width, roof_height: int, default=450, 100
         Ширина и высота крыши
 
-    brick_width, brick_height: int, default=80, 40
+    brick_width, brick_height: int, default=60, 30
         Ширина и высота кирпича
 
     Returns
     -------
     Возвращает кортеж из двух координат середины верхней части дымохода
     """
-
     last_brick_y = draw_wall(
         x, y,
         wall_width=wall_width, wall_height=wall_height,
@@ -169,7 +168,7 @@ def draw_house(x=100, y=0, wall_width=500, wall_height=400,
     window_height = 6 * brick_height
     draw_brick(
         x=x + (wall_width // brick_width + 1) * brick_width // 2 - window_width // 2,
-        y= (last_brick_y - y + brick_height) // 2 - window_height // 2,
+        y=(last_brick_y - y + brick_height) // 2 - window_height // 2,
         width=window_width,
         height=window_height,
         color=simple_draw.COLOR_BLUE,
@@ -239,7 +238,7 @@ def _draw_branches(start_point, angle, length, color=simple_draw.COLOR_BLUE):
     _draw_branches(start_point=branch2.end_point, angle=branch2.angle, length=next_length, color=next_color)
 
 
-def draw_tree(x=0, trunk_length=100, init_branch_length=100, color=simple_draw.COLOR_BLUE):
+def draw_tree(x=650, trunk_length=150, init_branch_length=100, color=simple_draw.COLOR_BLUE):
     """Рекурсивно риует дерево: ствол и рандомизованные ветви
 
     Parameters
@@ -268,19 +267,19 @@ def draw_tree(x=0, trunk_length=100, init_branch_length=100, color=simple_draw.C
     _draw_branches(start_point=init_branches_point, angle=90, length=init_branch_length, color=color)
 
 
-def draw_smile(x, y, color=simple_draw.COLOR_YELLOW, scale=1):
+def draw_smile(x=270, y=100, color=simple_draw.COLOR_YELLOW, scale=5):
     """Рисует смайл хоттабыча в соответствии с параметрами
 
     Parameters
     ----------
-    x, y: int
+    x, y: int, default=270, 100
         Координаты правого нижнего угла смайла
 
     color: tuple(int, int, int), default=(255, 255, 0)
         Цвет смайла. Это кортеж (red, green, blue),
         где для каждый из трёх элементов цвета принимает значения от 0 до 255 включительно
 
-    scale: int, default=1
+    scale: int, default=5
         Масштаб (размер пикселя) смайла
 
     """
@@ -514,15 +513,15 @@ def _draw_vertical_rectangle(x, y_top, y_bottom, color=simple_draw.COLOR_YELLOW,
 def _draw_beard(x, y, scale=1):
     """Рисует бороду смайла
 
-        Parameters
-        ----------
-        x, y: int
-            Координаты правого нижнего угла бороды
+    Parameters
+    ----------
+    x, y: int
+        Координаты правого нижнего угла бороды
 
-        scale: int, default=1
-            Масштаб (размер пикселя) смайла
+    scale: int, default=1
+        Масштаб (размер пикселя) смайла
 
-        """
+    """
     beard = [5, 7, 8, 12, 16, 15, 18, 20, 19, 17, 14, 13, 10, 8, 7, 4]
     hair_y_top = y + 20 * scale
     for i, hair in enumerate(beard):
@@ -569,6 +568,30 @@ def draw_rainbow(colors, center_x=0, center_y=-700):
         radius += line_width
 
 
+def draw_rainbow_step(step):
+    colors_shift = -step // 4 % 7
+    draw_rainbow(colors=shift_list(RAINBOW_COLORS, colors_shift), center_x=150, center_y=-250)
+
+
+def init_sun():
+    """Инициализирует параметры солнца
+
+    Returns
+    -------
+    Словарь с параметрами солнца (см. описание draw_sun) и направлением изменения размера
+    """
+    # инициализируем параметры для анимирования солнца
+    return {
+        'center_x': 200,
+        'center_y': 700,
+        'angle': 0,
+        'radius': 160,
+        'core_radius': 50,
+        'size_direction': 1,
+        'ray_gap': 10
+    }
+
+
 def draw_sun(center_x=0, center_y=0, angle=0, ray_length=100, core_radius=50, ray_gap=10, ray_count=8, ray_width=3):
     """Рисует солнце в соответствии с параметрами
 
@@ -604,7 +627,32 @@ def draw_sun(center_x=0, center_y=0, angle=0, ray_length=100, core_radius=50, ra
     simple_draw.circle(origin, core_radius, width=0)
 
 
-def set_new_destination(submarine, h_resolution, v_resolution, image_width, image_height):
+def draw_sun_step(sun):
+    """Отрисовывает солнце и изменяет его параметры для анимирования
+
+    Parameters
+    ----------
+    sun: dict
+        Словарь параметров солнца, см. init_sun
+
+    """
+    draw_sun(
+        center_x=sun['center_x'], center_y=sun['center_y'],
+        angle=sun['angle'], core_radius=sun['core_radius'],
+        ray_length=sun['radius'] - sun['core_radius'] - sun['ray_gap'])
+    sun['angle'] = (sun['angle'] - 2) % 360
+    if sun['core_radius'] >= 100:
+        sun['size_direction'] = -1
+    elif sun['core_radius'] <= 50:
+        sun['size_direction'] = 1
+    sun['core_radius'] += 2 * sun['size_direction']
+
+
+def get_sprite_dimensions(sprite):
+    return sprite.get_width(), sprite.get_height()
+
+
+def set_new_destination(submarine, h_resolution, v_resolution):
     """Задаёт новую точку назначения субмарины и пересчитывает вертикальную и горизонтальную скорости
 
     Parameters
@@ -615,13 +663,10 @@ def set_new_destination(submarine, h_resolution, v_resolution, image_width, imag
     h_resolution, v_resolution: int
         Горизонтальный и вертикальный размер окна. Нужны для того, чтобы спрайт не убежал за край экрана
 
-    image_width, image_height: int
-        Горизонтальный и вертикальный размер спрайта. Нужны для того, чтобы спрайт не убежал за край экрана
-
     """
     # создаём новую точку назначения
-    submarine['destination_x'] = random.randint(0, h_resolution - image_width)
-    submarine['destination_y'] = random.randint(0, v_resolution - image_height)
+    submarine['destination_x'] = random.randint(0, h_resolution - submarine['width'])
+    submarine['destination_y'] = random.randint(0, v_resolution - submarine['height'])
 
     # находим путь - гипотенузу треугольника
     path = ((submarine['x'] - submarine['destination_x']) ** 2 +
@@ -635,26 +680,29 @@ def set_new_destination(submarine, h_resolution, v_resolution, image_width, imag
     submarine['v_speed'] = -(submarine['y'] - submarine['destination_y']) / steps
 
 
-def generate_submarine(x, y, h_resolution, v_resolution, image_width, image_height):
+def init_submarine(screen, sprite, x=200, y=200):
     """Создаёт рандомизированную субмарину
 
     Parameters
     ----------
-    x, y: int
-            Координаты правого нижнего угла спрайта
+    x, y: int, default=200, 200
+        Координаты правого нижнего угла спрайта
 
-    h_resolution, v_resolution: int
-        Горизонтальный и вертикальный размер окна. Нужны для того, чтобы спрайт не убежал за край экрана
+    sprite: pygame.image
+        Спрайт, размеры которого (после скейлинга) будут записаны в параметры субмарины
 
-    image_width, image_height: int
-        Горизонтальный и вертикальный размер спрайта. Нужны для того, чтобы спрайт не убежал за край экрана
+    screen: pygame.display
+        Экран pygame для вычисления первой точки назначения
 
     Returns
     -------
     Словарь параметров субмарины
     """
-    submarine = {'x': x, 'y': y, 'speed': 10}
-    set_new_destination(submarine, h_resolution, v_resolution, image_width, image_height)
+    scaled_sprite = scale_sprite(sprite, SPRITE_SCALE)
+
+    submarine = {'x': x, 'y': y, 'speed': 10,
+                 'height': get_sprite_dimensions(scaled_sprite)[1], 'width': get_sprite_dimensions(scaled_sprite)[0]}
+    set_new_destination(submarine, screen.get_width(), screen.get_height())
     return submarine
 
 
@@ -704,6 +752,19 @@ def draw_sprite(screen, sprite, x, y, h_speed=1):
     )
 
 
+def draw_sprite_step(reference_sprite, submarine, screen):
+    sprite = scale_sprite(reference_sprite, SPRITE_SCALE)
+    draw_sprite(screen=screen, sprite=sprite, x=submarine['x'], y=submarine['y'], h_speed=submarine['h_speed'])
+
+    submarine['x'] += submarine['h_speed']
+    submarine['y'] += submarine['v_speed']
+    submarine['width'], submarine['height'] = get_sprite_dimensions(sprite)
+
+    # проверяем достижение нужной точки
+    if abs(submarine['x'] - submarine['destination_x']) < abs(submarine['h_speed']):
+        set_new_destination(submarine, *screen.get_size())
+
+
 if __name__ == "__main__":
     simple_draw.resolution = (1300, 900)
     simple_draw.start_drawing()
@@ -715,3 +776,18 @@ if __name__ == "__main__":
     simple_draw.pause()
 
 
+def draw_intro(screen, image):
+    """Выводит интро с заданной картинкой
+
+    Parameters
+    ----------
+    image: pygame.image
+
+    screen: pygame.display
+    """
+    intro_sprite = pygame.image.load(image)
+    simple_draw.start_drawing()
+    draw_sprite(screen=screen, sprite=intro_sprite,
+                x=screen.get_size()[0] // 2 - intro_sprite.get_width() // 2,
+                y=screen.get_size()[1] // 2 - intro_sprite.get_height() // 2)
+    simple_draw.finish_drawing()

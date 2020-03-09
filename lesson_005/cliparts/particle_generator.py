@@ -6,6 +6,8 @@ import random
 SNOWFLAKE_MAX_LENGTH = 40
 SNOWFLAKE_MIN_LENGTH = 5
 
+HOUSE_SMOKE_SCALE = 1.5
+
 
 def remap_range(value, in_min, in_max, out_min, out_max):
     """Функция пропорционально переносит значение (value) из текущего диапазона значений (in_min .. in_max)
@@ -40,6 +42,12 @@ def generate_snowflake():
                                      in_max=SNOWFLAKE_MAX_LENGTH, out_min=2, out_max=30)),
         'color': (color_byte, color_byte, color_byte)
     }
+
+
+def init_smoke(smoke_origin):
+    # немного смещаем вверх точку генерации дыма, чтобы было красивее
+    smoke_origin = (smoke_origin[0], smoke_origin[1] + 30)
+    return [generate_cloud(*smoke_origin, scale=HOUSE_SMOKE_SCALE), ]
 
 
 def generate_cloud(x, y, scale=1):
@@ -111,6 +119,13 @@ def draw_cloud(x, y, radii=[15, 10, 8], factor_a=5, factor_b=5, factor_c=5, fact
         circle_y += factor_d
 
 
+def blizzard_init():
+    blizzard = []
+    for _ in range(20):
+        blizzard.append(generate_snowflake())
+    return blizzard
+
+
 def draw_smoke(smoke):
     """Отрисовка дыма и изменение координат облачков в соответствии с параметрами
 
@@ -134,6 +149,20 @@ def draw_smoke(smoke):
         cloud['h_speed'] = -cloud['h_speed'] if random.randint(0, 100) < 2 else cloud['h_speed']
         cloud['x'] += int(cloud['h_speed'])
         cloud['y'] += int(cloud['v_speed'])
+
+    return smoke
+
+
+def draw_smoke_step(smoke, smoke_origin, submarine, step):
+    smoke = draw_smoke(smoke)
+
+    for i, cloud in enumerate(smoke):
+        if cloud['y'] > sd.resolution[1] + max(cloud['radii']) * 2:
+            del smoke[i]
+
+    if (step + 2) % 4 == 0:
+        smoke.append(generate_cloud(*smoke_origin, scale=HOUSE_SMOKE_SCALE))
+        smoke.append(generate_cloud(submarine['x'] + submarine['width'] // 2, submarine['y'] + submarine['height']))
 
     return smoke
 
@@ -165,6 +194,17 @@ def draw_blizzard(blizzard):
         snowflake['y'] -= snowflake['v_speed']
 
     return blizzard
+
+
+def draw_blizzard_step(blizzard):
+    blizzard = draw_blizzard(blizzard)
+
+    for i, snowflake in enumerate(blizzard):
+        if snowflake['y'] < 0 - snowflake['length']:
+            del blizzard[i]
+            blizzard.append(generate_snowflake())
+    return blizzard
+
 
 # тестовая демка
 if __name__ == "__main__":
