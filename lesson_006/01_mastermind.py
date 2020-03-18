@@ -43,4 +43,40 @@
 # Это пример применения SOLID принципа (см https://goo.gl/GFMoaI) в архитектуре программ.
 # Точнее, в этом случае важен принцип единственной ответственности - https://goo.gl/rYb3hT
 
-# TODO здесь ваш код...
+import mastermind_engine as mme
+
+
+def select_word_form(number, zero_form, one_form, two_form):
+    if number % 10 == 1 and number % 100 != 11:
+        return one_form
+
+    if number % 10 in [2, 3, 4] and number % 100 not in [12, 13, 14]:
+        return two_form
+
+    return zero_form
+
+
+while True:
+    mme.generate_number()
+    attempts = 1
+    while True:
+        print(f'\nПопытка номер {attempts}')
+        user_input = input('Введите ваш вариант числа или "выход", если хотите завершить игру: ')
+        if user_input.lower() == 'выход':
+            print('Жаль, что уходите. Возвращайтесь ещё!')
+            exit()
+
+        check_result = mme.check_number(user_input)
+        if check_result['bulls'] < 4:
+            print(f'{check_result["bulls"]} {select_word_form(check_result["bulls"], "быков", "бык", "быка")} '
+                  f'и {check_result["cows"]} {select_word_form(check_result["cows"], "коров", "корова", "коровы")}')
+            attempts += 1
+        else:
+            break
+    print(f'Ура! Вы угадали число за {attempts} {select_word_form(attempts, "попыток", "попытку", "попытки")}.')
+    user_want_to_play = input('Хотите сыграть ещё раз? 1 - да, 0 - нет: ')
+    if not int(user_want_to_play):
+        print('Спасибо за игру!')
+        exit()
+
+
