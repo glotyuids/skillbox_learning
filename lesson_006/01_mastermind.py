@@ -55,6 +55,12 @@ def select_word_form(number, zero_form, one_form, two_form):
 
     return zero_form
 
+# TODO Создайте функцию "проверка_ввода" для валидации ответа игрока, где проверяйте:
+#  1) ответ состоит из цифр
+#  2) цифр 4 шт.
+#  3) цифры разные
+#  4) число не начинается с нуля
+
 
 while True:
     mme.generate_number()

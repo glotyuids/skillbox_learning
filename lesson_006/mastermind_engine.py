@@ -7,6 +7,7 @@ _target_number = ''
 def generate_number():
     global _target_number
     _target_number = ''.join(random.sample(set('0123456789'), 4))
+    # TOdO Не обеспечивается правило "первой цифрой не может быть ноль"
 
 
 def check_number(user_number):
@@ -18,4 +19,4 @@ def check_number(user_number):
         if user_char in _target_number:
             cows += 1
     cows = cows - bulls
-    return {'bulls': bulls, 'cows': cows}
+    return {'bulls': bulls, 'cows': cows}  # TODO РЕР8 в конце файла должна быть ровно одна пустая строка
