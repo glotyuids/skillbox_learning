@@ -55,11 +55,12 @@ def select_word_form(number, zero_form, one_form, two_form):
 
     return zero_form
 
-# TODO Создайте функцию "проверка_ввода" для валидации ответа игрока, где проверяйте:
+#  Создайте функцию "проверка_ввода" для валидации ответа игрока, где проверяйте:
 #  1) ответ состоит из цифр
 #  2) цифр 4 шт.
 #  3) цифры разные
 #  4) число не начинается с нуля
+# TODO Готово. Докинул функцию в движок
 
 
 while True:
@@ -67,7 +68,11 @@ while True:
     attempts = 1
     while True:
         print(f'\nПопытка номер {attempts}')
+
         user_input = input('Введите ваш вариант числа или "выход", если хотите завершить игру: ')
+        while not mme.input_is_valid(user_input) and user_input.lower() != 'выход':
+            user_input = input('Вы где-то ошиблись с вводом числа. Попробуйте ещё раз: ')
+
         if user_input.lower() == 'выход':
             print('Жаль, что уходите. Возвращайтесь ещё!')
             exit()
@@ -84,5 +89,3 @@ while True:
     if not int(user_want_to_play):
         print('Спасибо за игру!')
         exit()
-
-
