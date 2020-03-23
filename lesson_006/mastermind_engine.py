@@ -9,7 +9,7 @@ def generate_number():
     _target_number = str(random.randint(1, 9))
     _target_number += ''.join(random.sample(set('0123456789') - set(_target_number), 3))
     # Не обеспечивается правило "первой цифрой не может быть ноль"
-    # TODO Поправил
+    #  Поправил
 
 
 def input_is_valid(number_str):

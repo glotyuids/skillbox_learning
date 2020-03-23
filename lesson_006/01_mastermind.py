@@ -60,7 +60,7 @@ def select_word_form(number, zero_form, one_form, two_form):
 #  2) цифр 4 шт.
 #  3) цифры разные
 #  4) число не начинается с нуля
-# TODO Готово. Докинул функцию в движок
+#  Готово. Докинул функцию в движок
 
 
 while True:
@@ -89,3 +89,5 @@ while True:
     if not int(user_want_to_play):
         print('Спасибо за игру!')
         exit()
+
+# зачет!
