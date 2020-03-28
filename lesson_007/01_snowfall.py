@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import random
 
 import simple_draw as sd
 
@@ -9,9 +10,60 @@ import simple_draw as sd
 
 
 class Snowflake:
-    pass
+    max_length = 40
+    min_length = 5
 
-    # TODO здесь ваш код
+    def __init__(self):
+        def remap_range(value, in_min, in_max, out_min, out_max):
+            """Функция пропорционально переносит значение (value) из текущего диапазона значений (in_min .. in_max)
+                    в новый диапазон (out_min .. out_max), заданный параметрами.
+                    Конкретно здесь используется для создания эффекта параллакса
+
+            """
+            return (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+
+        self.x = random.randint(-self.max_length * 2, sd.resolution[0])
+        self.y = sd.resolution[1] + self.max_length
+        self.length = random.randint(self.min_length, self.max_length)
+        self.factor_a = round(random.uniform(0.2, 1), 2)
+        self.factor_b = round(random.uniform(0.1, 1), 2)
+        self.factor_c = round(random.randint(20, 90), 2)
+        self.h_speed = round(remap_range(value=self.length * random.uniform(0.7, 1),
+                                         in_min=self.min_length, in_max=self.max_length, out_min=0, out_max=15))
+        self.v_speed = round(remap_range(value=self.length, in_min=self.min_length,
+                                         in_max=self.max_length, out_min=2, out_max=30))
+        color_byte = round(remap_range(value=self.length, in_min=self.min_length,
+                                       in_max=self.max_length, out_min=64, out_max=255))
+        self.color = (color_byte, color_byte, color_byte)
+
+    def move(self):
+        self.h_speed = -self.h_speed if random.randint(0, 100) < 2 else self.h_speed
+        self.x += self.h_speed
+        self.y -= self.v_speed
+
+    def draw(self, color=None):
+        if color is None:
+            color = self.color
+
+        sd.start_drawing()
+        point = sd.get_point(self.x, self.y)
+        sd.snowflake(
+            center=point,
+            length=self.length,
+            factor_a=self.factor_a,
+            factor_b=self.factor_b,
+            factor_c=self.factor_c,
+            color=color,
+        )
+        sd.finish_drawing()
+
+    def can_fall(self):
+        return ((self.y >= -self.length * 2) and
+                (self.x >= -self.length * 2) and
+                (self.x <= sd.resolution[0] + self.length * 2))
+
+    def clear_previous_picture(self):
+        self.draw(color=sd.background_color)
 
 
 flake = Snowflake()
