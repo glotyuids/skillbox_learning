@@ -19,8 +19,93 @@
 #   print(Water(), '+', Air(), '=', Water() + Air())
 #   print(Fire(), '+', Air(), '=', Fire() + Air())
 
-# TODO здесь ваш код
 
+class Water:
+
+    def __str__(self):
+        return 'Вода'
+
+    def __add__(self, other):
+        elements = [Water, Air, Fire, Earth]
+        results = [Water, Storm, Steam, Mud]
+        for i, element in enumerate(elements):
+            if isinstance(other, element):
+                return results[i]()
+        return None
+
+
+class Air:
+    def __str__(self):
+        return 'Воздух'
+
+    def __add__(self, other):
+        elements = [Water, Air, Fire, Earth]
+        results = [Storm, Air, Lighting, Dust]
+        for i, element in enumerate(elements):
+            if isinstance(other, element):
+                return results[i]()
+        return None
+
+
+class Fire:
+    def __str__(self):
+        return 'Огонь'
+
+    def __add__(self, other):
+        elements = [Water, Air, Fire, Earth]
+        results = [Steam, Lighting, Fire, Lava]
+        for i, element in enumerate(elements):
+            if isinstance(other, element):
+                return results[i]()
+        return None
+
+
+class Earth:
+    def __str__(self):
+        return 'Земля'
+
+    def __add__(self, other):
+        elements = [Water, Air, Fire, Earth]
+        results = [Mud, Dust, Lava, Earth]
+        for i, element in enumerate(elements):
+            if isinstance(other, element):
+                return results[i]()
+        return None
+
+
+class Storm:
+    def __str__(self):
+        return 'Шторм'
+
+
+class Steam:
+    def __str__(self):
+        return 'Пар'
+
+
+class Mud:
+    def __str__(self):
+        return 'Грязь'
+
+
+class Lighting:
+    def __str__(self):
+        return 'Молния'
+
+
+class Dust:
+    def __str__(self):
+        return 'Пыль'
+
+
+class Lava:
+    def __str__(self):
+        return 'Лава'
+
+
+print(Water(), '+', Air(), '=', Water() + Air())
+print(Fire(), '+', Air(), '=', Fire() + Air())
+print(Earth(), '+', Air(), '=', Earth() + Air())
 # Усложненное задание (делать по желанию)
 # Добавить еще элемент в игру.
 # Придумать что будет при сложении существующих элементов с новым.
