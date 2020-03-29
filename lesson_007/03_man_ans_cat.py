@@ -63,6 +63,8 @@ class Man:
             self.house.food += 50
         else:
             cprint('{} денег на еду нет!'.format(self.name), color='red')
+            # TODO Люди не умирали от голода, поскольку во время голода сытость не изменялась. Исправил
+            self.fullness -= 10
 
     def buy_cat_food(self):
         if self.house.money >= 50:
@@ -83,6 +85,9 @@ class Man:
         cprint('{} Вьехал в дом'.format(self.name), color='cyan')
 
     def take_cat_from_animal_shelter(self):
+        # TODO Изначально сытость уменьшалась на 10, но тогда на 4 коте человек умирал.
+        #  Поэтому предположим, что приют находится прямо напротив дома
+        self.fullness -= 0
         cat_names = ['Феликс', 'Том', 'Сильвестр', 'Гарфилд', 'в сапогах',
                      'Чешир', 'Артемис', 'Мяут', 'Котобус', 'Мистер Кэт']
         cprint('{} Взял кота из приюта'.format(self.name), color='cyan')
@@ -91,22 +96,22 @@ class Man:
     def act(self):
         if self.fullness <= 0:
             cprint('{} умер...'.format(self.name), color='red')
-            quit()
+            quit(1)
             return
         dice = randint(1, 6)
         if self.fullness < 20:
             self.eat()
-        elif self.house.food < 10:
+        elif self.house.food < 30:
             self.shopping()
         elif self.house.money < 50:
             self.work()
-        elif self.house.cat_food < 10:
+        elif self.house.cat_food < 30:
             self.buy_cat_food()
         elif self.house.dirtiness > 100:
             self.clean_house()
-        elif dice == 1:
+        elif 1 <= dice <= 3:
             self.work()
-        elif dice == 2:
+        elif dice == 4:
             self.eat()
         else:
             self.watch_MTV()
@@ -142,13 +147,14 @@ class Cat:
             self.house.cat_food -= 10
         else:
             cprint('Мяу! Кот {} нет еды'.format(self.name), color='red')
+            self.fullness -= 10
 
     def sleep(self):
         cprint('Кот {} целый день дрых как скотина'.format(self.name), color='green')
         self.fullness -= 10
 
     def rip_wallpapers(self):
-        if randint(0,100) > 35:
+        if randint(0, 100) > 35:
             cprint('Кот {} подрал обои. Не забыть бы их подклеить'.format(self.name), color='green')
             self.house.dirtiness += 5
         else:
@@ -159,14 +165,14 @@ class Cat:
     def act(self):
         if self.fullness <= 0:
             cprint('Кот {} умер...'.format(self.name), color='red')
-            quit()
+            quit(2)
             return
         dice = randint(1, 6)
         if self.fullness < 20:
             self.eat()
-        elif dice == 4:
+        elif 1 <= dice <= 2:
             self.eat()
-        elif dice > 4:
+        elif 3 <= dice <= 4:
             self.rip_wallpapers()
         else:
             self.sleep()
@@ -176,15 +182,17 @@ beavis = Man(name='Бивис')
 
 my_sweet_home = House()
 beavis.go_to_the_house(house=my_sweet_home)
-cat = beavis.take_cat_from_animal_shelter()
+cats = [beavis.take_cat_from_animal_shelter() for _ in range(3)]
 
 for day in range(1, 366):
     print('================ день {} =================='.format(day))
     beavis.act()
-    cat.act()
+    for cat in cats:
+        cat.act()
     print('--- в конце дня ---')
     print(beavis)
-    print(cat)
+    for cat in cats:
+        print(cat)
     print(my_sweet_home)
 
 # Усложненное задание (делать по желанию)
