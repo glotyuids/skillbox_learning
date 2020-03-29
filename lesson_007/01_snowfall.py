@@ -58,38 +58,57 @@ class Snowflake:
         sd.finish_drawing()
 
     def can_fall(self):
-        return ((self.y >= -self.length * 2) and
-                (self.x >= -self.length * 2) and
-                (self.x <= sd.resolution[0] + self.length * 2))
+        return (self.y >= -self.length * 2 and
+                -self.length * 2 <= self.x <= sd.resolution[0] + self.length * 2)
 
     def clear_previous_picture(self):
         self.draw(color=sd.background_color)
 
 
-flake = Snowflake()
+def get_flakes(count):
+    return [Snowflake() for _ in range(count)]
 
-while True:
-    flake.clear_previous_picture()
-    flake.move()
-    flake.draw()
-    if not flake.can_fall():
-        break
-    sd.sleep(0.1)
-    if sd.user_want_exit():
-        break
 
-# шаг 2: создать снегопад - список объектов Снежинка в отдельном списке, обработку примерно так:
-# flakes = get_flakes(count=N)  # создать список снежинок
+def delete_offscreen_flakes():
+    global flakes
+    offscreen_flakes = [number for number, flake in enumerate(flakes) if not flake.can_fall()]
+    for number in sorted(offscreen_flakes, reverse=True):
+        del flakes[number]
+    return len(offscreen_flakes)
+
+
+def append_flakes(count):
+    global flakes
+    flakes.extend(get_flakes(count))
+
+
+# flake = Snowflake()
+#
 # while True:
-#     for flake in flakes:
-#         flake.clear_previous_picture()
-#         flake.move()
-#         flake.draw()
-#     fallen_flakes = get_fallen_flakes()  # подчитать сколько снежинок уже упало
-#     if fallen_flakes:
-#         append_flakes(count=fallen_flakes)  # добавить еще сверху
+#     flake.clear_previous_picture()
+#     flake.move()
+#     flake.draw()
+#     if not flake.can_fall():
+#         break
 #     sd.sleep(0.1)
 #     if sd.user_want_exit():
 #         break
+
+# шаг 2: создать снегопад - список объектов Снежинка в отдельном списке, обработку примерно так:
+flakes = get_flakes(count=20)  # создать список снежинок
+while True:
+    for flake in flakes:
+        flake.clear_previous_picture()
+        flake.move()
+        flake.draw()
+    # TODO С улетевшими за экран снежинками ничего не происходит, а список объектов будет расти и всё будет тормозить.
+    #  Поэтому, мне кажется, что тут вместо get_fallen_flakes() подошла бы процедура delete_fallen_flakes(),
+    #  которая будет подчищать улетевшие за экран снежинки и возвращать их количество
+    fallen_flakes = delete_offscreen_flakes()  # подсчитать сколько снежинок уже упало
+    if fallen_flakes:
+        append_flakes(count=fallen_flakes)  # добавить еще сверху
+    sd.sleep(0.1)
+    if sd.user_want_exit():
+        break
 
 sd.pause()
