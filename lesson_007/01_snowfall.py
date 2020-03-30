@@ -10,14 +10,15 @@ import simple_draw as sd
 
 
 class Snowflake:
-    max_length = 40
-    min_length = 5
-    # TODO 1) Если это константы класса, то они должны быть большими буквами.
+    #  1) Если это константы класса, то они должны быть большими буквами.
     #  2) Знаете отличие атрибутов класса от атрибутов объекта? Таким образом объявляются атрибуты класса (доступ к
     #  которым должен быть через имя класса), но ниже по коду вы к ним обращаетесь как атрибутам объекта (через self).
     #  Предлагаю просто сделать их глобальными константами
+    # TODO Да, это должны были быть атрибуты класса. Но поскольку они используются только во время генерации снежинки
+    #  и я хотел бы оставить возможность изменять эти параметры,
+    #  то добавлю эти переменные как необязательные аргументы __init__
 
-    def __init__(self):
+    def __init__(self, min_length=5, max_length=40):
         def remap_range(value, in_min, in_max, out_min, out_max):
             """Функция пропорционально переносит значение (value) из текущего диапазона значений (in_min .. in_max)
                     в новый диапазон (out_min .. out_max), заданный параметрами.
@@ -26,18 +27,18 @@ class Snowflake:
             """
             return (value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
 
-        self.x = random.randint(-self.max_length * 2, sd.resolution[0])
-        self.y = sd.resolution[1] + self.max_length
-        self.length = random.randint(self.min_length, self.max_length)
+        self.x = random.randint(-max_length * 2, sd.resolution[0])
+        self.y = sd.resolution[1] + max_length
+        self.length = random.randint(min_length, max_length)
         self.factor_a = round(random.uniform(0.2, 1), 2)
         self.factor_b = round(random.uniform(0.1, 1), 2)
         self.factor_c = round(random.randint(20, 90), 2)
         self.h_speed = round(remap_range(value=self.length * random.uniform(0.7, 1),
-                                         in_min=self.min_length, in_max=self.max_length, out_min=0, out_max=15))
-        self.v_speed = round(remap_range(value=self.length, in_min=self.min_length,
-                                         in_max=self.max_length, out_min=2, out_max=30))
-        color_byte = round(remap_range(value=self.length, in_min=self.min_length,
-                                       in_max=self.max_length, out_min=64, out_max=255))
+                                         in_min=min_length, in_max=max_length, out_min=0, out_max=15))
+        self.v_speed = round(remap_range(value=self.length, in_min=min_length,
+                                         in_max=max_length, out_min=2, out_max=30))
+        color_byte = round(remap_range(value=self.length, in_min=min_length,
+                                       in_max=max_length, out_min=64, out_max=255))
         self.color = (color_byte, color_byte, color_byte)
 
     def move(self):
@@ -49,8 +50,6 @@ class Snowflake:
         if color is None:
             color = self.color
 
-        sd.start_drawing()  # TODO Эффективнее использовать это ускорение для отрисовки кадра целиком, то есть в
-                            #  основном цикле
         point = sd.get_point(self.x, self.y)
         sd.snowflake(
             center=point,
@@ -60,7 +59,6 @@ class Snowflake:
             factor_c=self.factor_c,
             color=color,
         )
-        sd.finish_drawing()
 
     def can_fall(self):
         return (self.y >= -self.length * 2 and
@@ -74,13 +72,21 @@ def get_flakes(count):
     return [Snowflake() for _ in range(count)]
 
 
-def delete_offscreen_flakes():
-    global flakes  # TODO C этого модуля избегаем глобальных переменных - передавайте их через параметры функций
-    offscreen_flakes = [number for number, flake in enumerate(flakes) if not flake.can_fall()]
-    # TODO возвращает список упавших функция "get_fallen_flakes", а удаляет delete_fallen_flakes
-    for number in sorted(offscreen_flakes, reverse=True):
-        del flakes[number]
-    return len(offscreen_flakes)
+def delete_flakes(flakes_list, numbers_list):
+
+    # C этого модуля избегаем глобальных переменных - передавайте их через параметры функций
+    # TODO Принял. В принципе, изначально и хотел так поступить,
+    #  но после снегопада в шестом модуле решил перестраховаться
+
+    # возвращает список упавших функция "get_fallen_flakes", а удаляет delete_fallen_flakes
+    # TODO Глядя на функцию vector из simple_draw, которая и рисовала вектор и возвращала конечную точку я посчитал,
+    #  что подобное поведение функции допустимо. Исправляю
+    for number in sorted(numbers_list, reverse=True):
+        del flakes_list[number]
+
+
+def get_offscreen_flakes(flakes_list):
+    return [number for number, flake in enumerate(flakes_list) if not flake.can_fall()]
 
 
 def append_flakes(count):
@@ -103,20 +109,26 @@ def append_flakes(count):
 # шаг 2: создать снегопад - список объектов Снежинка в отдельном списке, обработку примерно так:
 flakes = get_flakes(count=20)  # создать список снежинок
 while True:
+    sd.start_drawing()
     for flake in flakes:
         flake.clear_previous_picture()
         flake.move()
         flake.draw()
+    sd.finish_drawing()
     #  С улетевшими за экран снежинками ничего не происходит, а список объектов будет расти и всё будет тормозить.
     #  Поэтому, мне кажется, что тут вместо get_fallen_flakes() подошла бы процедура delete_fallen_flakes(),
     #  которая будет подчищать улетевшие за экран снежинки и возвращать их количество
-    # TODO  Всё верно, только не "вместо", а в дополнение. Функции должны выполнять строго по одному "делу", одна
+
+    # Всё верно, только не "вместо", а в дополнение. Функции должны выполнять строго по одному "делу", одна
     #  считает (точнее отдаёт список упавших), другая удаляет. Так проще понять код, проще комбинировать из таких
     #  "кирпичиков" новый функционал, и проще тестировать.
-    fallen_flakes = delete_offscreen_flakes()  # подсчитать сколько снежинок уже упало
-    if fallen_flakes:
-        append_flakes(count=fallen_flakes)  # добавить еще сверху
-    sd.sleep(0.1)
+
+    # TODO Готово
+    fallen_flakes_numbers = get_offscreen_flakes(flakes)
+    if fallen_flakes_numbers:
+        delete_flakes(flakes, fallen_flakes_numbers)
+        append_flakes(count=len(fallen_flakes_numbers))  # добавить еще сверху
+    sd.sleep(0.046)
     if sd.user_want_exit():
         break
 
