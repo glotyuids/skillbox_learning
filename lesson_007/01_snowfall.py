@@ -12,6 +12,10 @@ import simple_draw as sd
 class Snowflake:
     max_length = 40
     min_length = 5
+    # TODO 1) Если это константы класса, то они должны быть большими буквами.
+    #  2) Знаете отличие атрибутов класса от атрибутов объекта? Таким образом объявляются атрибуты класса (доступ к
+    #  которым должен быть через имя класса), но ниже по коду вы к ним обращаетесь как атрибутам объекта (через self).
+    #  Предлагаю просто сделать их глобальными константами
 
     def __init__(self):
         def remap_range(value, in_min, in_max, out_min, out_max):
@@ -45,7 +49,8 @@ class Snowflake:
         if color is None:
             color = self.color
 
-        sd.start_drawing()
+        sd.start_drawing()  # TODO Эффективнее использовать это ускорение для отрисовки кадра целиком, то есть в
+                            #  основном цикле
         point = sd.get_point(self.x, self.y)
         sd.snowflake(
             center=point,
@@ -70,8 +75,9 @@ def get_flakes(count):
 
 
 def delete_offscreen_flakes():
-    global flakes
+    global flakes  # TODO C этого модуля избегаем глобальных переменных - передавайте их через параметры функций
     offscreen_flakes = [number for number, flake in enumerate(flakes) if not flake.can_fall()]
+    # TODO возвращает список упавших функция "get_fallen_flakes", а удаляет delete_fallen_flakes
     for number in sorted(offscreen_flakes, reverse=True):
         del flakes[number]
     return len(offscreen_flakes)
@@ -101,9 +107,12 @@ while True:
         flake.clear_previous_picture()
         flake.move()
         flake.draw()
-    # TODO С улетевшими за экран снежинками ничего не происходит, а список объектов будет расти и всё будет тормозить.
+    #  С улетевшими за экран снежинками ничего не происходит, а список объектов будет расти и всё будет тормозить.
     #  Поэтому, мне кажется, что тут вместо get_fallen_flakes() подошла бы процедура delete_fallen_flakes(),
     #  которая будет подчищать улетевшие за экран снежинки и возвращать их количество
+    # TODO  Всё верно, только не "вместо", а в дополнение. Функции должны выполнять строго по одному "делу", одна
+    #  считает (точнее отдаёт список упавших), другая удаляет. Так проще понять код, проще комбинировать из таких
+    #  "кирпичиков" новый функционал, и проще тестировать.
     fallen_flakes = delete_offscreen_flakes()  # подсчитать сколько снежинок уже упало
     if fallen_flakes:
         append_flakes(count=fallen_flakes)  # добавить еще сверху
