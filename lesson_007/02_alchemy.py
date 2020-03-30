@@ -24,15 +24,28 @@
 #  Есть два списка: список классов элементов, с которым можно сложить текущий, и список классов - результатов сложения.
 #  Соответственно, в первом списке ищем класс переданного элемента,
 #  а из второго дёргаем класс с соответствующим номером и возвращаем объект этого класса
-# TODO Идея прикольная, только эти две константы должны быть атрибутами класса, а ещё лучше сделать это словарём где
+
+# Идея прикольная, только эти две константы должны быть атрибутами класса, а ещё лучше сделать это словарём где
 #  ключ объект из elements, а значение элемент из results.
+
+# TODO Я хотел вынести списки в атрибуты класса, но интерпретатор ругался на то, что элементы списка ещё не определены.
+#   Два списка словарём заменил
+
+
 #  Но самый шик был бы вложенный словарь один на все элементы, типа таблицы умножения где ряд числа в левой колонке
 #  пересекатся с колонкой числа в верхней строке и так находится результат.
 #  Что-то типа (но это будет работать только после определения классов):
-MAGIC_JAR = {}
-MAGIC_JAR[Water] = {}
-MAGIC_JAR[Water][Air] = Storm
-# TODO Но эта задача просто на применение на практике функции isinstance, а тут похоже она и не пригодится.
+# MAGIC_JAR = {}
+# MAGIC_JAR[Water] = {}
+# MAGIC_JAR[Water][Air] = Storm
+#  Но эта задача просто на применение на практике функции isinstance, а тут похоже она и не пригодится.
+
+# TODO Я подумывал как раз о подобном решении,
+#  но в итоге пришёл к выводу, что для данного задания это будет уже оверкилл.
+#  Хотя, можно попробовать, но тогда уже не нужна будет сама перегрузка оператора сложения,
+#  поскольку вся арифметика будет осуществляться в основном коде программы
+
+# TODO Реализовал такой подход ниже
 
 
 class Water:
@@ -41,11 +54,18 @@ class Water:
         return 'Вода'
 
     def __add__(self, other):
-        elements = [Water, Air, Fire, Earth, Storm, Steam, Mud, Lighting, Dust, Lava]
-        results = [Puddle, Storm, Steam, Mud, Flood, Mist, Swamp, Plasma, Mud, Stone]
-        for i, element in enumerate(elements):
-            if isinstance(other, element):
-                return results[i]()
+        # elements = [Water, Air, Fire, Earth, Storm, Steam, Mud, Lighting, Dust, Lava]
+        # results = [Puddle, Storm, Steam, Mud, Flood, Mist, Swamp, Plasma, Mud, Stone]
+
+        adding_results = {
+            Water: Puddle, Air: Storm, Fire: Steam, Earth: Mud,
+            Storm: Flood, Steam: Mist, Mud: Swamp, Lighting: Plasma,
+            Dust: Mud, Lava: Stone
+        }
+        # for i, element in enumerate(elements):
+        #     if isinstance(other, element):
+        if type(other) in adding_results:
+            return adding_results[type(other)]()
         return None
 
 
@@ -54,11 +74,13 @@ class Air:
         return 'Воздух'
 
     def __add__(self, other):
-        elements = [Water, Air, Fire, Earth, Storm, Steam, Mud, Lighting, Dust, Lava]
-        results = [Storm, Air, Lighting, Dust, Mist, Mist, Dust, Plasma, Storm, Stone]
-        for i, element in enumerate(elements):
-            if isinstance(other, element):
-                return results[i]()
+        adding_results = {
+            Water: Storm, Air: Air, Fire: Lighting, Earth: Dust,
+            Storm: Mist, Steam: Mist, Mud: Dust, Lighting: Plasma,
+            Dust: Storm, Lava: Stone,
+        }
+        if type(other) in adding_results:
+            return adding_results[type(other)]()
         return None
 
 
@@ -67,11 +89,13 @@ class Fire:
         return 'Огонь'
 
     def __add__(self, other):
-        elements = [Water, Air, Fire, Earth, Storm, Steam, Mud, Lighting, Dust, Lava]
-        results = [Steam, Lighting, Fire, Lava, Steam, Water, Earth, Plasma, Lava, Lava]
-        for i, element in enumerate(elements):
-            if isinstance(other, element):
-                return results[i]()
+        adding_results = {
+            Water: Steam, Air: Lighting, Fire: Fire, Earth: Lava,
+            Storm: Steam, Steam: Water, Mud: Earth, Lighting: Plasma,
+            Dust: Lava, Lava: Lava,
+        }
+        if type(other) in adding_results:
+            return adding_results[type(other)]()
         return None
 
 
@@ -80,11 +104,13 @@ class Earth:
         return 'Земля'
 
     def __add__(self, other):
-        elements = [Water, Air, Fire, Earth, Storm, Steam, Mud, Lighting, Dust, Lava]
-        results = [Mud, Dust, Lava, Earth, Flood, Mud, Mud, Stone, Dust, Stone]
-        for i, element in enumerate(elements):
-            if isinstance(other, element):
-                return results[i]()
+        adding_results = {
+            Water: Mud, Air: Dust, Fire: Lava, Earth: Earth,
+            Storm: Flood, Steam: Mud, Mud: Mud, Lighting: Stone,
+            Dust: Dust, Lava: Stone,
+        }
+        if type(other) in adding_results:
+            return adding_results[type(other)]()
         return None
 
 
@@ -93,11 +119,13 @@ class Storm:
         return 'Шторм'
 
     def __add__(self, other):
-        elements = [Water, Air, Fire, Earth, Storm, Steam, Mud, Lighting, Dust, Lava]
-        results = [Flood, Mist, Steam, Flood, Flood, Lighting, Swamp, Flood, Swamp, Stone]
-        for i, element in enumerate(elements):
-            if isinstance(other, element):
-                return results[i]()
+        adding_results = {
+            Water: Flood, Air: Mist, Fire: Steam, Earth: Flood,
+            Storm: Flood, Steam: Lighting, Mud: Swamp, Lighting: Flood,
+            Dust: Swamp, Lava: Stone,
+        }
+        if type(other) in adding_results:
+            return adding_results[type(other)]()
         return None
 
 
@@ -106,11 +134,13 @@ class Steam:
         return 'Пар'
 
     def __add__(self, other):
-        elements = [Water, Air, Fire, Earth, Storm, Steam, Mud, Lighting, Dust, Lava]
-        results = [Mist, Mist, Water, Mud, Lighting, Lighting, Swamp, Plasma, Mud, Stone]
-        for i, element in enumerate(elements):
-            if isinstance(other, element):
-                return results[i]()
+        adding_results = {
+            Water: Mist, Air: Mist, Fire: Water, Earth: Mud,
+            Storm: Lighting, Steam: Lighting, Mud: Swamp, Lighting: Plasma,
+            Dust: Mud, Lava: Stone,
+        }
+        if type(other) in adding_results:
+            return adding_results[type(other)]()
         return None
 
 
@@ -119,11 +149,13 @@ class Mud:
         return 'Грязь'
 
     def __add__(self, other):
-        elements = [Water, Air, Fire, Earth, Storm, Steam, Mud, Lighting, Dust, Lava]
-        results = [Swamp, Dust, Earth, Mud, Swamp, Swamp, Swamp, Stone, Earth, Stone]
-        for i, element in enumerate(elements):
-            if isinstance(other, element):
-                return results[i]()
+        adding_results = {
+            Water: Swamp, Air: Dust, Fire: Earth, Earth: Mud,
+            Storm: Swamp, Steam: Swamp, Mud: Swamp, Lighting: Stone,
+            Dust: Earth, Lava: Stone,
+        }
+        if type(other) in adding_results:
+            return adding_results[type(other)]()
         return None
 
 
@@ -132,11 +164,13 @@ class Lighting:
         return 'Молния'
 
     def __add__(self, other):
-        elements = [Water, Air, Fire, Earth, Storm, Steam, Mud, Lighting, Dust, Lava]
-        results = [Plasma, Plasma, Plasma, Stone, Flood, Plasma, Stone, Plasma, Stone, Plasma]
-        for i, element in enumerate(elements):
-            if isinstance(other, element):
-                return results[i]()
+        adding_results = {
+            Water: Plasma, Air: Plasma, Fire: Plasma, Earth: Stone,
+            Storm: Flood, Steam: Plasma, Mud: Stone, Lighting: Plasma,
+            Dust: Stone, Lava: Plasma,
+        }
+        if type(other) in adding_results:
+            return adding_results[type(other)]()
         return None
 
 
@@ -145,11 +179,13 @@ class Dust:
         return 'Пыль'
 
     def __add__(self, other):
-        elements = [Water, Air, Fire, Earth, Storm, Steam, Mud, Lighting, Dust, Lava]
-        results = [Mud, Storm, Lava, Dust, Swamp, Mud, Earth, Stone, Earth, Lava]
-        for i, element in enumerate(elements):
-            if isinstance(other, element):
-                return results[i]()
+        adding_results = {
+            Water: Mud, Air: Storm, Fire: Lava, Earth: Dust,
+            Storm: Swamp, Steam: Mud, Mud: Earth, Lighting: Stone,
+            Dust: Earth, Lava: Lava,
+        }
+        if type(other) in adding_results:
+            return adding_results[type(other)]()
         return None
 
 
@@ -158,11 +194,13 @@ class Lava:
         return 'Лава'
 
     def __add__(self, other):
-        elements = [Water, Air, Fire, Earth, Storm, Steam, Mud, Lighting, Dust, Lava]
-        results = [Stone, Stone, Lava, Stone, Stone, Stone, Stone, Plasma, Lava, Lava]
-        for i, element in enumerate(elements):
-            if isinstance(other, element):
-                return results[i]()
+        adding_results = {
+            Water: Stone, Air: Stone, Fire: Lava, Earth: Stone,
+            Storm: Stone, Steam: Stone, Mud: Stone, Lighting: Plasma,
+            Dust: Lava, Lava: Lava,
+        }
+        if type(other) in adding_results:
+            return adding_results[type(other)]()
         return None
 
 
@@ -195,11 +233,71 @@ class Stone:
     def __str__(self):
         return 'Камень'
 
+
+ADDING_RESULTS = {
+    Water: {
+        Water: Puddle, Air: Storm, Fire: Steam, Earth: Mud, Storm: Flood, Steam: Mist, Mud: Swamp, Lighting: Plasma,
+        Dust: Mud, Lava: Stone
+    },
+    Air: {
+        Air: Air, Fire: Lighting, Earth: Dust, Storm: Mist, Steam: Mist, Mud: Dust, Lighting: Plasma, Dust: Storm,
+        Lava: Stone,
+    },
+    Fire: {
+        Fire: Fire, Earth: Lava, Storm: Steam, Steam: Water, Mud: Earth, Lighting: Plasma, Dust: Lava, Lava: Lava,
+    },
+    Earth: {
+        Earth: Earth, Storm: Flood, Steam: Mud, Mud: Mud, Lighting: Stone, Dust: Dust, Lava: Stone,
+    },
+    Storm: {
+        Storm: Flood, Steam: Lighting, Mud: Swamp, Lighting: Flood, Dust: Swamp, Lava: Stone,
+    },
+    Steam: {
+        Steam: Lighting, Mud: Swamp, Lighting: Plasma, Dust: Mud, Lava: Stone,
+    },
+    Mud: {
+        Mud: Swamp, Lighting: Stone, Dust: Earth, Lava: Stone,
+    },
+    Lighting: {
+        Lighting: Plasma, Dust: Stone, Lava: Plasma,
+    },
+    Dust: {
+        Dust: Earth, Lava: Lava,
+    },
+    Lava: {
+        Lava: Lava,
+    }
+}
+
+
+def add_elements(first_element, second_element):
+    if type(second_element) in ADDING_RESULTS[type(first_element)]:
+        return ADDING_RESULTS[type(first_element)][type(second_element)]()
+    if type(first_element) in ADDING_RESULTS[type(second_element)]:
+        return ADDING_RESULTS[type(second_element)][type(first_element)]()
+    return None
+
+
+# TODO Если речь зашла о словаре-таблице, то такие таблица и функция сложения
+#  позволят сохранить коммутативность сложения, при этом избежав дублирования пар слагаемых в таблице
+#  и, соответственно, избежать ошибок при добавлении новых элементов,
+#  поскольку результат нужно будет внести в таблицу только один раз для любого из слагаемых
+
+
 print(Water(), '+', Air(), '=', Water() + Air())
+print(Water(), '+', Air(), '=', add_elements(Water(), Air()))
+print()
+
 print(Fire(), '+', Air(), '=', Fire() + Air())
+print(Fire(), '+', Air(), '=', add_elements(Fire(), Air()))
+print()
+
 print(Earth(), '+', Air(), '=', Earth() + Air())
+print(Earth(), '+', Air(), '=', add_elements(Earth(), Air()))
+print()
 
 print(Mud(), '+', Dust(), '=', Mud() + Dust())
+print(Mud(), '+', Dust(), '=', add_elements(Mud(), Dust()))
 # Усложненное задание (делать по желанию)
 # Добавить еще элемент в игру.
 # Придумать что будет при сложении существующих элементов с новым.
