@@ -34,11 +34,13 @@ class Man:
         self.name = name
         self.fullness = 50
         self.house = None
+        self.desired_cats_number = 0
 
     def __str__(self):
         return 'Я - {}, сытость {}'.format(
             self.name, self.fullness)
 
+    # TODO Если человек хочет есть и видит, что еды нет, то он в тот же день идёт в магазин
     def eat(self):
         if self.house.food >= 10:
             cprint('{} поел'.format(self.name), color='yellow')
@@ -46,6 +48,7 @@ class Man:
             self.house.food -= 10
         else:
             cprint('{} нет еды'.format(self.name), color='red')
+            self.buy_food()
 
     def work(self):
         cprint('{} сходил на работу'.format(self.name), color='blue')
@@ -56,31 +59,38 @@ class Man:
         cprint('{} смотрел MTV целый день'.format(self.name), color='green')
         self.fullness -= 10
 
-    def shopping(self):
+    # TODO Если нет денег для похода в магазин (за едой или кормом), то человек в тот же день идёт на работу
+    def buy_food(self):
         if 50 <= self.house.money < 100:
             cprint('{} сходил в магазин за едой'.format(self.name), color='magenta')
             self.house.money -= 50
             self.house.food += 50
+            self.fullness -= 10
         elif self.house.money >= 100:
             cprint('{} купил целый ящик доширака'.format(self.name), color='magenta')
             self.house.money -= 100
             self.house.food += 100
+            self.fullness -= 10
         else:
             cprint('{} денег на еду нет!'.format(self.name), color='red')
             #  Люди не умирали от голода, поскольку во время голода сытость не изменялась. Исправил
             # Отлично, что вы сами это оттестировали и нашли
+            self.work()
 
     def buy_cat_food(self):
         if 50 <= self.house.money < 100:
             cprint('{} сходил в зоомагазин за кошачьим кормом'.format(self.name), color='magenta')
             self.house.money -= 50
             self.house.cat_food += 50
+            self.fullness -= 10
         elif self.house.money >= 100:
             cprint('{} купил много кошачьего корма'.format(self.name), color='magenta')
             self.house.money -= 100
             self.house.cat_food += 100
+            self.fullness -= 10
         else:
             cprint('{} на кошачий корм денег нет!'.format(self.name), color='red')
+            self.work()
 
     def clean_house(self):
         if self.house.dirtiness >= 500 and self.house.money >= 50:
@@ -106,15 +116,14 @@ class Man:
     def take_cat_from_animal_shelter(self):
         # Изначально сытость уменьшалась на 10, но тогда на 4 коте человек умирал.
         #  Поэтому предположим, что приют находится прямо напротив дома
-        # TODO Любое действие отнимает 10 от сытости
-        self.fullness -= 0
-        cat_names = ['Феликс', 'Том', 'Сильвестр', 'Гарфилд', 'в сапогах',
-                     'Чешир', 'Артемис', 'Мяут', 'Котобус', 'Мистер Кэт']
-        # TOdO Глобальная константа!
-        cprint('{} Взял кота из приюта'.format(self.name), color='cyan')
-        return Cat(name=choice(cat_names), house=self.house)
+        # Любое действие отнимает 10 от сытости
+        self.fullness -= 10
+        self.desired_cats_number -= 1
 
-    def act(self, number_of_cats=0):
+        cprint('{} Взял кота из приюта'.format(self.name), color='cyan')
+        return Cat(house=self.house)
+
+    def act(self, my_cats):
         if self.fullness <= 0:
             cprint('{} умер...'.format(self.name), color='red')
             quit(1)
@@ -122,13 +131,16 @@ class Man:
         if self.fullness < 20:
             self.eat()
         elif self.house.food < 30:
-            self.shopping()
+            self.buy_food()
         elif self.house.money < 50:
             self.work()
-        elif self.house.cat_food < number_of_cats * 20:
+        elif self.house.cat_food < len(cats) * 20:
             self.buy_cat_food()
         elif self.house.dirtiness > 100:
             self.clean_house()
+        # TODO Теперь человек берёт нового кота не сразу, а когда у него есть такая возможность
+        elif self.desired_cats_number > 0:
+            my_cats.append(self.take_cat_from_animal_shelter())
         elif 1 <= dice <= 3:
             self.work()
         elif dice == 4:
@@ -162,7 +174,12 @@ class House:
 
 
 class Cat:
-    def __init__(self, name, house):
+    # TODO Сделал имена кошек константой класса Cat.
+    NAMES = ['Феликс', 'Том', 'Сильвестр', 'Гарфилд', 'в сапогах', 'Чешир', 'Артемис', 'Мяут', 'Котобус', 'Мистер Кэт']
+
+    def __init__(self, house, name=None):
+        if name is None:
+            name = choice(Cat.NAMES)
         self.name = name
         self.fullness = 50
         self.house = house
@@ -218,11 +235,12 @@ beavis = Man(name='Бивис')
 
 my_sweet_home = House()
 beavis.go_to_the_house(house=my_sweet_home)
-cats = [beavis.take_cat_from_animal_shelter() for _ in range(8)]
+beavis.desired_cats_number = 4
+cats = [beavis.take_cat_from_animal_shelter()]
 
 for day in range(1, 366):
     print('================ день {} =================='.format(day))
-    beavis.act(number_of_cats=len(cats))
+    beavis.act(my_cats=cats)
     for cat in cats:
         cat.act()
     my_sweet_home.check_status()
