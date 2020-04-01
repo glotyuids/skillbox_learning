@@ -30,7 +30,18 @@
 
 #  Я хотел вынести списки в атрибуты класса, но интерпретатор ругался на то, что элементы списка ещё не определены.
 #   Два списка словарём заменил
-# TODO Что-то не так сделали, покажите
+
+# Что-то не так сделали, покажите
+
+# TODO предположим, пусть будет условный Fire2
+# class Fire2:
+#     ADDING_RESULTS = {
+#         Water: Steam, Air: Lighting, Fire: Fire, Earth: Lava,
+#         Storm: Steam, Steam: Water, Mud: Earth, Lighting: Plasma,
+#         Dust: Lava, Lava: Lava,
+#     }
+# TODO Как я понял, это будет работать только в том случае, если я объявил все используемые классы ранее.
+#  Так что сделаю так, как предложили вы - буду объявлять в __init__
 
 #  Но самый шик был бы вложенный словарь один на все элементы, типа таблицы умножения где ряд числа в левой колонке
 #  пересекатся с колонкой числа в верхней строке и так находится результат.
@@ -47,192 +58,159 @@
 
 #  Реализовал такой подход ниже
 
+# adding_results = {}
+# Сделайте эту переменную атрибутом класса (константой) и обьявите в __init__
+# TODO Объявить в __init__? Вы натолкнули меня на мысль...
+#  Меня гнетёт куча повторяющегося кода в классах (честно, ощущаю физический дискомфорт),
+#  поэтому можно я попробую забежать чуть-чуть вперёд и создам суперкласс Element, от которого унаследую все остальные?
+#  Понадеюсь только, что всё делаю правильно
 
-class Water:
 
+class Element:
+    # TODO Атрибут приватный, поскольку нормально использовать его вне класса не получится,
+    #  пока не будет создан хотя бы один экземпляр этого класса.
+    _ADDING_RESULTS = {}
+    _NAME = ''
+
+    # TODO Я правильно обращаюсь к атрибутам класса?
+    #  Потому что если обращаться просто через self, то получится обращение к атрибутам объекта
     def __str__(self):
-        return 'Вода'
+        return type(self)._NAME
 
     def __add__(self, other):
-        # elements = [Water, Air, Fire, Earth, Storm, Steam, Mud, Lighting, Dust, Lava]
-        # results = [Puddle, Storm, Steam, Mud, Flood, Mist, Swamp, Plasma, Mud, Stone]
+        if type(other) in type(self)._ADDING_RESULTS:
+            return type(self)._ADDING_RESULTS[type(other)]()
+        return None
 
-        adding_results = {
+
+class Water(Element):
+    def __init__(self):
+        Water._NAME = 'Вода'
+        Water._ADDING_RESULTS = {
             Water: Puddle, Air: Storm, Fire: Steam, Earth: Mud,
             Storm: Flood, Steam: Mist, Mud: Swamp, Lighting: Plasma,
             Dust: Mud, Lava: Stone
         }
-        # ToDO Сделайте эту переменную атрибутом класса (константой) и обьявите в __init__
-        # for i, element in enumerate(elements):
-        #     if isinstance(other, element):
-        if type(other) in adding_results:
-            return adding_results[type(other)]()
-        return None
 
 
-class Air:
-    def __str__(self):
-        return 'Воздух'
-
-    def __add__(self, other):
-        adding_results = {
+class Air(Element):
+    def __init__(self):
+        Air._NAME = 'Воздух'
+        Air._ADDING_RESULTS = {
             Water: Storm, Air: Air, Fire: Lighting, Earth: Dust,
             Storm: Mist, Steam: Mist, Mud: Dust, Lighting: Plasma,
             Dust: Storm, Lava: Stone,
         }
-        if type(other) in adding_results:
-            return adding_results[type(other)]()
-        return None
 
 
-class Fire:
-    def __str__(self):
-        return 'Огонь'
-
-    def __add__(self, other):
-        adding_results = {
+class Fire(Element):
+    def __init__(self):
+        Fire._NAME = 'Огонь'
+        Fire._ADDING_RESULTS = {
             Water: Steam, Air: Lighting, Fire: Fire, Earth: Lava,
             Storm: Steam, Steam: Water, Mud: Earth, Lighting: Plasma,
             Dust: Lava, Lava: Lava,
         }
-        if type(other) in adding_results:
-            return adding_results[type(other)]()
-        return None
 
 
-class Earth:
-    def __str__(self):
-        return 'Земля'
-
-    def __add__(self, other):
-        adding_results = {
+class Earth(Element):
+    def __init__(self):
+        Earth._NAME = 'Земля'
+        Earth._ADDING_RESULTS = {
             Water: Mud, Air: Dust, Fire: Lava, Earth: Earth,
             Storm: Flood, Steam: Mud, Mud: Mud, Lighting: Stone,
             Dust: Dust, Lava: Stone,
         }
-        if type(other) in adding_results:
-            return adding_results[type(other)]()
-        return None
 
 
-class Storm:
-    def __str__(self):
-        return 'Шторм'
-
-    def __add__(self, other):
-        adding_results = {
+class Storm(Element):
+    def __init__(self):
+        Storm._NAME = 'Шторм'
+        Storm._ADDING_RESULTS = {
             Water: Flood, Air: Mist, Fire: Steam, Earth: Flood,
             Storm: Flood, Steam: Lighting, Mud: Swamp, Lighting: Flood,
             Dust: Swamp, Lava: Stone,
         }
-        if type(other) in adding_results:
-            return adding_results[type(other)]()
-        return None
 
 
-class Steam:
-    def __str__(self):
-        return 'Пар'
-
-    def __add__(self, other):
-        adding_results = {
+class Steam(Element):
+    def __init__(self):
+        Stone._NAME = 'Пар'
+        Steam._ADDING_RESULTS = {
             Water: Mist, Air: Mist, Fire: Water, Earth: Mud,
             Storm: Lighting, Steam: Lighting, Mud: Swamp, Lighting: Plasma,
             Dust: Mud, Lava: Stone,
         }
-        if type(other) in adding_results:
-            return adding_results[type(other)]()
-        return None
 
 
-class Mud:
-    def __str__(self):
-        return 'Грязь'
-
-    def __add__(self, other):
-        adding_results = {
+class Mud(Element):
+    def __init__(self):
+        Mud._NAME = 'Грязь'
+        Mud._ADDING_RESULTS = {
             Water: Swamp, Air: Dust, Fire: Earth, Earth: Mud,
             Storm: Swamp, Steam: Swamp, Mud: Swamp, Lighting: Stone,
             Dust: Earth, Lava: Stone,
         }
-        if type(other) in adding_results:
-            return adding_results[type(other)]()
-        return None
 
 
-class Lighting:
-    def __str__(self):
-        return 'Молния'
-
-    def __add__(self, other):
-        adding_results = {
+class Lighting(Element):
+    def __init__(self):
+        Lighting._NAME = 'Молния'
+        Lighting._ADDING_RESULTS = {
             Water: Plasma, Air: Plasma, Fire: Plasma, Earth: Stone,
             Storm: Flood, Steam: Plasma, Mud: Stone, Lighting: Plasma,
             Dust: Stone, Lava: Plasma,
         }
-        if type(other) in adding_results:
-            return adding_results[type(other)]()
-        return None
 
 
-class Dust:
-    def __str__(self):
-        return 'Пыль'
-
-    def __add__(self, other):
-        adding_results = {
+class Dust(Element):
+    def __init__(self):
+        Dust._NAME = 'Пыль'
+        Dust._ADDING_RESULTS = {
             Water: Mud, Air: Storm, Fire: Lava, Earth: Dust,
             Storm: Swamp, Steam: Mud, Mud: Earth, Lighting: Stone,
             Dust: Earth, Lava: Lava,
         }
-        if type(other) in adding_results:
-            return adding_results[type(other)]()
-        return None
 
 
-class Lava:
-    def __str__(self):
-        return 'Лава'
-
-    def __add__(self, other):
-        adding_results = {
+class Lava(Element):
+    def __init__(self):
+        Lava._NAME = 'Лава'
+        Lava._ADDING_RESULTS = {
             Water: Stone, Air: Stone, Fire: Lava, Earth: Stone,
             Storm: Stone, Steam: Stone, Mud: Stone, Lighting: Plasma,
             Dust: Lava, Lava: Lava,
         }
-        if type(other) in adding_results:
-            return adding_results[type(other)]()
-        return None
 
 
-class Puddle:
-    def __str__(self):
-        return 'Лужа'
+class Puddle(Element):
+    def __init__(self):
+        Puddle._NAME = 'Лужа'
 
 
-class Flood:
-    def __str__(self):
-        return 'Потоп'
+class Flood(Element):
+    def __init__(self):
+        Flood._NAME = 'Потоп'
 
 
-class Mist:
-    def __str__(self):
-        return 'Туман'
+class Mist(Element):
+    def __init__(self):
+        Mist._NAME = 'Туман'
 
 
-class Swamp:
-    def __str__(self):
-        return 'Болото'
+class Swamp(Element):
+    def __init__(self):
+        Swamp._NAME = 'Болото'
 
 
-class Plasma:
-    def __str__(self):
-        return 'Плазма'
+class Plasma(Element):
+    def __init__(self):
+        Plasma._NAME = 'Плазма'
 
 
-class Stone:
-    def __str__(self):
-        return 'Камень'
+class Stone(Element):
+    def __init__(self):
+        Stone._NAME = 'Камень'
 
 
 ADDING_RESULTS = {
@@ -283,8 +261,17 @@ def add_elements(first_element, second_element):
 #  позволят сохранить коммутативность сложения, при этом избежав дублирования пар слагаемых в таблице
 #  и, соответственно, избежать ошибок при добавлении новых элементов,
 #  поскольку результат нужно будет внести в таблицу только один раз для любого из слагаемых
-# TODO Красота! Надеюсь isinstance знаете? А то я беспокоюсь чисто за методологию курса,
+
+# Красота! Надеюсь isinstance знаете? А то я беспокоюсь чисто за методологию курса,
 #  так как именно применение этой функции  является целью задачи.
+
+# TODO Само собой, isinstance знаю - функция в качестве аргументов принимает экземпляр и класс/кортеж классов,
+#  возвращает флаг соответствия экземпляра классу/какому-либо классу из кортежа.
+#  Просто в стремлении избежать механического бездумного набивания if isinstance(other, ...)
+#  я получил алгоритм, который не потребовал её применения ¯\_(ツ)_/¯
+#  Опять же, вы можете глянуть в предыдущих коммитах закомментированный код,
+#  который я специально оставил в Water.__add__().
+#  Он изначально использовался для поиска второго слагаемого в списке элементов именно с помощью isinstance()
 
 print(Water(), '+', Air(), '=', Water() + Air())
 print(Water(), '+', Air(), '=', add_elements(Water(), Air()))
