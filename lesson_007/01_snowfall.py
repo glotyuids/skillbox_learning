@@ -3,6 +3,7 @@ import random
 
 import simple_draw as sd
 
+
 # Шаг 1: Реализовать падение снежинки через класс. Внести в методы:
 #  - создание снежинки с нужными параметрами
 #  - отработку изменений координат
@@ -14,7 +15,8 @@ class Snowflake:
     #  2) Знаете отличие атрибутов класса от атрибутов объекта? Таким образом объявляются атрибуты класса (доступ к
     #  которым должен быть через имя класса), но ниже по коду вы к ним обращаетесь как атрибутам объекта (через self).
     #  Предлагаю просто сделать их глобальными константами
-    # TODO Да, это должны были быть атрибуты класса. Но поскольку они используются только во время генерации снежинки
+
+    # Да, это должны были быть атрибуты класса. Но поскольку они используются только во время генерации снежинки
     #  и я хотел бы оставить возможность изменять эти параметры,
     #  то добавлю эти переменные как необязательные аргументы __init__
 
@@ -73,7 +75,6 @@ def get_flakes(count):
 
 
 def delete_flakes(flakes_list, numbers_list):
-
     # C этого модуля избегаем глобальных переменных - передавайте их через параметры функций
     #  Принял. В принципе, изначально и хотел так поступить,
     #  но после снегопада в шестом модуле решил перестраховаться
@@ -81,7 +82,8 @@ def delete_flakes(flakes_list, numbers_list):
     # возвращает список упавших функция "get_fallen_flakes", а удаляет delete_fallen_flakes
     #  Глядя на функцию vector из simple_draw, которая и рисовала вектор и возвращала конечную точку я посчитал,
     #  что подобное поведение функции допустимо. Исправляю
-    # TODO Не вполне соответствующий пример. Если бы vector кроме рисования ещё в другом месте стирала или писала в
+
+    # Не вполне соответствующий пример. Если бы vector кроме рисования ещё в другом месте стирала или писала в
     #  файл, вот тогда - да, плохо :)
     for number in sorted(numbers_list, reverse=True):
         del flakes_list[number]
@@ -89,11 +91,6 @@ def delete_flakes(flakes_list, numbers_list):
 
 def get_offscreen_flakes(flakes_list):
     return [number for number, flake in enumerate(flakes_list) if not flake.can_fall()]
-
-
-def append_flakes(count):
-    global flakes
-    flakes.extend(get_flakes(count))
 
 
 # flake = Snowflake()
@@ -112,8 +109,11 @@ def append_flakes(count):
 flakes = get_flakes(count=20)  # создать список снежинок
 while True:
     sd.start_drawing()
+    # TODO Для того, чтобы избавиться от синих артефактов при наложении снежинок, вынес отрисовку синих в отдельный цикл
     for flake in flakes:
         flake.clear_previous_picture()
+
+    for flake in flakes:
         flake.move()
         flake.draw()
     sd.finish_drawing()
@@ -129,10 +129,13 @@ while True:
     fallen_flakes_numbers = get_offscreen_flakes(flakes)
     if fallen_flakes_numbers:
         delete_flakes(flakes, fallen_flakes_numbers)
-        append_flakes(count=len(fallen_flakes_numbers))  # добавить еще сверху
-        # TOdO Тут тоже можно обойтись без функции завязанной на глобальную переменную: добавить снежинок
+        flakes.extend(get_flakes(len(fallen_flakes_numbers)))
+        # Тут тоже можно обойтись без функции завязанной на глобальную переменную: добавить снежинок
         #  непосредственно во flakes c помощью get_flakes и extend
-    sd.sleep(0.046)
+
+        # TODO В принципе да, просто я пытался вписать код в изначально предложенный "скелет" программы. Исправил)
+
+    sd.sleep(0.1)
     if sd.user_want_exit():
         break
 
