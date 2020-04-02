@@ -69,28 +69,29 @@
 class Element:
     #  Атрибут приватный, поскольку нормально использовать его вне класса не получится,
     #  пока не будет создан хотя бы один экземпляр этого класса.
-    _ADDING_RESULTS = {}
+    _transformations = {}
     _NAME = ''
 
     #  Я правильно обращаюсь к атрибутам класса?
     #  Потому что если обращаться просто через self, то получится обращение к атрибутам объекта
     def __str__(self):
-        return type(self)._NAME
+        return self._NAME
 
     def __add__(self, other):
-        if type(other) in type(self)._ADDING_RESULTS:
+        if type(other) in self._transformations:
             # return type(self)._ADDING_RESULTS[type(other)]()
-            # TODO Заменяем на:
+            # Заменяем на:
+            # TODO Готово
             new_class = self._transformations[type(other)]
             return new_class()
         return None
 
 
 class Water(Element):
-    _NAME = 'Вода'  # TODO Тут ему место
+    _NAME = 'Вода'  # Тут ему место
 
     def __init__(self):
-        Water._ADDING_RESULTS = {  # TODO А это назовите так self._transformation = {...
+        self._transformations = {  # А это назовите так self._transformation = {...
             Water: Puddle, Air: Storm, Fire: Steam, Earth: Mud,
             Storm: Flood, Steam: Mist, Mud: Swamp, Lighting: Plasma,
             Dust: Mud, Lava: Stone
@@ -98,9 +99,10 @@ class Water(Element):
 
 
 class Air(Element):
+    _NAME = 'Воздух'
+
     def __init__(self):
-        Air._NAME = 'Воздух'
-        Air._ADDING_RESULTS = {
+        self._transformations = {
             Water: Storm, Air: Air, Fire: Lighting, Earth: Dust,
             Storm: Mist, Steam: Mist, Mud: Dust, Lighting: Plasma,
             Dust: Storm, Lava: Stone,
@@ -108,9 +110,10 @@ class Air(Element):
 
 
 class Fire(Element):
+    _NAME = 'Огонь'
+
     def __init__(self):
-        Fire._NAME = 'Огонь'
-        Fire._ADDING_RESULTS = {
+        self._transformations = {
             Water: Steam, Air: Lighting, Fire: Fire, Earth: Lava,
             Storm: Steam, Steam: Water, Mud: Earth, Lighting: Plasma,
             Dust: Lava, Lava: Lava,
@@ -118,9 +121,10 @@ class Fire(Element):
 
 
 class Earth(Element):
+    _NAME = 'Земля'
+
     def __init__(self):
-        Earth._NAME = 'Земля'
-        Earth._ADDING_RESULTS = {
+        self._transformations = {
             Water: Mud, Air: Dust, Fire: Lava, Earth: Earth,
             Storm: Flood, Steam: Mud, Mud: Mud, Lighting: Stone,
             Dust: Dust, Lava: Stone,
@@ -128,9 +132,10 @@ class Earth(Element):
 
 
 class Storm(Element):
+    _NAME = 'Шторм'
+
     def __init__(self):
-        Storm._NAME = 'Шторм'
-        Storm._ADDING_RESULTS = {
+        self._transformations = {
             Water: Flood, Air: Mist, Fire: Steam, Earth: Flood,
             Storm: Flood, Steam: Lighting, Mud: Swamp, Lighting: Flood,
             Dust: Swamp, Lava: Stone,
@@ -138,9 +143,10 @@ class Storm(Element):
 
 
 class Steam(Element):
+    _NAME = 'Пар'
+
     def __init__(self):
-        Stone._NAME = 'Пар'
-        Steam._ADDING_RESULTS = {
+        self._transformations = {
             Water: Mist, Air: Mist, Fire: Water, Earth: Mud,
             Storm: Lighting, Steam: Lighting, Mud: Swamp, Lighting: Plasma,
             Dust: Mud, Lava: Stone,
@@ -148,9 +154,10 @@ class Steam(Element):
 
 
 class Mud(Element):
+    _NAME = 'Грязь'
+
     def __init__(self):
-        Mud._NAME = 'Грязь'
-        Mud._ADDING_RESULTS = {
+        self._transformations = {
             Water: Swamp, Air: Dust, Fire: Earth, Earth: Mud,
             Storm: Swamp, Steam: Swamp, Mud: Swamp, Lighting: Stone,
             Dust: Earth, Lava: Stone,
@@ -158,9 +165,10 @@ class Mud(Element):
 
 
 class Lighting(Element):
+    _NAME = 'Молния'
+
     def __init__(self):
-        Lighting._NAME = 'Молния'
-        Lighting._ADDING_RESULTS = {
+        self._transformations = {
             Water: Plasma, Air: Plasma, Fire: Plasma, Earth: Stone,
             Storm: Flood, Steam: Plasma, Mud: Stone, Lighting: Plasma,
             Dust: Stone, Lava: Plasma,
@@ -168,9 +176,10 @@ class Lighting(Element):
 
 
 class Dust(Element):
+    _NAME = 'Пыль'
+
     def __init__(self):
-        Dust._NAME = 'Пыль'
-        Dust._ADDING_RESULTS = {
+        self._transformations = {
             Water: Mud, Air: Storm, Fire: Lava, Earth: Dust,
             Storm: Swamp, Steam: Mud, Mud: Earth, Lighting: Stone,
             Dust: Earth, Lava: Lava,
@@ -178,9 +187,10 @@ class Dust(Element):
 
 
 class Lava(Element):
+    _NAME = 'Лава'
+
     def __init__(self):
-        Lava._NAME = 'Лава'
-        Lava._ADDING_RESULTS = {
+        self._transformations = {
             Water: Stone, Air: Stone, Fire: Lava, Earth: Stone,
             Storm: Stone, Steam: Stone, Mud: Stone, Lighting: Plasma,
             Dust: Lava, Lava: Lava,
@@ -188,33 +198,27 @@ class Lava(Element):
 
 
 class Puddle(Element):
-    def __init__(self):
-        Puddle._NAME = 'Лужа'
+    _NAME = 'Лужа'
 
 
 class Flood(Element):
-    def __init__(self):
-        Flood._NAME = 'Потоп'
+    _NAME = 'Потоп'
 
 
 class Mist(Element):
-    def __init__(self):
-        Mist._NAME = 'Туман'
+    _NAME = 'Туман'
 
 
 class Swamp(Element):
-    def __init__(self):
-        Swamp._NAME = 'Болото'
+    _NAME = 'Болото'
 
 
 class Plasma(Element):
-    def __init__(self):
-        Plasma._NAME = 'Плазма'
+    _NAME = 'Плазма'
 
 
 class Stone(Element):
-    def __init__(self):
-        Stone._NAME = 'Камень'
+    _NAME = 'Камень'
 
 
 ADDING_RESULTS = {
