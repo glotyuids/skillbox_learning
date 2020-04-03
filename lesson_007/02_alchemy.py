@@ -81,7 +81,7 @@ class Element:
         if type(other) in self._transformations:
             # return type(self)._ADDING_RESULTS[type(other)]()
             # Заменяем на:
-            # TODO Готово
+            #  Готово
             new_class = self._transformations[type(other)]
             return new_class()
         return None
@@ -298,3 +298,5 @@ print(Mud(), '+', Dust(), '=', add_elements(Mud(), Dust()))
 # Усложненное задание (делать по желанию)
 # Добавить еще элемент в игру.
 # Придумать что будет при сложении существующих элементов с новым.
+
+# зачет!
