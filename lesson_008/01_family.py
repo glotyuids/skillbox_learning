@@ -11,21 +11,32 @@ from random import randint
 # Все вместе они должны прожить год и не умереть.
 #
 # Муж может:
-#   есть,
-#   играть в WoT,
-#   ходить на работу,
-# Жена может:
-#   есть,
+# +   есть,
+# +   играть в WoT,
+# +   ходить на работу,
+
+# TODO По идеологическим причинам с представленную ниже концепцию роли жены не считаю корректной
+#  Жена может:
+#    есть,
+#    покупать продукты,
+#    покупать шубу,
+#    убираться в доме,
+
+# TODO Но для того, чтобы несмотря на концептуальные расхождения задача была выполнена корректно,
+#  вместо мужа примем отца, а вмето жены - старшую дочь, которая может:
+#  + есть,
 #   покупать продукты,
-#   покупать шубу,
-#   убираться в доме,
+#  + тусить в клубе,
+#  + убираться в доме,
+
+# TODO Соответственно, все дальнейшие условия будут скорректированы под эти вводные
 
 # Все они живут в одном доме, дом характеризуется:
-#   кол-во денег в тумбочке (в начале - 100)
-#   кол-во еды в холодильнике (в начале - 50)
-#   кол-во грязи (в начале - 0)
+# +   кол-во денег в тумбочке (в начале - 100)
+# +   кол-во еды в холодильнике (в начале - 50)
+# +   кол-во грязи (в начале - 0)
 #
-# У людей есть имя, степень сытости (в начале - 30) и степень счастья (в начале - 100).
+# + У людей есть имя, степень сытости (в начале - 30) и степень счастья (в начале - 100).
 #
 # Любое действие, кроме "есть", приводит к уменьшению степени сытости на 10 пунктов
 # Кушают взрослые максимум по 30 единиц еды, степень сытости растет на 1 пункт за 1 пункт еды.
@@ -42,65 +53,162 @@ from random import randint
 # Подвести итоги жизни за год: сколько было заработано денег, сколько сьедено еды, сколько куплено шуб.
 
 
+# TODO Попробовать ввести механизм стикеров на холодильнике для команд другому члену семьи (если он вообще будет нужен)
+#  Нужен, поскольку члены семьи могут голодать в разное время.
+#  Хотя и не нужен, поскольку они должны контроллировать ресурсы
 class House:
 
     def __init__(self):
-        pass
-
-
-class Husband:
-
-    def __init__(self):
-        pass
+        self.dirtiness = 0
+        self.money = 100
+        self.food = 50
+        # TODO возможно, имеет смысл завести список жителей (и животных)
 
     def __str__(self):
-        return super().__str__()
+        return f'Дом: денег - {self.money}, еды - {self.food}, грязи - {self.dirtiness}'
 
-    def act(self):
-        pass
+    def get_old(self):
+        self.dirtiness += 5
+
+
+# TODO каждый метод, где есть вероятность "пролететь" (питание, шоппинг и т.д.) должен возвращать статус выполнения,
+#  чтобы можно было отстроить логику в act()
+class Human:
+    def __init__(self, name, home):
+        self.home = home
+        self.name = name
+        self.fullness = 30
+        self.happiness = 100
+
+    def __str__(self):
+        return f'{self.name}: сытость {self.fullness}, счастье {self.happiness}'
 
     def eat(self):
-        pass
+        # Проработать дозировку еды, поскольку по условию она может варьироваться. Но пока пусть будет константой
+        #  При отсутствии еды и денег всё затянется на два-три дня (работа, покупки, питание).
+        #  Так что 30 - это вполне себе нормальный минимум.
+        #  Можно было бы кормить персонажей и не кратно 10,
+        #  но это будет влиять только в каких-то редких пограничных случаях
+        if self.home.food >= 30:
+            self.home.food -= 30
+            self.fullness += 30
+            print(f'{self.name}: поел')
+            return True
+        else:
+            print(f'{self.name}: еды нет')
+            return False
+
+    def act(self):
+        if self.fullness < 0:
+            print(f'{self.name}: смерть от голода')
+            exit(1)
+        if self.happiness < 10:
+            print(f'{self.name}: забрали в дурку')
+            exit(2)
+        if self.home.dirtiness > 90:
+            self.happiness -= 5
+
+
+class Father(Human):
 
     def work(self):
-        pass
+        print(f'{self.name}: сходил на работу')
+        self.home.money += 150
+        # TODO возможно, изменение сытости следовало бы вынести в act(),
+        #  но надо подумать как сделать красиво с питанием, чтобы не добавлять лишние 10 единиц еды
+        self.fullness -= 10
 
     def gaming(self):
-        pass
-
-
-class Wife:
-
-    def __init__(self):
-        pass
-
-    def __str__(self):
-        return super().__str__()
+        print(f'{self.name}: сыграл 100500 каток в Doom Crossing: Eternal Horizons')
+        self.happiness += 20
+        self.fullness -= 10
 
     def act(self):
-        pass
+        super().act()
+        dice = randint(1, 6)
+        # TODO Тут развитие идеи из прошлого модуля, но теперь без возможности улететь в рекурсию
+        if self.fullness <= 20:
+            if not self.eat() and self.home.money < 50:
+                self.work()
+        elif self.home.money < 50:
+            self.work()
+        elif self.happiness <= 15:
+            self.gaming()
+        elif 1 <= dice <= 3:
+            self.work()
+        elif dice == 4:
+            self.eat()
+        else:
+            self.gaming()
 
-    def eat(self):
-        pass
 
-    def shopping(self):
-        pass
+class EldestDaughter(Human):
 
-    def buy_fur_coat(self):
-        pass
+    def chilling(self):
+        if self.home.money >= 350:
+            print(f'{self.name}: потусила в клубе')
+            self.home.money -= 350
+            self.happiness += 60
+            self.fullness -= 10
+            return True
+
+        print(f'{self.name}: хотела потусить, но денег нет')
+        return False
 
     def clean_house(self):
-        pass
+        print(f'{self.name}: убрала дома')
+        self.home.dirtiness -= 100 if self.home.dirtiness > 100 else self.home.dirtiness
+        self.fullness -= 10
+
+    def shopping(self):
+        if 50 <= self.home.money < 100:
+            print(f'{self.name}: сходила в магазин за едой')
+            self.home.money -= 50
+            self.home.food += 50
+            self.fullness -= 10
+            return True
+
+        if self.home.money >= 100:
+            print(f'{self.name}: купила целый ящик доширака')
+            self.home.money -= 100
+            self.home.food += 100
+            self.fullness -= 10
+            return True
+
+        print(f'{self.name}: денег на еду нет!')
+        return False
+
+    def act(self):
+        super().act()
+        dice = randint(1, 6)
+        if self.fullness <= 20:
+            if not self.eat():
+                if not self.shopping():
+                    self.clean_house()
+        elif self.home.food < 30:
+            if not self.shopping():
+                self.clean_house()
+        elif self.home.dirtiness >= 80:
+            self.clean_house()
+        elif self.happiness <= 15:
+            self.chilling()
+        elif 1 <= dice <= 3:
+            self.clean_house()
+        elif dice == 4:
+            self.eat()
+        else:
+            self.chilling()
 
 
 home = House()
-serge = Husband(name='Сережа')
-masha = Wife(name='Маша')
+serge = Father(name='Папа Сережа', home=home)
+masha = EldestDaughter(name='Дочка Маша', home=home)
 
 for day in range(365):
     cprint('================== День {} =================='.format(day), color='red')
     serge.act()
     masha.act()
+    home.get_old()
     cprint(serge, color='cyan')
     cprint(masha, color='cyan')
     cprint(home, color='cyan')
@@ -132,22 +240,22 @@ for day in range(365):
 # Если кот дерет обои, то грязи становится больше на 5 пунктов
 
 
-class Cat:
-
-    def __init__(self):
-        pass
-
-    def act(self):
-        pass
-
-    def eat(self):
-        pass
-
-    def sleep(self):
-        pass
-
-    def soil(self):
-        pass
+# class Cat:
+#
+#     def __init__(self):
+#         pass
+#
+#     def act(self):
+#         pass
+#
+#     def eat(self):
+#         pass
+#
+#     def sleep(self):
+#         pass
+#
+#     def soil(self):
+#         pass
 
 
 ######################################################## Часть вторая бис
@@ -161,22 +269,22 @@ class Cat:
 # отличия от взрослых - кушает максимум 10 единиц еды,
 # степень счастья  - не меняется, всегда ==100 ;)
 
-class Child:
-
-    def __init__(self):
-        pass
-
-    def __str__(self):
-        return super().__str__()
-
-    def act(self):
-        pass
-
-    def eat(self):
-        pass
-
-    def sleep(self):
-        pass
+# class Child:
+#
+#     def __init__(self):
+#         pass
+#
+#     def __str__(self):
+#         return super().__str__()
+#
+#     def act(self):
+#         pass
+#
+#     def eat(self):
+#         pass
+#
+#     def sleep(self):
+#         pass
 
 
 # TODO после реализации второй части - отдать на проверку учителем две ветки
@@ -189,22 +297,22 @@ class Child:
 # отправить на проверку учителем.
 
 
-home = House()
-serge = Husband(name='Сережа')
-masha = Wife(name='Маша')
-kolya = Child(name='Коля')
-murzik = Cat(name='Мурзик')
-
-for day in range(365):
-    cprint('================== День {} =================='.format(day), color='red')
-    serge.act()
-    masha.act()
-    kolya.act()
-    murzik.act()
-    cprint(serge, color='cyan')
-    cprint(masha, color='cyan')
-    cprint(kolya, color='cyan')
-    cprint(murzik, color='cyan')
+# home = House()
+# serge = Father(name='Сережа')
+# masha = EldestDaughter(name='Маша')
+# kolya = Child(name='Коля')
+# murzik = Cat(name='Мурзик')
+#
+# for day in range(365):
+#     cprint('================== День {} =================='.format(day), color='red')
+#     serge.act()
+#     masha.act()
+#     kolya.act()
+#     murzik.act()
+#     cprint(serge, color='cyan')
+#     cprint(masha, color='cyan')
+#     cprint(kolya, color='cyan')
+#     cprint(murzik, color='cyan')
 
 
 # Усложненное задание (делать по желанию)
