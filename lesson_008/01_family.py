@@ -15,21 +15,18 @@ from random import randint
 # +   играть в WoT,
 # +   ходить на работу,
 
-# TODO По идеологическим причинам с представленную ниже концепцию роли жены не считаю корректной
+# TODO Не могу согласиться с предсавленной ниже концепцией жены, поэтому введём аналогичную позицию старшей дочери
 #  Жена может:
 #    есть,
 #    покупать продукты,
 #    покупать шубу,
 #    убираться в доме,
-
-# TODO Но для того, чтобы несмотря на концептуальные расхождения задача была выполнена корректно,
-#  вместо мужа примем отца, а вмето жены - старшую дочь, которая может:
+#  -
+#  Старшая дочь может:
 #  + есть,
 #   покупать продукты,
-#  + тусить в клубе,
+#  + тусить в клубе (на те же деньги),
 #  + убираться в доме,
-
-# TODO Соответственно, все дальнейшие условия будут скорректированы под эти вводные
 
 # Все они живут в одном доме, дом характеризуется:
 # +   кол-во денег в тумбочке (в начале - 100)
@@ -38,31 +35,32 @@ from random import randint
 #
 # + У людей есть имя, степень сытости (в начале - 30) и степень счастья (в начале - 100).
 #
-# Любое действие, кроме "есть", приводит к уменьшению степени сытости на 10 пунктов
-# Кушают взрослые максимум по 30 единиц еды, степень сытости растет на 1 пункт за 1 пункт еды.
-# Степень сытости не должна падать ниже 0, иначе чел умрет от голода.
+# + Любое действие, кроме "есть", приводит к уменьшению степени сытости на 10 пунктов
+# + Кушают взрослые максимум по 30 единиц еды, степень сытости растет на 1 пункт за 1 пункт еды.
+# + Степень сытости не должна падать ниже 0, иначе чел умрет от голода.
 #
-# Деньги в тумбочку добавляет муж, после работы - 150 единиц за раз.
-# Еда стоит 10 денег 10 единиц еды. Шуба стоит 350 единиц.
+# + Деньги в тумбочку добавляет муж, после работы - 150 единиц за раз.
+# + Еда стоит 10 денег 10 единиц еды. Шуба стоит 350 единиц.
 #
-# Грязь добавляется каждый день по 5 пунктов, за одну уборку жена может убирать до 100 единиц грязи.
-# Если в доме грязи больше 90 - у людей падает степень счастья каждый день на 10 пунктов,
-# Степень счастья растет: у мужа от игры в WoT (на 20), у жены от покупки шубы (на 60, но шуба дорогая)
-# Степень счастья не должна падать ниже 10, иначе чел умрает от депресии.
+# + Грязь добавляется каждый день по 5 пунктов, за одну уборку жена может убирать до 100 единиц грязи.
+# + Если в доме грязи больше 90 - у людей падает степень счастья каждый день на 10 пунктов,
+# + Степень счастья растет: у мужа от игры в WoT (на 20), у жены от покупки шубы (на 60, но шуба дорогая)
+# + Степень счастья не должна падать ниже 10, иначе чел умрает от депресии.
 #
-# Подвести итоги жизни за год: сколько было заработано денег, сколько сьедено еды, сколько куплено шуб.
+# + Подвести итоги жизни за год: сколько было заработано денег, сколько сьедено еды, сколько куплено шуб.
 
 
-# TODO Попробовать ввести механизм стикеров на холодильнике для команд другому члену семьи (если он вообще будет нужен)
-#  Нужен, поскольку члены семьи могут голодать в разное время.
-#  Хотя и не нужен, поскольку они должны контроллировать ресурсы
 class House:
 
     def __init__(self):
         self.dirtiness = 0
-        self.money = 100
-        self.food = 50
-        # TODO возможно, имеет смысл завести список жителей (и животных)
+        self.__money = 100
+        self.__food = 50
+        self.money_earned = 0
+        self.money_spent = 0
+        self.food_bought = 0
+        self.food_eaten = 0
+        # TODO себе: возможно, в дальнейшем имеет смысл завести список жителей (и животных)
 
     def __str__(self):
         return f'Дом: денег - {self.money}, еды - {self.food}, грязи - {self.dirtiness}'
@@ -70,66 +68,91 @@ class House:
     def get_old(self):
         self.dirtiness += 5
 
+    # TODO Для того, чтобы не искать по всему коду изменение количества денег и еды (чтобы собрать статистику)
+    #  попробую применить сеттеры (без геттеров почему-то не работают), о которых недавно узнал
+    @property
+    def money(self):
+        return self.__money
 
-# TODO каждый метод, где есть вероятность "пролететь" (питание, шоппинг и т.д.) должен возвращать статус выполнения,
-#  чтобы можно было отстроить логику в act()
+    @money.setter
+    def money(self, money):
+        if money > self.__money:
+            self.money_earned += money - self.__money
+        elif money < self.__money:
+            self.money_spent += self.__money - money
+        self.__money = money
+
+    @property
+    def food(self):
+        return self.__food
+
+    @food.setter
+    def food(self, food):
+        if food > self.__food:
+            self.food_bought += food - self.__food
+        elif food < self.__food:
+            self.food_eaten += self.__food - food
+        self.__food = food
+
+
 class Human:
-    def __init__(self, name, home):
+    def __init__(self, name, home, sex):
         self.home = home
         self.name = name
         self.fullness = 30
         self.happiness = 100
+        self.sex = sex  # string: male or female
+        self.chilling_number = 0
 
     def __str__(self):
         return f'{self.name}: сытость {self.fullness}, счастье {self.happiness}'
 
+    def _right_sex_word(self, male_word, female_word):
+        return male_word if self.sex == 'male' else female_word
+
+    # TODO каждый метод, где есть вероятность "пролететь" (питание, шоппинг и т.д.) должен возвращать статус выполнения,
+    #  чтобы можно было отстроить логику в act()
     def eat(self):
-        # Проработать дозировку еды, поскольку по условию она может варьироваться. Но пока пусть будет константой
-        #  При отсутствии еды и денег всё затянется на два-три дня (работа, покупки, питание).
-        #  Так что 30 - это вполне себе нормальный минимум.
-        #  Можно было бы кормить персонажей и не кратно 10,
-        #  но это будет влиять только в каких-то редких пограничных случаях
         if self.home.food >= 30:
             self.home.food -= 30
             self.fullness += 30
-            print(f'{self.name}: поел')
+            print(f'{self.name} {self._right_sex_word("поел", "поела")}')
             return True
         else:
-            print(f'{self.name}: еды нет')
+            print(f'{self.name} {self._right_sex_word("остался голодным", "осталась голодной")} - еды нет')
             return False
 
     def act(self):
         if self.fullness < 0:
-            print(f'{self.name}: смерть от голода')
+            print(f'{self.name} {self._right_sex_word("умер", "умерла")} от голода')
             exit(1)
         if self.happiness < 10:
-            print(f'{self.name}: забрали в дурку')
+            print(f'{self.name} {self._right_sex_word("уехал", "уехала")} в дурку')
             exit(2)
         if self.home.dirtiness > 90:
-            self.happiness -= 5
+            self.happiness -= 10
 
 
-class Father(Human):
+class Parent(Human):
 
     def work(self):
-        print(f'{self.name}: сходил на работу')
+        print(f'{self.name} {self._right_sex_word("сходил", "сходила")} на работу')
         self.home.money += 150
-        # TODO возможно, изменение сытости следовало бы вынести в act(),
-        #  но надо подумать как сделать красиво с питанием, чтобы не добавлять лишние 10 единиц еды
         self.fullness -= 10
 
     def gaming(self):
-        print(f'{self.name}: сыграл 100500 каток в Doom Crossing: Eternal Horizons')
+        print(f'{self.name} {self._right_sex_word("сыграл", "сыграла")} катку в Doom Crossing: Eternal Horizons')
         self.happiness += 20
         self.fullness -= 10
+        self.chilling_number += 1
 
     def act(self):
         super().act()
         dice = randint(1, 6)
         # TODO Тут развитие идеи из прошлого модуля, но теперь без возможности улететь в рекурсию
         if self.fullness <= 20:
-            if not self.eat() and self.home.money < 50:
-                self.work()
+            if not self.eat():
+                self.work()    # безусловная работа на случай, если на покупку еды не хватит денег
         elif self.home.money < 50:
             self.work()
         elif self.happiness <= 15:
@@ -142,40 +165,41 @@ class Father(Human):
             self.gaming()
 
 
-class EldestDaughter(Human):
+class ElderChild(Human):
 
     def chilling(self):
         if self.home.money >= 350:
-            print(f'{self.name}: потусила в клубе')
+            print(f'{self.name} {self._right_sex_word("ушёл", "ушла")} на тусовку в клуб')
             self.home.money -= 350
             self.happiness += 60
             self.fullness -= 10
+            self.chilling_number += 1
             return True
 
-        print(f'{self.name}: хотела потусить, но денег нет')
+        print(f'{self.name} не {self._right_sex_word("смог", "смогла")} попасть на тусовку - денег нет')
         return False
 
     def clean_house(self):
-        print(f'{self.name}: убрала дома')
+        print(f'{self.name} {self._right_sex_word("убрал", "убрала")} дома')
         self.home.dirtiness -= 100 if self.home.dirtiness > 100 else self.home.dirtiness
         self.fullness -= 10
 
     def shopping(self):
         if 50 <= self.home.money < 100:
-            print(f'{self.name}: сходила в магазин за едой')
+            print(f'{self.name} {self._right_sex_word("сходил", "сходила")} в магазин за едой')
             self.home.money -= 50
             self.home.food += 50
             self.fullness -= 10
             return True
 
         if self.home.money >= 100:
-            print(f'{self.name}: купила целый ящик доширака')
+            print(f'{self.name} {self._right_sex_word("купил", "купила")} целый ящик доширака')
             self.home.money -= 100
             self.home.food += 100
             self.fullness -= 10
             return True
 
-        print(f'{self.name}: денег на еду нет!')
+        print(f'{self.name} ничего не {self._right_sex_word("купил", "купила")} - денег нет')
         return False
 
     def act(self):
@@ -191,7 +215,8 @@ class EldestDaughter(Human):
         elif self.home.dirtiness >= 80:
             self.clean_house()
         elif self.happiness <= 15:
-            self.chilling()
+            if not self.chilling():
+                self.clean_house()
         elif 1 <= dice <= 3:
             self.clean_house()
         elif dice == 4:
@@ -201,8 +226,8 @@ class EldestDaughter(Human):
 
 
 home = House()
-serge = Father(name='Папа Сережа', home=home)
-masha = EldestDaughter(name='Дочка Маша', home=home)
+serge = Parent(name='Папа Сережа', sex='male', home=home)
+masha = ElderChild(name='Дочка Маша', sex='female', home=home)
 
 for day in range(365):
     cprint('================== День {} =================='.format(day), color='red')
@@ -212,6 +237,14 @@ for day in range(365):
     cprint(serge, color='cyan')
     cprint(masha, color='cyan')
     cprint(home, color='cyan')
+
+print(f'\nДенег заработано: {home.money_earned}\n'
+      f'Денег потрачено: {home.money_spent}\n'
+      f'Еды куплено: {home.food_bought}\n'
+      f'Еды съедено: {home.food_eaten}')
+
+print(f'\nПапа сыграл {serge.chilling_number} каток в Doom Crossing: Eternal Horizons\n'
+      f'Дочь сходила {masha.chilling_number} раз в клуб\n')
 
 # TODO после реализации первой части - отдать на проверку учителю
 
