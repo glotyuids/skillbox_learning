@@ -115,10 +115,10 @@ class Human:
     #  каждый метод, где есть вероятность "пролететь" (питание, шоппинг и т.д.) должен возвращать статус выполнения,
     #  чтобы можно было отстроить логику в act()
     #  В точку!
-    def eat(self):
-        if self.home.food >= 30:
-            self.home.food -= 30
-            self.fullness += 30
+    def eat(self, food_amount=30):
+        if self.home.food >= food_amount:
+            self.home.food -= food_amount
+            self.fullness += food_amount
             print(f'{self.name} {self._right_sex_word("поел", "поела")}')
             return True
         else:
@@ -228,17 +228,43 @@ class ElderChild(Human):
             self.chilling()
 
 
+class YoungerChild(Human):
+
+    def act(self):
+        super().act()
+        self.happiness = 100
+        dice = randint(1, 6)
+        if self.fullness <= 10:
+            if not self.eat():
+                self.sleep()
+        elif dice < 3:
+            if not self.eat():
+                self.sleep()
+        else:
+            self.sleep()
+
+    def eat(self):
+        return super().eat(food_amount=10)
+
+    def sleep(self):
+        print(f'{self.name} сегодня весь день {self._right_sex_word("спал", "спала")}')
+        self.fullness -= 10
+
+
 home = House()
 serge = Parent(name='Папа Сережа', sex='male', home=home)
 masha = ElderChild(name='Дочка Маша', sex='female', home=home)
+kolya = YoungerChild(name='Сынок Коля', sex='male', home=home)
 
-for day in range(365):  # TODO Нумерация дней с 0 не полне привычна для обихода
+for day in range(1, 366):  # Нумерация дней с 0 не полне привычна для обихода
     cprint('================== День {} =================='.format(day), color='red')
     serge.act()
     masha.act()
+    kolya.act()
     home.get_old()
     cprint(serge, color='cyan')
     cprint(masha, color='cyan')
+    cprint(kolya, color='cyan')
     cprint(home, color='cyan')
 
 print(f'\nДенег заработано: {home.money_earned}\n'
@@ -299,11 +325,11 @@ print(f'\nПапа сыграл {serge.chilling_number} каток в Doom Cross
 # После реализации первой части надо в ветке мастер продолжить работу над семьей - добавить ребенка
 #
 # Ребенок может:
-#   есть,
-#   спать,
+# +  есть,
+# +  спать,
 #
-# отличия от взрослых - кушает максимум 10 единиц еды,
-# степень счастья  - не меняется, всегда ==100 ;)
+# + отличия от взрослых - кушает максимум 10 единиц еды,
+# + степень счастья  - не меняется, всегда ==100 ;)
 
 # class Child:
 #
