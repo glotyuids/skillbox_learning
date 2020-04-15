@@ -141,19 +141,24 @@ class Human:
     def act(self):
         if self.fullness < 0:
             print(f'{self.name} {self._right_sex_word("умер", "умерла")} от голода')
-            exit(1)
+            return 1
         if self.happiness < 10:
             print(f'{self.name} {self._right_sex_word("уехал", "уехала")} в дурку')
-            exit(2)
+            return 2
         if self.home.dirtiness > 90:
             self.happiness -= 10
+        return 0
 
 
 class Parent(Human):
 
+    def __init__(self, salary=150, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.salary = salary
+
     def work(self):
         print(f'{self.name} {self._right_sex_word("сходил", "сходила")} на работу')
-        self.home.money += 150
+        self.home.money += self.salary
         self.fullness -= 10
 
     def gaming(self):
@@ -163,7 +168,10 @@ class Parent(Human):
         self.chilling_number += 1
 
     def act(self):
-        super().act()
+        disease = super().act()
+        if disease:
+            return disease
+
         dice = randint(1, 6)
         #  Тут развитие идеи из прошлого модуля, но теперь без возможности улететь в рекурсию
         if self.fullness <= 20:
@@ -181,6 +189,8 @@ class Parent(Human):
             self.eat()
         else:
             self.gaming()
+
+        return 0
 
 
 class ElderChild(Human):
@@ -239,7 +249,10 @@ class ElderChild(Human):
         return False
 
     def act(self):
-        super().act()
+        disease = super().act()
+        if disease:
+            return disease
+
         dice = randint(1, 6)
         if self.fullness <= 20:
             if not self.eat():
@@ -265,11 +278,16 @@ class ElderChild(Human):
         else:
             self.chilling()
 
+        return 0
+
 
 class YoungerChild(Human):
 
     def act(self):
-        super().act()
+        disease = super().act()
+        if disease:
+            return disease
+
         self.happiness = 100
         dice = randint(1, 6)
         if self.fullness <= 10:
@@ -280,6 +298,8 @@ class YoungerChild(Human):
                 self.sleep()
         else:
             self.sleep()
+
+        return 0
 
     def eat(self):
         return super().eat(food_amount=10)
@@ -328,7 +348,7 @@ class Cat:
     def act(self):
         if self.fullness < 0:
             print(f'Кот {self.name} умер...')
-            quit(3)
+            return 3
 
         dice = randint(1, 6)
         if self.fullness < 20:
@@ -345,30 +365,32 @@ class Cat:
         else:
             self.sleep()
 
+        return 0
 
-home = House()
-home.residents.append(Parent(name='Папа Сережа', sex='male', home=home))
-home.residents.append(ElderChild(name='Дочка Маша', sex='female', home=home))
-home.residents.append(YoungerChild(name='Сынок Коля', sex='male', home=home))
-home.pets.append(Cat(home=home))
 
-for day in range(1, 366):  # Нумерация дней с 0 не полне привычна для обихода
-    cprint('================== День {} =================='.format(day), color='red')
-    for someone in home.residents + home.pets:
-        someone.act()
-    home.get_old()
-    for someone in home.residents + home.pets + [home]:
-        cprint(someone, color='cyan')
-    # Реализуйте идею со списком жителей в классе Дом. Это позволит избавиться от необоходимости дорабатывать
-    #  главный цикл каждый раз когда появляется новый житель
-
-print(f'\nДенег заработано: {home.money_earned}\n'
-      f'Денег потрачено: {home.money_spent}\n'
-      f'Еды куплено: {home.food_bought}\n'
-      f'Еды съедено: {home.food_eaten}')
-
-print(f'\nПапа сыграл {home.residents[0].chilling_number} каток в Doom Crossing: Eternal Horizons\n'
-      f'Дочь сходила {home.residents[1].chilling_number} раз в клуб\n')
+# home = House()
+# home.residents.append(Parent(name='Папа Сережа', sex='male', home=home))
+# home.residents.append(ElderChild(name='Дочка Маша', sex='female', home=home))
+# home.residents.append(YoungerChild(name='Сынок Коля', sex='male', home=home))
+# home.pets.append(Cat(home=home))
+#
+# for day in range(1, 366):  # Нумерация дней с 0 не полне привычна для обихода
+#     cprint('================== День {} =================='.format(day), color='red')
+#     for someone in home.residents + home.pets:
+#         someone.act()
+#     home.get_old()
+#     for someone in home.residents + home.pets + [home]:
+#         cprint(someone, color='cyan')
+#     # Реализуйте идею со списком жителей в классе Дом. Это позволит избавиться от необоходимости дорабатывать
+#     #  главный цикл каждый раз когда появляется новый житель
+#
+# print(f'\nДенег заработано: {home.money_earned}\n'
+#       f'Денег потрачено: {home.money_spent}\n'
+#       f'Еды куплено: {home.food_bought}\n'
+#       f'Еды съедено: {home.food_eaten}')
+#
+# print(f'\nПапа сыграл {home.residents[0].chilling_number} каток в Doom Crossing: Eternal Horizons\n'
+#       f'Дочь сходила {home.residents[1].chilling_number} раз в клуб\n')
 
 #  после реализации первой части - отдать на проверку учителю
 # зачет первой части
@@ -478,3 +500,52 @@ print(f'\nПапа сыграл {home.residents[0].chilling_number} каток �
 #           max_cats = life.experiment(salary)
 #           print(f'При зарплате {salary} максимально можно прокормить {max_cats} котов')
 
+class Simulation:
+
+    def __init__(self, money_incidents, food_incidents):
+        self.money_incidents = money_incidents
+        self.food_incidents = food_incidents
+        self.max_cats = 0
+
+    def live_a_year(self, salary, attempt):
+        home = House()
+        home.residents.append(Parent(name='Папа Сережа', sex='male', salary=salary, home=home))
+        home.residents.append(ElderChild(name='Дочка Маша', sex='female', home=home))
+        home.residents.append(YoungerChild(name='Сынок Коля', sex='male', home=home))
+        home.pets.append(Cat(home=home))
+
+        diseases = 0
+        for day in range(1, 366):
+            cprint(f'================== Попытка {attempt} - День {day} ==================', color='red')
+            diseases = sum([someone.act() for someone in home.residents + home.pets])
+            if diseases:
+                return False
+            home.get_old()
+            for someone in home.residents + home.pets + [home]:
+                cprint(someone, color='cyan')
+
+        return True
+
+    def experiment(self, salary):
+        success_attempts = 0
+        for attempt in range(1, 4):
+
+            attempt_result = self.live_a_year(salary=salary, attempt=attempt)
+
+            success_attempts += 1 if attempt_result else 0
+            if success_attempts == 1 and attempt == 2:
+                break
+            if success_attempts == 2:
+                break
+
+        if success_attempts >= 2:
+            print('Success experiment')
+        else:
+            print('Fail')
+
+        return 0
+
+
+life = Simulation(0, 0)
+max_cats = life.experiment(salary=50)
+#   print(f'При зарплате {salary} максимально можно прокормить {max_cats} котов')
