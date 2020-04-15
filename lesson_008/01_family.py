@@ -62,7 +62,9 @@ class House:
         self.money_spent = 0
         self.food_bought = 0
         self.food_eaten = 0
-        # TODO себе: возможно, в дальнейшем имеет смысл завести список жителей (и животных)
+        self.residents = []
+        self.pets = []
+        # возможно, в дальнейшем имеет смысл завести список жителей (и животных)
         # -- Отличная идея, очень упрощает и автоматизирует основной цикл программы!
 
     def __str__(self):
@@ -322,21 +324,18 @@ class Cat:
 
 
 home = House()
-serge = Parent(name='Папа Сережа', sex='male', home=home)
-masha = ElderChild(name='Дочка Маша', sex='female', home=home)
-cat = Cat(home=home)
+home.residents.append(Parent(name='Папа Сережа', sex='male', home=home))
+home.residents.append(ElderChild(name='Дочка Маша', sex='female', home=home))
+home.pets.append(Cat(home=home))
 
 for day in range(1, 366):  # Нумерация дней с 0 не полне привычна для обихода
     cprint('================== День {} =================='.format(day), color='red')
-    serge.act()
-    masha.act()
-    cat.act()
+    for someone in home.residents + home.pets:
+        someone.act()
     home.get_old()
-    cprint(serge, color='cyan')
-    cprint(masha, color='cyan')
-    cprint(cat, color='cyan')
-    cprint(home, color='cyan')
-    # TODO Реализуйте идею со списком жителей в классе Дом. Это позволит избавиться от необоходимости дорабатывать
+    for someone in home.residents + home.pets + [home]:
+        cprint(someone, color='cyan')
+    # Реализуйте идею со списком жителей в классе Дом. Это позволит избавиться от необоходимости дорабатывать
     #  главный цикл каждый раз когда появляется новый житель
 
 print(f'\nДенег заработано: {home.money_earned}\n'
@@ -344,10 +343,10 @@ print(f'\nДенег заработано: {home.money_earned}\n'
       f'Еды куплено: {home.food_bought}\n'
       f'Еды съедено: {home.food_eaten}')
 
-print(f'\nПапа сыграл {serge.chilling_number} каток в Doom Crossing: Eternal Horizons\n'
-      f'Дочь сходила {masha.chilling_number} раз в клуб\n')
+print(f'\nПапа сыграл {home.residents[0].chilling_number} каток в Doom Crossing: Eternal Horizons\n'
+      f'Дочь сходила {home.residents[1].chilling_number} раз в клуб\n')
 
-# TODO после реализации первой части - отдать на проверку учителю
+# после реализации первой части - отдать на проверку учителю
 
 ######################################################## Часть вторая
 #
