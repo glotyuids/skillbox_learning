@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from termcolor import cprint
-from random import randint
+from random import randint, choice
 
 ######################################################## Часть первая
 #
@@ -57,11 +57,14 @@ class House:
         self.dirtiness = 0
         self.__money = 100
         self.__food = 50
+        self.cat_food = 30
         self.money_earned = 0
         self.money_spent = 0
         self.food_bought = 0
         self.food_eaten = 0
-        # TODO себе: возможно, в дальнейшем имеет смысл завести список жителей (и животных)
+        self.residents = []
+        self.pets = []
+        # возможно, в дальнейшем имеет смысл завести список жителей (и животных)
         # -- Отличная идея, очень упрощает и автоматизирует основной цикл программы!
 
     def __str__(self):
@@ -125,6 +128,16 @@ class Human:
             print(f'{self.name} {self._right_sex_word("остался голодным", "осталась голодной")} - еды нет')
             return False
 
+    def play_with_cat(self):
+        # TODO себе: возможно, стоит передавать коту маркер того, что он сегодня был "занят", либо вызывать
+        #  метод cat.play_with_human(). Сделать атрибут-флаг игрались или нет,
+        #  в методе обрабатывать голод и взводить флаг, а в cat.act() просто сбрасывать флаг, если он был взведён).
+        #  То есть можно накрутить, например, отказ кота в игре, если он голоден.
+        #  Но это потребует некоторого времени, поэтому отложим на потом.
+        print(f'{self.name} {self._right_sex_word("поиграл", "поиграла")} с котом')
+        self.happiness += 5
+        self.fullness -= 10
+
     def act(self):
         if self.fullness < 0:
             print(f'{self.name} {self._right_sex_word("умер", "умерла")} от голода')
@@ -160,8 +173,10 @@ class Parent(Human):
             self.work()
         elif self.happiness <= 15:
             self.gaming()
-        elif 1 <= dice <= 3:
+        elif 1 <= dice <= 2:
             self.work()
+        elif dice == 3:
+            self.play_with_cat()
         elif dice == 4:
             self.eat()
         else:
@@ -187,7 +202,7 @@ class ElderChild(Human):
         self.home.dirtiness -= 100 if self.home.dirtiness > 100 else self.home.dirtiness
         self.fullness -= 10
 
-    def shopping(self):
+    def buy_food(self):
         if 50 <= self.home.money < 100:
             print(f'{self.name} {self._right_sex_word("сходил", "сходила")} в магазин за едой')
             self.home.money -= 50
@@ -202,7 +217,25 @@ class ElderChild(Human):
             self.fullness -= 10
             return True
 
-        print(f'{self.name} ничего не {self._right_sex_word("купил", "купила")} - денег нет')
+        print(f'{self.name} еды не {self._right_sex_word("купил", "купила")} - денег нет')
+        return False
+
+    def buy_cat_food(self):
+        if 50 <= self.home.money < 100:
+            print(f'{self.name} {self._right_sex_word("сходил", "сходила")} в зоомагазин за кошачьим кормом')
+            self.home.money -= 50
+            self.home.cat_food += 50
+            self.fullness -= 10
+            return True
+
+        if self.home.money >= 100:
+            print(f'{self.name} {self._right_sex_word("купил", "купила")} много кошачьего корма')
+            self.home.money -= 100
+            self.home.cat_food += 100
+            self.fullness -= 10
+            return True
+
+        print(f'{self.name} корма не {self._right_sex_word("купил", "купила")} - денег нет')
         return False
 
     def act(self):
@@ -210,18 +243,23 @@ class ElderChild(Human):
         dice = randint(1, 6)
         if self.fullness <= 20:
             if not self.eat():
-                if not self.shopping():
+                if not self.buy_food():
                     self.clean_house()
         elif self.home.food < 30:
-            if not self.shopping():
+            if not self.buy_food():
+                self.clean_house()
+        elif self.home.cat_food < 20:
+            if not self.buy_cat_food():
                 self.clean_house()
         elif self.home.dirtiness >= 80:
             self.clean_house()
         elif self.happiness <= 15:
             if not self.chilling():
-                self.clean_house()
-        elif 1 <= dice <= 3:
+                self.play_with_cat()
+        elif 1 <= dice <= 2:
             self.clean_house()
+        elif dice == 3:
+            self.play_with_cat()
         elif dice == 4:
             self.eat()
         else:
@@ -251,29 +289,86 @@ class YoungerChild(Human):
         self.fullness -= 10
 
 
+class Cat:
+    NAMES = ['Феликс', 'Том', 'Сильвестр', 'Гарфилд', 'в сапогах', 'Чешир', 'Артемис', 'Мяут', 'Котобус', 'Мистер Кэт']
+
+    def __init__(self, home, name=None):
+        if name is None:
+            name = choice(Cat.NAMES)
+        self.name = name
+        self.fullness = 30
+        self.home = home
+
+    def __str__(self):
+        return f'Я - кот {self.name}, сытость {self.fullness}'
+
+    def eat(self):
+        if self.home.cat_food >= 10:
+            print(f'Кот {self.name} поел')
+            self.fullness += 20
+            self.home.cat_food -= 10
+            return True
+
+        print(f'Мяу! Кот {self.name} нет еды')
+        return False
+
+    def sleep(self):
+        print(f'Кот {self.name} целый день дрых как скотина')
+        self.fullness -= 10
+
+    def rip_wallpapers(self):
+        if randint(0, 100) > 20:
+            print(f'Кот {self.name} подрал обои. Не забыть бы их подклеить')
+            self.home.dirtiness += 5
+        else:
+            print(f'Кот {self.name} Нагадил мимо лотка. Надо конфуз убрать')
+            self.home.dirtiness += 50
+        self.fullness -= 10
+
+    def act(self):
+        if self.fullness < 0:
+            print(f'Кот {self.name} умер...')
+            quit(3)
+
+        dice = randint(1, 6)
+        if self.fullness < 20:
+            self.eat()
+        elif self.fullness > 100:
+            if 1 <= dice <= 2:
+                self.rip_wallpapers()
+            else:
+                self.sleep()
+        elif 1 <= dice <= 2:
+            self.eat()
+        elif 3 <= dice <= 4:
+            self.rip_wallpapers()
+        else:
+            self.sleep()
+
+
 home = House()
-serge = Parent(name='Папа Сережа', sex='male', home=home)
-masha = ElderChild(name='Дочка Маша', sex='female', home=home)
-kolya = YoungerChild(name='Сынок Коля', sex='male', home=home)
+home.residents.append(Parent(name='Папа Сережа', sex='male', home=home))
+home.residents.append(ElderChild(name='Дочка Маша', sex='female', home=home))
+home.residents.append(YoungerChild(name='Сынок Коля', sex='male', home=home))
+home.pets.append(Cat(home=home))
 
 for day in range(1, 366):  # Нумерация дней с 0 не полне привычна для обихода
     cprint('================== День {} =================='.format(day), color='red')
-    serge.act()
-    masha.act()
-    kolya.act()
+    for someone in home.residents + home.pets:
+        someone.act()
     home.get_old()
-    cprint(serge, color='cyan')
-    cprint(masha, color='cyan')
-    cprint(kolya, color='cyan')
-    cprint(home, color='cyan')
+    for someone in home.residents + home.pets + [home]:
+        cprint(someone, color='cyan')
+    # Реализуйте идею со списком жителей в классе Дом. Это позволит избавиться от необоходимости дорабатывать
+    #  главный цикл каждый раз когда появляется новый житель
 
 print(f'\nДенег заработано: {home.money_earned}\n'
       f'Денег потрачено: {home.money_spent}\n'
       f'Еды куплено: {home.food_bought}\n'
       f'Еды съедено: {home.food_eaten}')
 
-print(f'\nПапа сыграл {serge.chilling_number} каток в Doom Crossing: Eternal Horizons\n'
-      f'Дочь сходила {masha.chilling_number} раз в клуб\n')
+print(f'\nПапа сыграл {home.residents[0].chilling_number} каток в Doom Crossing: Eternal Horizons\n'
+      f'Дочь сходила {home.residents[1].chilling_number} раз в клуб\n')
 
 #  после реализации первой части - отдать на проверку учителю
 # зачет первой части
@@ -281,44 +376,26 @@ print(f'\nПапа сыграл {serge.chilling_number} каток в Doom Cross
 ######################################################## Часть вторая
 #
 # После подтверждения учителем первой части надо
-# отщепить ветку develop и в ней начать добавлять котов в модель семьи
+# +отщепить ветку develop и в ней начать добавлять котов в модель семьи
 #
-# Кот может:
-#   есть,
-#   спать,
-#   драть обои
+# + Кот может:
+#  + есть,
+#  + спать,
+#  + драть обои
 #
-# Люди могут:
-#   гладить кота (растет степень счастья на 5 пунктов)
+# + Люди могут:
+#  + гладить кота (растет степень счастья на 5 пунктов)
 #
-# В доме добавляется:
-#   еда для кота (в начале - 30)
+# + В доме добавляется:
+# +  еда для кота (в начале - 30)
 #
-# У кота есть имя и степень сытости (в начале - 30)
-# Любое действие кота, кроме "есть", приводит к уменьшению степени сытости на 10 пунктов
-# Еда для кота покупается за деньги: за 10 денег 10 еды.
-# Кушает кот максимум по 10 единиц еды, степень сытости растет на 2 пункта за 1 пункт еды.
-# Степень сытости не должна падать ниже 0, иначе кот умрет от голода.
+# + У кота есть имя и степень сытости (в начале - 30)
+# + Любое действие кота, кроме "есть", приводит к уменьшению степени сытости на 10 пунктов
+# + Еда для кота покупается за деньги: за 10 денег 10 еды.
+# + Кушает кот максимум по 10 единиц еды, степень сытости растет на 2 пункта за 1 пункт еды.
+# + Степень сытости не должна падать ниже 0, иначе кот умрет от голода.
 #
-# Если кот дерет обои, то грязи становится больше на 5 пунктов
-
-
-# class Cat:
-#
-#     def __init__(self):
-#         pass
-#
-#     def act(self):
-#         pass
-#
-#     def eat(self):
-#         pass
-#
-#     def sleep(self):
-#         pass
-#
-#     def soil(self):
-#         pass
+# + Если кот дерет обои, то грязи становится больше на 5 пунктов
 
 # зачет второй части
 
