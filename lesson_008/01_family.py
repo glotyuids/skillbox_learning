@@ -336,6 +336,8 @@ for day in range(1, 366):  # Нумерация дней с 0 не полне п
     cprint(masha, color='cyan')
     cprint(cat, color='cyan')
     cprint(home, color='cyan')
+    # TODO Реализуйте идею со списком жителей в классе Дом. Это позволит избавиться от необоходимости дорабатывать
+    #  главный цикл каждый раз когда появляется новый житель
 
 print(f'\nДенег заработано: {home.money_earned}\n'
       f'Денег потрачено: {home.money_spent}\n'
