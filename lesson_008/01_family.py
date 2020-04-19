@@ -507,16 +507,34 @@ class Simulation:
         self.food_incidents = food_incidents
         self.max_cats = 0
 
-    def live_a_year(self, salary, attempt):
+    def live_a_year(self, salary, attempt, cats_number=0):
+        """
+        В этом методе семья проживает год своей жизни
+
+        Parameters
+        ----------
+        salary: int
+            Зарплата главы семейства
+
+        attempt: int
+            Номер попытки. Здесь нужен только для корректного вывода на консоль
+
+        cats_number: int, default=0
+            Количество кошек в доме
+
+        Returns
+        -------
+        True, если семья дожила до конца года и False - если нет
+        """
         home = House()
         home.residents.append(Parent(name='Папа Сережа', sex='male', salary=salary, home=home))
         home.residents.append(ElderChild(name='Дочка Маша', sex='female', home=home))
         home.residents.append(YoungerChild(name='Сынок Коля', sex='male', home=home))
-        home.pets.append(Cat(home=home))
+        for _ in range(cats_number):
+            home.pets.append(Cat(home=home))
 
-        diseases = 0
         for day in range(1, 366):
-            cprint(f'================== Попытка {attempt} - День {day} ==================', color='red')
+            cprint(f'=============== {cats_number} кошек - Попытка {attempt} - День {day} ===============', color='red')
             diseases = sum([someone.act() for someone in home.residents + home.pets])
             if diseases:
                 return False
@@ -527,25 +545,48 @@ class Simulation:
         return True
 
     def experiment(self, salary):
-        success_attempts = 0
-        for attempt in range(1, 4):
+        """
+        В этом методе проводится эксперимент по поиску максимального количество кошек, с которым семья может выжить.
+        Для сглаживания случайностей моделирование делается 3 раза, если два раза из трёх выжили - эксперимент успешен.
 
-            attempt_result = self.live_a_year(salary=salary, attempt=attempt)
+        В цикле просто посследовательно увеличиваем количество котов и проводим эксперимент
+            (для оптимизации расчёта кол-ва кошек можно было бы использовать метод умножения на два и вычитания половин,
+            но здесь это лишь усложнит код)
+        Выход из цикла происходит при неудачном результате эксперимента
 
-            success_attempts += 1 if attempt_result else 0
-            if success_attempts == 1 and attempt == 2:
+
+        Parameters
+        ----------
+        salary: int
+            Зарплата главы семейства
+
+        Returns
+        -------
+        Максимальное количество кошек, которое может прокормить семейство при заданных вводных
+        """
+        cats_number = 0
+        while True:
+            cats_number += 1
+
+            success_attempts = 0
+            for attempt in range(1, 4):
+                attempt_result = self.live_a_year(salary=salary, attempt=attempt, cats_number=cats_number)
+                success_attempts += 1 if attempt_result else 0
+                if success_attempts == 1 and attempt == 2:
+                    break
+                if success_attempts == 2:
+                    break
+
+            if success_attempts >= 2:
+                cprint(f'\n{cats_number} кошек - успешный эксперимент\n', color='green')
+            else:
+                cprint(f'\n{cats_number} кошек - неудачный эксперимент\n', color='red')
                 break
-            if success_attempts == 2:
-                break
 
-        if success_attempts >= 2:
-            print('Success experiment')
-        else:
-            print('Fail')
-
-        return 0
+        return cats_number - 1
 
 
 life = Simulation(0, 0)
-max_cats = life.experiment(salary=50)
-#   print(f'При зарплате {salary} максимально можно прокормить {max_cats} котов')
+salary = 150
+max_cats = life.experiment(salary=salary)
+cprint(f'\nПри зарплате {salary} максимально можно прокормить {max_cats} кошек', color='yellow')
