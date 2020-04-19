@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from termcolor import cprint
-from random import randint, choice
+from random import randint, choice, sample
 
 ######################################################## Часть первая
 #
@@ -506,6 +506,26 @@ class Simulation:
         self.money_incidents = money_incidents
         self.food_incidents = food_incidents
         self.max_cats = 0
+        self.money_incidents_days = []
+        self.food_incidents_days = []
+        self.seed_incidents()
+
+    def seed_incidents(self, money_incidents=None, food_incidents=None):
+        """
+        Метод создаёт список дней, когда будут возникать проблемы с деньгами и едой
+
+        Parameters
+        ----------
+        money_incidents: int, default=None
+            Количество проблем с деньгами в году
+
+        food_incidents: int, default=None
+            Количество проблем с едой в году
+        """
+        self.money_incidents = money_incidents if money_incidents is not None else self.money_incidents
+        self.food_incidents = food_incidents if food_incidents is not None else self.food_incidents
+        self.money_incidents_days = sample(range(1, 366), self.money_incidents)
+        self.food_incidents_days = sample(range(1, 366), self.food_incidents)
 
     def live_a_year(self, salary, attempt, cats_number=0):
         """
@@ -535,6 +555,13 @@ class Simulation:
 
         for day in range(1, 366):
             cprint(f'=============== {cats_number} кошек - Попытка {attempt} - День {day} ===============', color='red')
+            if day in self.money_incidents_days:
+                cprint('Из копилки пропала половина денег!', color='red')
+                home.money //= 2
+            if day in self.food_incidents_days:
+                cprint('Из холодильника пропала половина еды!', color='red')
+                home.food //= 2
+
             diseases = sum([someone.act() for someone in home.residents + home.pets])
             if diseases:
                 return False
@@ -586,7 +613,22 @@ class Simulation:
         return cats_number - 1
 
 
-life = Simulation(0, 0)
-salary = 150
-max_cats = life.experiment(salary=salary)
-cprint(f'\nПри зарплате {salary} максимально можно прокормить {max_cats} кошек', color='yellow')
+experiment_results = {}
+for food_incidents in range(6):
+    experiment_results[food_incidents] = {}
+    for money_incidents in range(6):
+        experiment_results[food_incidents][money_incidents] = {}
+        life = Simulation(money_incidents, food_incidents)
+        for salary in range(50, 401, 50):
+            max_cats = life.experiment(salary)
+            experiment_results[food_incidents][money_incidents][salary] = max_cats
+
+for food_incident_number, money_incidents in experiment_results:
+    for money_incidents_number, salaries in money_incidents:
+        for salary, max_cats in salaries:
+            print(f'При зарплате {salary} максимально можно прокормить {max_cats} котов')
+
+# life = Simulation(0, 0)
+# salary = 150
+# max_cats = life.experiment(salary=salary)
+# cprint(f'\nПри зарплате {salary} максимально можно прокормить {max_cats} кошек', color='yellow')
