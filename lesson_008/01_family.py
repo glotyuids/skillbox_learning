@@ -2,6 +2,7 @@
 
 from termcolor import cprint
 from random import randint, choice, sample
+from tabulate import tabulate
 
 ######################################################## Часть первая
 #
@@ -49,6 +50,8 @@ from random import randint, choice, sample
 # + Степень счастья не должна падать ниже 10, иначе чел умрает от депресии.
 #
 # + Подвести итоги жизни за год: сколько было заработано денег, сколько сьедено еды, сколько куплено шуб.
+
+PRINT_LOG = False
 
 
 class House:
@@ -122,10 +125,10 @@ class Human:
         if self.home.food >= food_amount:
             self.home.food -= food_amount
             self.fullness += food_amount
-            print(f'{self.name} {self._right_sex_word("поел", "поела")}')
+            lgprint(f'{self.name} {self._right_sex_word("поел", "поела")}')
             return True
         else:
-            print(f'{self.name} {self._right_sex_word("остался голодным", "осталась голодной")} - еды нет')
+            lgprint(f'{self.name} {self._right_sex_word("остался голодным", "осталась голодной")} - еды нет')
             return False
 
     def play_with_cat(self):
@@ -134,16 +137,16 @@ class Human:
         #  в методе обрабатывать голод и взводить флаг, а в cat.act() просто сбрасывать флаг, если он был взведён).
         #  То есть можно накрутить, например, отказ кота в игре, если он голоден.
         #  Но это потребует некоторого времени, поэтому отложим на потом.
-        print(f'{self.name} {self._right_sex_word("поиграл", "поиграла")} с котом')
+        lgprint(f'{self.name} {self._right_sex_word("поиграл", "поиграла")} с котом')
         self.happiness += 5
         self.fullness -= 10
 
     def act(self):
         if self.fullness < 0:
-            print(f'{self.name} {self._right_sex_word("умер", "умерла")} от голода')
+            lgprint(f'{self.name} {self._right_sex_word("умер", "умерла")} от голода')
             return 1
         if self.happiness < 10:
-            print(f'{self.name} {self._right_sex_word("уехал", "уехала")} в дурку')
+            lgprint(f'{self.name} {self._right_sex_word("уехал", "уехала")} в дурку')
             return 2
         if self.home.dirtiness > 90:
             self.happiness -= 10
@@ -157,12 +160,12 @@ class Parent(Human):
         self.salary = salary
 
     def work(self):
-        print(f'{self.name} {self._right_sex_word("сходил", "сходила")} на работу')
+        lgprint(f'{self.name} {self._right_sex_word("сходил", "сходила")} на работу')
         self.home.money += self.salary
         self.fullness -= 10
 
     def gaming(self):
-        print(f'{self.name} {self._right_sex_word("сыграл", "сыграла")} катку в Doom Crossing: Eternal Horizons')
+        lgprint(f'{self.name} {self._right_sex_word("сыграл", "сыграла")} катку в Doom Crossing: Eternal Horizons')
         self.happiness += 20
         self.fullness -= 10
         self.chilling_number += 1
@@ -197,55 +200,55 @@ class ElderChild(Human):
 
     def chilling(self):
         if self.home.money >= 350:
-            print(f'{self.name} {self._right_sex_word("ушёл", "ушла")} на тусовку в клуб')
+            lgprint(f'{self.name} {self._right_sex_word("ушёл", "ушла")} на тусовку в клуб')
             self.home.money -= 350
             self.happiness += 60
             self.fullness -= 10
             self.chilling_number += 1
             return True
 
-        print(f'{self.name} не {self._right_sex_word("смог", "смогла")} попасть на тусовку - денег нет')
+        lgprint(f'{self.name} не {self._right_sex_word("смог", "смогла")} попасть на тусовку - денег нет')
         return False
 
     def clean_house(self):
-        print(f'{self.name} {self._right_sex_word("убрал", "убрала")} дома')
+        lgprint(f'{self.name} {self._right_sex_word("убрал", "убрала")} дома')
         self.home.dirtiness -= 100 if self.home.dirtiness > 100 else self.home.dirtiness
         self.fullness -= 10
 
     def buy_food(self):
         if 50 <= self.home.money < 100:
-            print(f'{self.name} {self._right_sex_word("сходил", "сходила")} в магазин за едой')
+            lgprint(f'{self.name} {self._right_sex_word("сходил", "сходила")} в магазин за едой')
             self.home.money -= 50
             self.home.food += 50
             self.fullness -= 10
             return True
 
         if self.home.money >= 100:
-            print(f'{self.name} {self._right_sex_word("купил", "купила")} целый ящик доширака')
+            lgprint(f'{self.name} {self._right_sex_word("купил", "купила")} целый ящик доширака')
             self.home.money -= 100
             self.home.food += 100
             self.fullness -= 10
             return True
 
-        print(f'{self.name} еды не {self._right_sex_word("купил", "купила")} - денег нет')
+        lgprint(f'{self.name} еды не {self._right_sex_word("купил", "купила")} - денег нет')
         return False
 
     def buy_cat_food(self):
         if 50 <= self.home.money < 100:
-            print(f'{self.name} {self._right_sex_word("сходил", "сходила")} в зоомагазин за кошачьим кормом')
+            lgprint(f'{self.name} {self._right_sex_word("сходил", "сходила")} в зоомагазин за кошачьим кормом')
             self.home.money -= 50
             self.home.cat_food += 50
             self.fullness -= 10
             return True
 
         if self.home.money >= 100:
-            print(f'{self.name} {self._right_sex_word("купил", "купила")} много кошачьего корма')
+            lgprint(f'{self.name} {self._right_sex_word("купил", "купила")} много кошачьего корма')
             self.home.money -= 100
             self.home.cat_food += 100
             self.fullness -= 10
             return True
 
-        print(f'{self.name} корма не {self._right_sex_word("купил", "купила")} - денег нет')
+        lgprint(f'{self.name} корма не {self._right_sex_word("купил", "купила")} - денег нет')
         return False
 
     def act(self):
@@ -305,7 +308,7 @@ class YoungerChild(Human):
         return super().eat(food_amount=10)
 
     def sleep(self):
-        print(f'{self.name} сегодня весь день {self._right_sex_word("спал", "спала")}')
+        lgprint(f'{self.name} сегодня весь день {self._right_sex_word("спал", "спала")}')
         self.fullness -= 10
 
 
@@ -324,30 +327,30 @@ class Cat:
 
     def eat(self):
         if self.home.cat_food >= 10:
-            print(f'Кот {self.name} поел')
+            lgprint(f'Кот {self.name} поел')
             self.fullness += 20
             self.home.cat_food -= 10
             return True
 
-        print(f'Мяу! Кот {self.name} нет еды')
+        lgprint(f'Мяу! Кот {self.name} нет еды')
         return False
 
     def sleep(self):
-        print(f'Кот {self.name} целый день дрых как скотина')
+        lgprint(f'Кот {self.name} целый день дрых как скотина')
         self.fullness -= 10
 
     def rip_wallpapers(self):
         if randint(0, 100) > 20:
-            print(f'Кот {self.name} подрал обои. Не забыть бы их подклеить')
+            lgprint(f'Кот {self.name} подрал обои. Не забыть бы их подклеить')
             self.home.dirtiness += 5
         else:
-            print(f'Кот {self.name} Нагадил мимо лотка. Надо конфуз убрать')
+            lgprint(f'Кот {self.name} Нагадил мимо лотка. Надо конфуз убрать')
             self.home.dirtiness += 50
         self.fullness -= 10
 
     def act(self):
         if self.fullness < 0:
-            print(f'Кот {self.name} умер...')
+            lgprint(f'Кот {self.name} умер...')
             return 3
 
         dice = randint(1, 6)
@@ -554,12 +557,12 @@ class Simulation:
             home.pets.append(Cat(home=home))
 
         for day in range(1, 366):
-            cprint(f'=============== {cats_number} кошек - Попытка {attempt} - День {day} ===============', color='red')
+            lgprint(f'=============== {cats_number} кошек - Попытка {attempt} - День {day} ===============', color='red')
             if day in self.money_incidents_days:
-                cprint('Из копилки пропала половина денег!', color='red')
+                lgprint('Из копилки пропала половина денег!', color='red')
                 home.money //= 2
             if day in self.food_incidents_days:
-                cprint('Из холодильника пропала половина еды!', color='red')
+                lgprint('Из холодильника пропала половина еды!', color='red')
                 home.food //= 2
 
             diseases = sum([someone.act() for someone in home.residents + home.pets])
@@ -567,7 +570,7 @@ class Simulation:
                 return False
             home.get_old()
             for someone in home.residents + home.pets + [home]:
-                cprint(someone, color='cyan')
+                lgprint(someone, color='cyan')
 
         return True
 
@@ -605,30 +608,42 @@ class Simulation:
                     break
 
             if success_attempts >= 2:
-                cprint(f'\n{cats_number} кошек - успешный эксперимент\n', color='green')
+                lgprint(f'\n{cats_number} кошек - успешный эксперимент\n', color='green')
             else:
-                cprint(f'\n{cats_number} кошек - неудачный эксперимент\n', color='red')
+                lgprint(f'\n{cats_number} кошек - неудачный эксперимент\n', color='red')
                 break
 
         return cats_number - 1
 
 
+def lgprint(*args, **kwargs):
+    if PRINT_LOG:
+        cprint(*args, **kwargs)
+
+
+print('\nВыполняется симуляция, пожалуйста подождите...')
+cprint('\nЭто процесс длительный, занимает порядка 30 секунд, \n'
+       'поскольку будет проведено около 2 592 симуляций, \n'
+       'прожито около 946 080 дней! \n'
+       'Как раз примерно столько времени назад родился Пифагор, а в Афинах начали чеканить монеты', color='cyan')
+print('\nМаксимальное количество кошек будет выводиться в ячейках таблиц, \n'
+      'столбцы - количество фейлов с деньгами, строки - количество фейлов с едой')
+print('Данные сгруппированы по таблицам в соответствии с зарплатой')
+
+
 experiment_results = {}
-for food_incidents in range(6):
-    experiment_results[food_incidents] = {}
-    for money_incidents in range(6):
-        experiment_results[food_incidents][money_incidents] = {}
-        life = Simulation(money_incidents, food_incidents)
-        for salary in range(50, 401, 50):
+for salary in range(50, 401, 50):
+    experiment_results[salary] = {}
+    for food_incidents in range(0, 6):
+        experiment_results[salary][food_incidents] = {}
+        for money_incidents in range(0, 6):
+            life = Simulation(money_incidents=money_incidents, food_incidents=food_incidents)
             max_cats = life.experiment(salary)
-            experiment_results[food_incidents][money_incidents][salary] = max_cats
+            experiment_results[salary][food_incidents][money_incidents] = max_cats
 
-for food_incident_number, money_incidents in experiment_results:
-    for money_incidents_number, salaries in money_incidents:
-        for salary, max_cats in salaries:
-            print(f'При зарплате {salary} максимально можно прокормить {max_cats} котов')
-
-# life = Simulation(0, 0)
-# salary = 150
-# max_cats = life.experiment(salary=salary)
-# cprint(f'\nПри зарплате {salary} максимально можно прокормить {max_cats} кошек', color='yellow')
+print('')
+for salary, incidents in experiment_results.items():
+    cprint('\nЗарплата: ', color='yellow', end='')
+    print(salary)
+    cprint(' ↓ Фейлы с едой | → Фейлы с деньгами', color='yellow')
+    print(tabulate(incidents.values(), headers="keys", showindex=incidents.keys(), tablefmt="github"))
