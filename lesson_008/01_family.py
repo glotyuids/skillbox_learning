@@ -66,7 +66,9 @@ class House:
         self.food_bought = 0
         self.food_eaten = 0
         self.residents = []
-        self.pets = []
+        self.pets = []  #  C точки зрения выполняемых действий, и люди и животные являются резидентами, у них
+                        #  одинаковые "методы" (act и __str__) и с точки зрения главного годового цикла проще не
+                        #  разделять список жителей на людей и животных
         # возможно, в дальнейшем имеет смысл завести список жителей (и животных)
         # -- Отличная идея, очень упрощает и автоматизирует основной цикл программы!
 
@@ -553,6 +555,7 @@ class Simulation:
         home.residents.append(Parent(name='Папа Сережа', sex='male', salary=salary, home=home))
         home.residents.append(ElderChild(name='Дочка Маша', sex='female', home=home))
         home.residents.append(YoungerChild(name='Сынок Коля', sex='male', home=home))
+        #  Предполагалось, что это будет осуществляться автоматически при создании "жителя", то есть в __init__
         for _ in range(cats_number):
             home.pets.append(Cat(home=home))
 
@@ -647,3 +650,5 @@ for salary, incidents in experiment_results.items():
     print(salary)
     cprint(' ↓ Фейлы с едой | → Фейлы с деньгами', color='yellow')
     print(tabulate(incidents.values(), headers="keys", showindex=incidents.keys(), tablefmt="github"))
+
+# зачет!
