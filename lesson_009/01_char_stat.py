@@ -22,7 +22,6 @@
 # Требования к коду: он должен быть готовым к расширению функциональности. Делать сразу на классах.
 
 import os
-from pprint import pprint
 
 
 class BaseTextAnalyzer():
@@ -70,9 +69,57 @@ class BaseTextAnalyzer():
         print('╚═════════╧══════════╝')
 
 
-filename = 'python_snippets/voyna-i-mir.txt'
+class SortByCount:
+    def postprocess_data(self):
+        self.processed_data.sort(key=lambda data: data[0])
 
-analyzer = BaseTextAnalyzer(filename)
+
+class SortByAlphabet:
+    def postprocess_data(self):
+        self.processed_data.sort(key=lambda data: data[1])
+
+
+class RevSortByAlphabet:
+    def postprocess_data(self):
+        self.processed_data.sort(key=lambda data: data[1], reverse=True)
+
+
+class UnzipTxtFile:
+    def prepare_file(self):
+        import zipfile
+        with zipfile.ZipFile(self.filename, 'r') as archive:
+            archived_files = archive.namelist()
+            archive.extract(archived_files[0], path=os.path.dirname(filename))
+            self.filename = os.path.join(os.path.dirname(filename), archived_files[0])
+
+
+class OutputToFile:
+    def output_data(self):
+        results_file = os.path.splitext(self.filename)[0] + '_stats.txt'
+        with open(results_file, mode='w') as file:
+            file.write('╔═════════╤══════════╗ \n'
+                       '║  буква  │ частота  ║ \n'
+                       '╟─────────┼──────────╢ \n')
+
+            for count, char in self.processed_data:
+                file.write(f'║{char:^9}│{count:8d}  ║ \n')
+
+            file.write('╟─────────┼──────────╢ \n')
+
+            chars_count = sum([count for count, _ in self.processed_data])
+            file.write(f'╟  итого  │{chars_count:8d}  ║ \n')
+
+            file.write('╚═════════╧══════════╝ \n')
+        print(f'Статистика записана в файл {results_file}')
+
+
+class UserAnalyzer(UnzipTxtFile, RevSortByAlphabet, OutputToFile, BaseTextAnalyzer):
+    pass
+
+
+filename = 'python_snippets/voyna-i-mir.txt.zip'
+
+analyzer = UserAnalyzer(filename)
 analyzer.analyze()
 
 # После выполнения первого этапа нужно сделать упорядочивание статистики
