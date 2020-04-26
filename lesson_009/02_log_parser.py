@@ -49,6 +49,7 @@ class BaseLogAnalyzer:
                     if 'NOK' in line:
                         current_minute_NOKs += 1
                 results.write(f'[{current_time}] {current_minute_NOKs}\n')
+        print(f'Результат обработки лога записан в файл {self.results_file}')
 
     def postprocess_result_file(self):
         pass
@@ -65,6 +66,7 @@ class GroupByMonth:
 class GroupByYear:
     time_slice = [1, 5]
 
+
 class PrintResults:
     def postprocess_result_file(self):
         with open(self.results_file, mode='r', encoding='utf-8') as results:
@@ -72,6 +74,12 @@ class PrintResults:
                 print(line, end='')
 
 
+# Базовый класс реализует обработку лога log_file с подсчётом NOK'ов по минутам и выводом результата в results_file
+# Доступные роли:
+#   GroupByHour - подсчёт NOK'ов по часам
+#   GroupByMonth - подсчёт NOK'ов по месяцам
+#   GroupByYear - подсчёт NOK'ов по годам
+#   PrintResults -  вывод результата на консоль, а не в файл
 class UserAnalyzer(GroupByHour, PrintResults, BaseLogAnalyzer):
     pass
 
@@ -81,7 +89,6 @@ results_file = 'results.txt'
 
 log_analyzer = UserAnalyzer(log_file=log_file, results_file=results_file)
 log_analyzer.analyze()
-
 
 # После выполнения первого этапа нужно сделать группировку событий
 #  - по часам

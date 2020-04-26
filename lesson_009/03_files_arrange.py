@@ -103,6 +103,10 @@ class DontUnzip():
             return archive.getinfo(file_name).date_time
 
 
+# Базовый класс реализует копирование файлов из input_dir в result_dir в соответствии с годом/месяцем/днём создания
+# Доступные роли:
+#   UnzipFiles - распаковка файлов в директорию рядом с архивом, работа с этой директорией реализуется в базовом классе
+#   DontUnzip - сортировка файлов без распаковки архива
 class UserSorterClass(DontUnzip, BaseSorter):
     pass
 

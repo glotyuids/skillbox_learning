@@ -113,13 +113,20 @@ class OutputToFile:
         print(f'Статистика записана в файл {results_file}')
 
 
+# Базовый класс реализует подсчёт количества каждой буквы в filename и вывод результата на консоль в виде таблицы
+# Доступные роли:
+#   SortByCount - сортировка данных по возрастанию количества букв
+#   SortByAlphabet - сортировка данных по алфавиту по возрастанию
+#   RevSortByAlphabet - сортировка данных по алфавиту по убыванию
+#   UnzipTxtFile - распаковка анализируемого файла из архива
+#   OutputToFile - вывод результата в текстовый файл рядом с анализируемым. К имени добавляется постфикс '_stats'
 class UserAnalyzer(UnzipTxtFile, RevSortByAlphabet, OutputToFile, BaseTextAnalyzer):
     pass
 
 
 filename = 'python_snippets/voyna-i-mir.txt.zip'
 
-analyzer = UserAnalyzer(filename)
+analyzer = UserAnalyzer(filename=filename)
 analyzer.analyze()
 
 # После выполнения первого этапа нужно сделать упорядочивание статистики
