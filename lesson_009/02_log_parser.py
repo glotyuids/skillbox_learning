@@ -35,6 +35,7 @@ class BaseLogAnalyzer:
         # может результаты в архив упаковать надо будет, приводить к нужному формату или просто вывести на консоль
 
     def process_data(self):
+        print(f'Обработка лога {os.path.abspath(self.log_file)}')
         with open(self.log_file, mode='r', encoding='utf-8') as log:
             with open(self.results_file, mode='w', encoding='utf-8') as results:
                 current_time = log.read(self.time_slice[1])
@@ -49,10 +50,9 @@ class BaseLogAnalyzer:
                     if 'NOK' in line:
                         current_minute_NOKs += 1
                 results.write(f'[{current_time}] {current_minute_NOKs}\n')
-        print(f'Результат обработки лога записан в файл {self.results_file}')
 
     def postprocess_result_file(self):
-        pass
+        print(f'Результат обработки лога записан в файл {os.path.abspath(self.results_file)}')
 
 
 class GroupByHour:
