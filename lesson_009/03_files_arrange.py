@@ -55,6 +55,7 @@ class BaseSorter:
                     self.filelist.append(os.path.join(directory, file))
 
     def process_files(self):
+        print(f'Сортировка {os.path.abspath(self.input_dir)} \nПожалуйста, подождите...')
         self.get_filelist()
         for file_name in self.filelist:
             creation_time = self.get_creation_time(file_name)
@@ -63,6 +64,8 @@ class BaseSorter:
             if not os.path.exists(dest_dir):
                 os.makedirs(dest_dir)
             self.copy_file(file_name, dest_dir)
+        print(f'Сортировка завершена. \n'
+              f'Результат находится в {os.path.abspath(self.result_dir)}')
 
     def get_creation_time(self, file_name):
         # под юниксами os.path.getctime возвращает время последнего изменения файла, поэтому st_birthtime
@@ -81,7 +84,6 @@ class UnzipFiles:
         with zipfile.ZipFile(self.input_dir, 'r') as archive:
             archive.extractall()
             self.input_dir = os.path.splitext(self.input_dir)[0]
-            print(self.input_dir)
 
 
 class DontUnzip():
