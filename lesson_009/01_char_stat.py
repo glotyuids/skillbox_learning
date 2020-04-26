@@ -39,6 +39,7 @@ class BaseTextAnalyzer():
         pass
 
     def process_data(self):
+        print(f'Обработка файла {os.path.abspath(self.filename)}')
         stats = {}
         with open(self.filename, mode='r', encoding='cp1251') as file:
             for line in file:
@@ -110,7 +111,7 @@ class OutputToFile:
             file.write(f'╟  итого  │{chars_count:8d}  ║ \n')
 
             file.write('╚═════════╧══════════╝ \n')
-        print(f'Статистика записана в файл {results_file}')
+        print(f'Статистика записана в файл {os.path.abspath(results_file)}')
 
 
 # Базовый класс реализует подсчёт количества каждой буквы в filename и вывод результата на консоль в виде таблицы
