@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import os, time, shutil
+import os
+import shutil
 import zipfile
+
 
 # Нужно написать скрипт для упорядочивания фотографий (вообще любых файлов)
 # Скрипт должен разложить файлы из одной папки по годам и месяцам в другую.
@@ -56,15 +58,21 @@ class BaseSorter:
 
     def process_files(self):
         print(f'Сортировка {os.path.abspath(self.input_dir)} \nПожалуйста, подождите...')
+        print(f'╒{" progressbar ":═^20}╕')
         self.get_filelist()
-        for file_name in self.filelist:
+        total_files = len(self.filelist)
+        step = total_files // 19
+        os.write(1, ' '.encode(encoding='utf-8'))
+        for number, file_name in enumerate(self.filelist):
+            if number % step == 0:
+                os.write(1, '▓'.encode(encoding='utf-8'))
             creation_time = self.get_creation_time(file_name)
             dest_dir = os.path.join(self.result_dir,
                                     str(creation_time[0]), f'{creation_time[1]:0>2}', f'{creation_time[2]:0>2}')
             if not os.path.exists(dest_dir):
                 os.makedirs(dest_dir)
             self.copy_file(file_name, dest_dir)
-        print(f'Сортировка завершена. \n'
+        print(f'\nСортировка завершена. \n'
               f'Результат находится в {os.path.abspath(self.result_dir)}')
 
     def get_creation_time(self, file_name):
