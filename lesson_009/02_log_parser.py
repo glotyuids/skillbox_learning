@@ -30,14 +30,9 @@ class BaseLogAnalyzer:
         self.results_file = os.path.normpath(results_file)
 
     def analyze(self):
-        self.prepare_file()  # может лог распаковать надо будет. а может привести к нужному формату
         self.process_data()  # обрабатываем лог
-        self.postprocess_data()  # постобработка данных (фильтрация например)
         self.postprocess_result_file()
         # может результаты в архив упаковать надо будет, приводить к нужному формату или просто вывести на консоль
-
-    def prepare_file(self):
-        pass
 
     def process_data(self):
         with open(self.log_file, mode='r', encoding='utf-8') as log:
@@ -54,9 +49,6 @@ class BaseLogAnalyzer:
                     if 'NOK' in line:
                         current_minute_NOKs += 1
                 results.write(f'[{current_time}] {current_minute_NOKs}\n')
-
-    def postprocess_data(self):
-        pass
 
     def postprocess_result_file(self):
         pass
