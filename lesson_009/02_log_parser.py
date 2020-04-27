@@ -23,7 +23,8 @@ import os
 
 
 class BaseLogAnalyzer:
-    time_slice = [1, 17]
+    time_slice = [1, 17]  # TODO Cоздайте атрибут - типа "правая_граница_признака_времени" - и метод для его установки.
+                          #  Этот метод переопределяйте в наследниках
 
     def __init__(self, log_file, results_file):
         self.log_file = os.path.normpath(log_file)
@@ -82,10 +83,12 @@ class PrintResults:
 #   PrintResults -  вывод результата на консоль, а не в файл
 class UserAnalyzer(GroupByHour, PrintResults, BaseLogAnalyzer):
     pass
+# TODO Сделайте на явном наследовании
 
 
 log_file = 'events.txt'
 results_file = 'results.txt'
+# TODO Исправьте константы согласно РЕР8
 
 log_analyzer = UserAnalyzer(log_file=log_file, results_file=results_file)
 log_analyzer.analyze()

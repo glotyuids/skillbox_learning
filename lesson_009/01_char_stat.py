@@ -123,9 +123,15 @@ class OutputToFile:
 #   OutputToFile - вывод результата в текстовый файл рядом с анализируемым. К имени добавляется постфикс '_stats'
 class UserAnalyzer(UnzipTxtFile, RevSortByAlphabet, OutputToFile, BaseTextAnalyzer):
     pass
+# TODO 1) имя класса слишком общее, оно должно отражать основное назначение класса и специфику
+#  2) множественное наследование достаточно сложная тема, в этом случае нужно смотреть на MRO -
+#  https://www.google.ru/search?q=python+mro
+#  и вот тут запутататься и получить непредсказуемое ошибки от перемены мест классов наследования - очень легко, из-за
+#  чего есть мнение, что множественно наследование это антипаттерн. Поэтому сделайте на явном наследовании.
 
 
 filename = 'python_snippets/voyna-i-mir.txt.zip'
+# TODO Имена констант пишутся большими буквами, распологаются сразу после импортов модулей
 
 analyzer = UserAnalyzer(filename=filename)
 analyzer.analyze()

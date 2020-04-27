@@ -37,6 +37,7 @@ import zipfile
 # Чтение документации/гугла по функциям - приветствуется. Как и поиск альтернативных вариантов :)
 # Требования к коду: он должен быть готовым к расширению функциональности. Делать сразу на классах.
 
+# TODO Все замечания аналогичны
 
 class BaseSorter:
     def __init__(self, input_dir, result_dir):
@@ -79,6 +80,7 @@ class BaseSorter:
         # под юниксами os.path.getctime возвращает время последнего изменения файла, поэтому st_birthtime
         creation_time = os.stat(file_name).st_birthtime
         return time.gmtime(creation_time)
+        # TODO module time не импортирован
 
     def copy_file(self, src, dst):
         shutil.copy2(src, dst)
