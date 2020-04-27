@@ -29,17 +29,17 @@ RESULTS_FILE = 'results.txt'
 
 
 class BaseLogAnalyzer:
-    time_slice = [1, 17]
     # Cоздайте атрибут - типа "правая_граница_признака_времени" - и метод для его установки.
     #  Этот метод переопределяйте в наследниках
-    # TODO Мне показалось, что такой подход будет более гибким. Но тут скорее следовало бы создать методы
-    #  get_data (возврат даты нужного формата из строки) и get_event (вытаскивание из лога и обработка статуса)
+    # TODO Мне показалось, что такой подход будет более гибким. Но тут для большей гибкости следовало бы создать методы
+    #  get_datetime (возврат даты нужного формата из строки)
+    #  и is_required_event (вытаскивание из лога и обработка статуса)
 
     def __init__(self, log_file, results_file):
         self.log_file = os.path.normpath(log_file)
         self.results_file = os.path.normpath(results_file)
 
-    def analyze(self):
+    def run(self):
         self.process_data()  # обрабатываем лог
         self.postprocess_result_file()
         # может результаты в архив упаковать надо будет, приводить к нужному формату или просто вывести на консоль
@@ -48,55 +48,78 @@ class BaseLogAnalyzer:
         print(f'Обработка лога {os.path.abspath(self.log_file)}')
         with open(self.log_file, mode='r', encoding='utf-8') as log:
             with open(self.results_file, mode='w', encoding='utf-8') as results:
-                current_time = log.read(self.time_slice[1])
-                current_time = current_time[self.time_slice[0]: self.time_slice[1]]
+                current_time = self.get_datetime(log.readline())
                 log.seek(0, 0)
                 current_minute_NOKs = 0
                 for line in log:
-                    if current_time != line[self.time_slice[0]: self.time_slice[1]]:
+                    if current_time != self.get_datetime(line):
                         results.write(f'[{current_time}] {current_minute_NOKs}\n')
-                        current_time = line[self.time_slice[0]: self.time_slice[1]]
+                        current_time = self.get_datetime(line)
                         current_minute_NOKs = 0
-                    if 'NOK' in line:
+                    if self.is_required_event(line):
                         current_minute_NOKs += 1
                 results.write(f'[{current_time}] {current_minute_NOKs}\n')
+
+    def get_datetime(self, string):
+        return string[1: 17]
+
+    def is_required_event(self, string):
+        return 'NOK' in string
 
     def postprocess_result_file(self):
         print(f'Результат обработки лога записан в файл {os.path.abspath(self.results_file)}')
 
 
-class GroupByHour:
-    time_slice = [1, 14]
+# class RoleGroupByHour:
+#     def get_datetime(self, string):
+#         return string[1: 14]
+#
+#
+# class RoleGroupByMonth:
+#     def get_datetime(self, string):
+#         return string[1: 8]
+#
+#
+# class RoleGroupByYear:
+#     def get_datetime(self, string):
+#         return string[1: 5]
+#
+#
+# class RolePrintResults:
+#     def postprocess_result_file(self):
+#         with open(self.results_file, mode='r', encoding='utf-8') as results:
+#             for line in results:
+#                 print(line, end='')
 
 
-class GroupByMonth:
-    time_slice = [1, 8]
+class GroupLogByHour(BaseLogAnalyzer):
+    def get_datetime(self, string):
+        return string[1: 14]
 
 
-class GroupByYear:
-    time_slice = [1, 5]
+class GroupLogByMonth(BaseLogAnalyzer):
+    def get_datetime(self, string):
+        return string[1: 8]
 
 
-class PrintResults:
-    def postprocess_result_file(self):
-        with open(self.results_file, mode='r', encoding='utf-8') as results:
-            for line in results:
-                print(line, end='')
+class GroupLogByYear(BaseLogAnalyzer):
+    def get_datetime(self, string):
+        return string[1: 5]
 
 
 # Базовый класс реализует обработку лога log_file с подсчётом NOK'ов по минутам и выводом результата в results_file
 # Доступные роли:
-#   GroupByHour - подсчёт NOK'ов по часам
-#   GroupByMonth - подсчёт NOK'ов по месяцам
-#   GroupByYear - подсчёт NOK'ов по годам
-#   PrintResults -  вывод результата на консоль, а не в файл
-class UserAnalyzer(GroupByHour, PrintResults, BaseLogAnalyzer):
-    pass
-# TODO Сделайте на явном наследовании
+#   RoleGroupByHour - подсчёт NOK'ов по часам
+#   RoleGroupByMonth - подсчёт NOK'ов по месяцам
+#   RoleGroupByYear - подсчёт NOK'ов по годам
+#   RolePrintResults -  вывод результата на консоль, а не в файл
+# class UserAnalyzer(RoleGroupByHour, RolePrintResults, BaseLogAnalyzer):
+#     pass
 
-
-log_analyzer = UserAnalyzer(log_file=LOG_FILE, results_file=RESULTS_FILE)
-log_analyzer.analyze()
+# Сделайте на явном наследовании
+# Формальности соблюдены =)
+log_analyzer = GroupLogByHour(log_file=LOG_FILE, results_file=RESULTS_FILE)
+log_analyzer.run()
 
 # После выполнения первого этапа нужно сделать группировку событий
 #  - по часам
