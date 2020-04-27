@@ -97,43 +97,6 @@ class BaseSorter:
         pass
 
 
-# class RoleUnzipFiles:
-#     def prepare_files(self):
-#         # почему-то extractall() не сохраняет мету файлов, поэтому будем извращаться)
-#         # будем подменять время изменения каждого распакованного файла на то, которое есть в мете архивированного
-#         with zipfile.ZipFile(self.input_dir, 'r') as archive:
-#             for filename in archive.namelist():
-#                 if archive.getinfo(filename).is_dir():
-#                     continue
-#
-#                 archive.extract(filename)
-#                 creation_time = archive.getinfo(filename).date_time
-#                 creation_time = datetime(*creation_time)
-#                 creation_time = time.mktime(creation_time.timetuple())
-#                 os.utime(filename, (creation_time, creation_time))
-#
-#         self.input_dir = os.path.splitext(self.input_dir)[0]
-#
-#
-# class RoleDontUnzip():
-#     def get_filelist(self):
-#         with zipfile.ZipFile(self.input_dir, mode='r') as archive:
-#             for file in archive.namelist():
-#                 if not archive.getinfo(file).is_dir():
-#                     self.filelist.append(os.path.normpath(file))
-#
-#     def copy_file(self, src, dst):
-#         # extract() извлекает файлы с учётом всго пути, поэтому пришлось извращаться с побайтовым копированием
-#         dst = os.path.join(dst, os.path.split(src)[1])
-#         with zipfile.ZipFile(self.input_dir, mode='r') as archive:
-#             with archive.open(src, mode='r') as archived_file, open(dst, mode='wb') as dest_file:
-#                 shutil.copyfileobj(archived_file, dest_file)
-#
-#     def get_creation_time(self, file_name):
-#         with zipfile.ZipFile(self.input_dir, mode='r') as archive:
-#             return archive.getinfo(file_name).date_time
-
-
 class UnzipAndSortFiles(BaseSorter):
     def prepare_files(self):
         # почему-то extractall() не сохраняет мету файлов, поэтому будем извращаться)
@@ -169,14 +132,6 @@ class DontUnzipAndSortFiles(BaseSorter):
     def get_creation_time(self, file_name):
         with zipfile.ZipFile(self.input_dir, mode='r') as archive:
             return archive.getinfo(file_name).date_time
-
-
-# Базовый класс реализует копирование файлов из input_dir в result_dir в соответствии с годом/месяцем/днём создания
-# Доступные роли:
-#   RoleUnzipFiles - распаковка файлов в директорию рядом с архивом
-#   RoleDontUnzip - сортировка файлов без распаковки архива
-# class UserSorterClass(RoleDontUnzip, BaseSorter):
-#     pass
 
 
 sorter = DontUnzipAndSortFiles(input_dir=ARCHIVE_NAME, result_dir=RESULT_DIR)

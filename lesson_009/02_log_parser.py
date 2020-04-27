@@ -31,9 +31,9 @@ RESULTS_FILE = 'results.txt'
 class BaseLogAnalyzer:
     # Cоздайте атрибут - типа "правая_граница_признака_времени" - и метод для его установки.
     #  Этот метод переопределяйте в наследниках
-    # TODO Мне показалось, что такой подход будет более гибким. Но тут для большей гибкости следовало бы создать методы
+    # TODO Мне показалось, что мой подход будет более гибким. Но тут для большей гибкости следовало бы создать методы
     #  get_datetime (возврат даты нужного формата из строки)
-    #  и is_required_event (вытаскивание из лога и обработка статуса)
+    #  и is_required_event (вытаскивание события из строки лога и его обработка)
 
     def __init__(self, log_file, results_file):
         self.log_file = os.path.normpath(log_file)
@@ -70,28 +70,6 @@ class BaseLogAnalyzer:
         print(f'Результат обработки лога записан в файл {os.path.abspath(self.results_file)}')
 
 
-# class RoleGroupByHour:
-#     def get_datetime(self, string):
-#         return string[1: 14]
-#
-#
-# class RoleGroupByMonth:
-#     def get_datetime(self, string):
-#         return string[1: 8]
-#
-#
-# class RoleGroupByYear:
-#     def get_datetime(self, string):
-#         return string[1: 5]
-#
-#
-# class RolePrintResults:
-#     def postprocess_result_file(self):
-#         with open(self.results_file, mode='r', encoding='utf-8') as results:
-#             for line in results:
-#                 print(line, end='')
-
-
 class GroupLogByHour(BaseLogAnalyzer):
     def get_datetime(self, string):
         return string[1: 14]
@@ -106,15 +84,6 @@ class GroupLogByYear(BaseLogAnalyzer):
     def get_datetime(self, string):
         return string[1: 5]
 
-
-# Базовый класс реализует обработку лога log_file с подсчётом NOK'ов по минутам и выводом результата в results_file
-# Доступные роли:
-#   RoleGroupByHour - подсчёт NOK'ов по часам
-#   RoleGroupByMonth - подсчёт NOK'ов по месяцам
-#   RoleGroupByYear - подсчёт NOK'ов по годам
-#   RolePrintResults -  вывод результата на консоль, а не в файл
-# class UserAnalyzer(RoleGroupByHour, RolePrintResults, BaseLogAnalyzer):
-#     pass
 
 # Сделайте на явном наследовании
 # Формальности соблюдены =)
