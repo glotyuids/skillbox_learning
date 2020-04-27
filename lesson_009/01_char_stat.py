@@ -24,12 +24,12 @@
 import os
 
 
-FILENAME = 'python_snippets/voyna-i-mir.txt.zip'
+FILENAME = 'python_snippets/voyna-i-mir.txt'
 # Имена констант пишутся большими буквами, распологаются сразу после импортов модулей
 # Done
 
 
-class BaseTextAnalyzer():
+class BaseTextAnalyzer:
     def __init__(self, filename):
         self.processed_data = []
         self.filename = os.path.normpath(filename)
@@ -76,22 +76,22 @@ class BaseTextAnalyzer():
         print('╚═════════╧══════════╝')
 
 
-class SortByCount:
+class RoleSortByCount:
     def postprocess_data(self):
         self.processed_data.sort(key=lambda data: data[0])
 
 
-class SortByAlphabet:
+class RoleSortByAlphabet:
     def postprocess_data(self):
         self.processed_data.sort(key=lambda data: data[1])
 
 
-class RevSortByAlphabet:
+class RoleRevSortByAlphabet:
     def postprocess_data(self):
         self.processed_data.sort(key=lambda data: data[1], reverse=True)
 
 
-class UnzipTxtFile:
+class RoleUnzipTxtFile:
     def prepare_file(self):
         import zipfile
         with zipfile.ZipFile(self.filename, 'r') as archive:
@@ -100,7 +100,7 @@ class UnzipTxtFile:
             self.filename = os.path.join(os.path.dirname(self.filename), archived_files[0])
 
 
-class OutputToFile:
+class RoleOutputToFile:
     def output_data(self):
         results_file = os.path.splitext(self.filename)[0] + '_stats.txt'
         with open(results_file, mode='w') as file:
@@ -120,14 +120,29 @@ class OutputToFile:
         print(f'Статистика записана в файл {os.path.abspath(results_file)}')
 
 
+class AnalyzeAndSortByCount(BaseTextAnalyzer):
+    def postprocess_data(self):
+        self.processed_data.sort(key=lambda data: data[0])
+
+
+class AnalyzeAndSortByAlphabet(BaseTextAnalyzer):
+    def postprocess_data(self):
+        self.processed_data.sort(key=lambda data: data[1])
+
+
+class AnalyzeAndRevSortByAlphabet(BaseTextAnalyzer):
+    def postprocess_data(self):
+        self.processed_data.sort(key=lambda data: data[1], reverse=True)
+
+
 # Базовый класс реализует подсчёт количества каждой буквы в filename и вывод результата на консоль в виде таблицы
 # Доступные роли:
-#   SortByCount - сортировка данных по возрастанию количества букв
-#   SortByAlphabet - сортировка данных по алфавиту по возрастанию
-#   RevSortByAlphabet - сортировка данных по алфавиту по убыванию
-#   UnzipTxtFile - распаковка анализируемого файла из архива
-#   OutputToFile - вывод результата в текстовый файл рядом с анализируемым. К имени добавляется постфикс '_stats'
-class UserAnalyzer(UnzipTxtFile, RevSortByAlphabet, OutputToFile, BaseTextAnalyzer):
+#   RoleSortByCount - сортировка данных по возрастанию количества букв
+#   RoleSortByAlphabet - сортировка данных по алфавиту по возрастанию
+#   RoleRevSortByAlphabet - сортировка данных по алфавиту по убыванию
+#   RoleUnzipTxtFile - распаковка анализируемого файла из архива
+#   RoleOutputToFile - вывод результата в текстовый файл рядом с анализируемым. К имени добавляется постфикс '_stats'
+class UserAnalyzer(RoleUnzipTxtFile, RoleRevSortByAlphabet, RoleOutputToFile, BaseTextAnalyzer):
     pass
 
 
@@ -140,17 +155,20 @@ class UserAnalyzer(UnzipTxtFile, RevSortByAlphabet, OutputToFile, BaseTextAnalyz
 #  и вот тут запутататься и получить непредсказуемое ошибки от перемены мест классов наследования - очень легко, из-за
 #  чего есть мнение, что множественно наследование это антипаттерн. Поэтому сделайте на явном наследовании.
 # TODO Да, про MRO Вадим в лекции о множественном наследовании говорил. И поскольку тут нет дочерних классов,
-#  то порядок разрешения будет в порядке перечисления классов.
+#  а роли ни от кого не наследуются и никому не наследуют, то порядок разрешения будет в порядке перечисления классов.
 #  Само собой, базовый класс всегда должен находиться в конце - об этом я забыл написать в комменте с описанием
 
+#  TODO Решение с ролями мне показалось достаточно изящным, так что, если позволите, я его пока оставлю -
+#   позже закину к себе в сниппеты, а для выполнения задания на основе ролей создам дочерние классы от BaseTextAnalyzer
 
-analyzer = UserAnalyzer(filename=FILENAME)
+
+analyzer = AnalyzeAndSortByCount(filename=FILENAME)
 analyzer.run()
 
 # После выполнения первого этапа нужно сделать упорядочивание статистики
-#  - по частоте по возрастанию
-#  - по алфавиту по возрастанию
-#  - по алфавиту по убыванию
+#  + по частоте по возрастанию
+#  + по алфавиту по возрастанию
+#  + по алфавиту по убыванию
 # Для этого пригодится шаблон проектирование "Шаблонный метод"
 #   см https://goo.gl/Vz4828
 #   и пример https://gitlab.skillbox.ru/vadim_shandrinov/python_base_snippets/snippets/4
