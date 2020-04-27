@@ -76,48 +76,48 @@ class BaseTextAnalyzer:
         print('╚═════════╧══════════╝')
 
 
-class RoleSortByCount:
-    def postprocess_data(self):
-        self.processed_data.sort(key=lambda data: data[0])
-
-
-class RoleSortByAlphabet:
-    def postprocess_data(self):
-        self.processed_data.sort(key=lambda data: data[1])
-
-
-class RoleRevSortByAlphabet:
-    def postprocess_data(self):
-        self.processed_data.sort(key=lambda data: data[1], reverse=True)
-
-
-class RoleUnzipTxtFile:
-    def prepare_file(self):
-        import zipfile
-        with zipfile.ZipFile(self.filename, 'r') as archive:
-            archived_files = archive.namelist()
-            archive.extract(archived_files[0], path=os.path.dirname(self.filename))
-            self.filename = os.path.join(os.path.dirname(self.filename), archived_files[0])
-
-
-class RoleOutputToFile:
-    def output_data(self):
-        results_file = os.path.splitext(self.filename)[0] + '_stats.txt'
-        with open(results_file, mode='w') as file:
-            file.write('╔═════════╤══════════╗ \n'
-                       '║  буква  │ частота  ║ \n'
-                       '╟─────────┼──────────╢ \n')
-
-            for count, char in self.processed_data:
-                file.write(f'║{char:^9}│{count:8d}  ║ \n')
-
-            file.write('╟─────────┼──────────╢ \n')
-
-            chars_count = sum([count for count, _ in self.processed_data])
-            file.write(f'╟  итого  │{chars_count:8d}  ║ \n')
-
-            file.write('╚═════════╧══════════╝ \n')
-        print(f'Статистика записана в файл {os.path.abspath(results_file)}')
+# class RoleSortByCount:
+#     def postprocess_data(self):
+#         self.processed_data.sort(key=lambda data: data[0])
+#
+#
+# class RoleSortByAlphabet:
+#     def postprocess_data(self):
+#         self.processed_data.sort(key=lambda data: data[1])
+#
+#
+# class RoleRevSortByAlphabet:
+#     def postprocess_data(self):
+#         self.processed_data.sort(key=lambda data: data[1], reverse=True)
+#
+#
+# class RoleUnzipTxtFile:
+#     def prepare_file(self):
+#         import zipfile
+#         with zipfile.ZipFile(self.filename, 'r') as archive:
+#             archived_files = archive.namelist()
+#             archive.extract(archived_files[0], path=os.path.dirname(self.filename))
+#             self.filename = os.path.join(os.path.dirname(self.filename), archived_files[0])
+#
+#
+# class RoleOutputToFile:
+#     def output_data(self):
+#         results_file = os.path.splitext(self.filename)[0] + '_stats.txt'
+#         with open(results_file, mode='w') as file:
+#             file.write('╔═════════╤══════════╗ \n'
+#                        '║  буква  │ частота  ║ \n'
+#                        '╟─────────┼──────────╢ \n')
+#
+#             for count, char in self.processed_data:
+#                 file.write(f'║{char:^9}│{count:8d}  ║ \n')
+#
+#             file.write('╟─────────┼──────────╢ \n')
+#
+#             chars_count = sum([count for count, _ in self.processed_data])
+#             file.write(f'╟  итого  │{chars_count:8d}  ║ \n')
+#
+#             file.write('╚═════════╧══════════╝ \n')
+#         print(f'Статистика записана в файл {os.path.abspath(results_file)}')
 
 
 class AnalyzeAndSortByCount(BaseTextAnalyzer):
@@ -142,8 +142,8 @@ class AnalyzeAndRevSortByAlphabet(BaseTextAnalyzer):
 #   RoleRevSortByAlphabet - сортировка данных по алфавиту по убыванию
 #   RoleUnzipTxtFile - распаковка анализируемого файла из архива
 #   RoleOutputToFile - вывод результата в текстовый файл рядом с анализируемым. К имени добавляется постфикс '_stats'
-class UserAnalyzer(RoleUnzipTxtFile, RoleRevSortByAlphabet, RoleOutputToFile, BaseTextAnalyzer):
-    pass
+# class UserAnalyzer(RoleUnzipTxtFile, RoleRevSortByAlphabet, RoleOutputToFile, BaseTextAnalyzer):
+#     pass
 
 
 # 1) имя класса слишком общее, оно должно отражать основное назначение класса и специфику
@@ -162,7 +162,7 @@ class UserAnalyzer(RoleUnzipTxtFile, RoleRevSortByAlphabet, RoleOutputToFile, Ba
 #   позже закину к себе в сниппеты, а для выполнения задания на основе ролей создам дочерние классы от BaseTextAnalyzer
 
 
-analyzer = AnalyzeAndSortByCount(filename=FILENAME)
+analyzer = AnalyzeAndRevSortByAlphabet(filename=FILENAME)
 analyzer.run()
 
 # После выполнения первого этапа нужно сделать упорядочивание статистики
