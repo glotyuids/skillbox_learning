@@ -2,7 +2,12 @@
 
 import os
 import shutil
+import time
 import zipfile
+
+
+ARCHIVE_NAME = 'icons.zip'
+RESULT_DIR = 'icons_by_date'
 
 
 # Нужно написать скрипт для упорядочивания фотографий (вообще любых файлов)
@@ -80,7 +85,8 @@ class BaseSorter:
         # под юниксами os.path.getctime возвращает время последнего изменения файла, поэтому st_birthtime
         creation_time = os.stat(file_name).st_birthtime
         return time.gmtime(creation_time)
-        # TODO module time не импортирован
+        # module time не импортирован
+        # Видимо, когда подчищал код, случайно снёс. Пофиксил
 
     def copy_file(self, src, dst):
         shutil.copy2(src, dst)
@@ -123,10 +129,7 @@ class UserSorterClass(DontUnzip, BaseSorter):
     pass
 
 
-archive_name = 'icons.zip'
-result_dir = 'icons_by_date'
-
-sorter = UserSorterClass(input_dir=archive_name, result_dir=result_dir)
+sorter = UserSorterClass(input_dir=ARCHIVE_NAME, result_dir=RESULT_DIR)
 sorter.sort_files()
 
 # Усложненное задание (делать по желанию)

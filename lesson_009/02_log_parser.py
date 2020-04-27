@@ -22,9 +22,18 @@
 import os
 
 
+LOG_FILE = 'events.txt'
+RESULTS_FILE = 'results.txt'
+# Исправьте константы согласно РЕР8
+# Done
+
+
 class BaseLogAnalyzer:
-    time_slice = [1, 17]  # TODO Cоздайте атрибут - типа "правая_граница_признака_времени" - и метод для его установки.
-                          #  Этот метод переопределяйте в наследниках
+    time_slice = [1, 17]
+    # Cоздайте атрибут - типа "правая_граница_признака_времени" - и метод для его установки.
+    #  Этот метод переопределяйте в наследниках
+    # TODO Мне показалось, что такой подход будет более гибким. Но тут скорее следовало бы создать методы
+    #  get_data (возврат даты нужного формата из строки) и get_event (вытаскивание из лога и обработка статуса)
 
     def __init__(self, log_file, results_file):
         self.log_file = os.path.normpath(log_file)
@@ -86,11 +95,7 @@ class UserAnalyzer(GroupByHour, PrintResults, BaseLogAnalyzer):
 # TODO Сделайте на явном наследовании
 
 
-log_file = 'events.txt'
-results_file = 'results.txt'
-# TODO Исправьте константы согласно РЕР8
-
-log_analyzer = UserAnalyzer(log_file=log_file, results_file=results_file)
+log_analyzer = UserAnalyzer(log_file=LOG_FILE, results_file=RESULTS_FILE)
 log_analyzer.analyze()
 
 # После выполнения первого этапа нужно сделать группировку событий

@@ -24,17 +24,23 @@
 import os
 
 
+FILENAME = 'python_snippets/voyna-i-mir.txt.zip'
+# Имена констант пишутся большими буквами, распологаются сразу после импортов модулей
+# Done
+
+
 class BaseTextAnalyzer():
     def __init__(self, filename):
         self.processed_data = []
         self.filename = os.path.normpath(filename)
 
-    def analyze(self):  # TOdO Имя шаблонного метода может быть более общее и простое, типа "запустить", "выполнить"
-        self.prepare_file()         # может его распаковать надо будет. а может сконвертить из одного формата в другой
-        self.process_data()         # собираем статистику
-        self.postprocess_data()     # обработка данных. В данном случае та или иная сортировка
-        self.output_data()          # выводим данные (в консоль, файл и т.д. - зависит от метода)
-        
+    def run(self):  # Имя шаблонного метода может быть более общее и простое, типа "запустить", "выполнить"
+        # поправил
+        self.prepare_file()  # может его распаковать надо будет. а может сконвертить из одного формата в другой
+        self.process_data()  # собираем статистику
+        self.postprocess_data()  # обработка данных. В данном случае та или иная сортировка
+        self.output_data()  # выводим данные (в консоль, файл и т.д. - зависит от метода)
+
     def prepare_file(self):
         pass
 
@@ -90,8 +96,8 @@ class UnzipTxtFile:
         import zipfile
         with zipfile.ZipFile(self.filename, 'r') as archive:
             archived_files = archive.namelist()
-            archive.extract(archived_files[0], path=os.path.dirname(filename))
-            self.filename = os.path.join(os.path.dirname(filename), archived_files[0])
+            archive.extract(archived_files[0], path=os.path.dirname(self.filename))
+            self.filename = os.path.join(os.path.dirname(self.filename), archived_files[0])
 
 
 class OutputToFile:
@@ -123,18 +129,23 @@ class OutputToFile:
 #   OutputToFile - вывод результата в текстовый файл рядом с анализируемым. К имени добавляется постфикс '_stats'
 class UserAnalyzer(UnzipTxtFile, RevSortByAlphabet, OutputToFile, BaseTextAnalyzer):
     pass
-# TODO 1) имя класса слишком общее, оно должно отражать основное назначение класса и специфику
+
+
+# 1) имя класса слишком общее, оно должно отражать основное назначение класса и специфику
+# TODO Тут в названии скорее имелось ввиду, что тот, кто будет с этим кодом работать,
+#  может собирать свой кастомный класс из доступных ролей
+
 #  2) множественное наследование достаточно сложная тема, в этом случае нужно смотреть на MRO -
 #  https://www.google.ru/search?q=python+mro
 #  и вот тут запутататься и получить непредсказуемое ошибки от перемены мест классов наследования - очень легко, из-за
 #  чего есть мнение, что множественно наследование это антипаттерн. Поэтому сделайте на явном наследовании.
+# TODO Да, про MRO Вадим в лекции о множественном наследовании говорил. И поскольку тут нет дочерних классов,
+#  то порядок разрешения будет в порядке перечисления классов.
+#  Само собой, базовый класс всегда должен находиться в конце - об этом я забыл написать в комменте с описанием
 
 
-filename = 'python_snippets/voyna-i-mir.txt.zip'
-# TODO Имена констант пишутся большими буквами, распологаются сразу после импортов модулей
-
-analyzer = UserAnalyzer(filename=filename)
-analyzer.analyze()
+analyzer = UserAnalyzer(filename=FILENAME)
+analyzer.run()
 
 # После выполнения первого этапа нужно сделать упорядочивание статистики
 #  - по частоте по возрастанию
