@@ -29,7 +29,7 @@ class BaseTextAnalyzer():
         self.processed_data = []
         self.filename = os.path.normpath(filename)
 
-    def analyze(self):
+    def analyze(self):  # TOdO Имя шаблонного метода может быть более общее и простое, типа "запустить", "выполнить"
         self.prepare_file()         # может его распаковать надо будет. а может сконвертить из одного формата в другой
         self.process_data()         # собираем статистику
         self.postprocess_data()     # обработка данных. В данном случае та или иная сортировка
