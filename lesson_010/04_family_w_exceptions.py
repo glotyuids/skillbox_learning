@@ -8,6 +8,51 @@ from tabulate import tabulate
 PRINT_LOG = False
 
 
+class ResidentError(Exception):
+    pass
+
+
+class ResourcesError(Exception):
+    pass
+
+
+class HungryResidentError(ResidentError):
+    def __str__(self):
+        return f'{self.args[0].name}: смерть от голода'
+
+
+class MadResidentError(ResidentError):
+    def __str__(self):
+        return f'{self.args[0].name}: уехал отдохнуть в ПНД'
+
+
+class NoMoneyError(ResourcesError):
+    def __str__(self):
+        return f'{self.args[0].name}: нет денег!'
+
+
+class NoFoodError(ResourcesError):
+    def __str__(self):
+        return f'{self.args[0].name}: нет еды!'
+
+
+class NoCatFoodError(ResourcesError):
+    def __str__(self):
+        return f'{self.args[0].name}: нет кошачьего корма!'
+
+
+class SurviveOneYearError(Exception):
+    def __init__(self, attempt, day, salary, cats):
+        self.attempt = attempt
+        self.day = day
+        self.salary = salary
+        self.cats = cats
+
+    def __str__(self):
+        return (f'Зарплата {self.salary}, {self.cats} котов, попытка {self.attempt}, день {self.day}. '
+                f'Семья год не пережила')
+
+
 class House:
 
     def __init__(self):
@@ -70,18 +115,12 @@ class Human:
     def _right_sex_word(self, male_word, female_word):
         return male_word if self.sex == 'male' else female_word
 
-    #  каждый метод, где есть вероятность "пролететь" (питание, шоппинг и т.д.) должен возвращать статус выполнения,
-    #  чтобы можно было отстроить логику в act()
-    #  В точку!
     def eat(self, food_amount=30):
-        if self.home.food >= food_amount:
-            self.home.food -= food_amount
-            self.fullness += food_amount
-            lgprint(f'{self.name} {self._right_sex_word("поел", "поела")}')
-            return True
-        else:
-            lgprint(f'{self.name} {self._right_sex_word("остался голодным", "осталась голодной")} - еды нет')
-            return False
+        if self.home.food < food_amount:
+            raise NoFoodError(self)
+        self.home.food -= food_amount
+        self.fullness += food_amount
+        lgprint(f'{self.name} {self._right_sex_word("поел", "поела")}')
 
     def play_with_cat(self):
         lgprint(f'{self.name} {self._right_sex_word("поиграл", "поиграла")} с котом')
@@ -90,14 +129,11 @@ class Human:
 
     def act(self):
         if self.fullness < 0:
-            lgprint(f'{self.name} {self._right_sex_word("умер", "умерла")} от голода')
-            return 1
+            raise HungryResidentError(self)
         if self.happiness < 10:
-            lgprint(f'{self.name} {self._right_sex_word("уехал", "уехала")} в дурку')
-            return 2
+            raise MadResidentError(self)
         if self.home.dirtiness > 90:
             self.happiness -= 10
-        return 0
 
 
 class Parent(Human):
@@ -118,14 +154,15 @@ class Parent(Human):
         self.chilling_number += 1
 
     def act(self):
-        disease = super().act()
-        if disease:
-            return disease
+        super().act()
 
         dice = randint(1, 6)
-        #  Тут развитие идеи из прошлого модуля, но теперь без возможности улететь в рекурсию
+
         if self.fullness <= 20:
-            if not self.eat():
+            try:
+                self.eat()
+            except NoFoodError as exc:
+                lgprint(str(exc))
                 self.work()    # безусловная работа на случай, если на покупку еды не хватит денег
         elif self.home.money < 50:
             self.work()
@@ -136,26 +173,25 @@ class Parent(Human):
         elif dice == 3:
             self.play_with_cat()
         elif dice == 4:
-            self.eat()
+            try:
+                self.eat()
+            except NoFoodError as exc:
+                lgprint(str(exc))
+                self.work()
         else:
             self.gaming()
-
-        return 0
 
 
 class ElderChild(Human):
 
     def chilling(self):
-        if self.home.money >= 350:
-            lgprint(f'{self.name} {self._right_sex_word("ушёл", "ушла")} на тусовку в клуб')
-            self.home.money -= 350
-            self.happiness += 60
-            self.fullness -= 10
-            self.chilling_number += 1
-            return True
-
-        lgprint(f'{self.name} не {self._right_sex_word("смог", "смогла")} попасть на тусовку - денег нет')
-        return False
+        if self.home.money < 350:
+            raise NoMoneyError(self)
+        lgprint(f'{self.name} {self._right_sex_word("ушёл", "ушла")} на тусовку в клуб')
+        self.home.money -= 350
+        self.happiness += 60
+        self.fullness -= 10
+        self.chilling_number += 1
 
     def clean_house(self):
         lgprint(f'{self.name} {self._right_sex_word("убрал", "убрала")} дома')
@@ -163,96 +199,116 @@ class ElderChild(Human):
         self.fullness -= 10
 
     def buy_food(self):
+        if self.home.money < 50:
+            raise NoMoneyError(self)
+
         if 50 <= self.home.money < 100:
             lgprint(f'{self.name} {self._right_sex_word("сходил", "сходила")} в магазин за едой')
             self.home.money -= 50
             self.home.food += 50
             self.fullness -= 10
-            return True
 
         if self.home.money >= 100:
             lgprint(f'{self.name} {self._right_sex_word("купил", "купила")} целый ящик доширака')
             self.home.money -= 100
             self.home.food += 100
             self.fullness -= 10
-            return True
-
-        lgprint(f'{self.name} еды не {self._right_sex_word("купил", "купила")} - денег нет')
-        return False
 
     def buy_cat_food(self):
+        if self.home.money < 50:
+            raise NoMoneyError(self)
+
         if 50 <= self.home.money < 100:
             lgprint(f'{self.name} {self._right_sex_word("сходил", "сходила")} в зоомагазин за кошачьим кормом')
             self.home.money -= 50
             self.home.cat_food += 50
             self.fullness -= 10
-            return True
 
         if self.home.money >= 100:
             lgprint(f'{self.name} {self._right_sex_word("купил", "купила")} много кошачьего корма')
             self.home.money -= 100
             self.home.cat_food += 100
             self.fullness -= 10
-            return True
-
-        lgprint(f'{self.name} корма не {self._right_sex_word("купил", "купила")} - денег нет')
-        return False
 
     def act(self):
-        disease = super().act()
-        if disease:
-            return disease
+        super().act()
 
         dice = randint(1, 6)
         if self.fullness <= 20:
-            if not self.eat():
-                if not self.buy_food():
+            try:
+                self.eat()
+            except NoFoodError as food_exc:
+                lgprint(str(food_exc))
+                try:
+                    self.buy_food()
+                except NoMoneyError as money_exc:
+                    lgprint(str(money_exc))
                     self.clean_house()
         elif self.home.food < 30:
-            if not self.buy_food():
+            try:
+                self.buy_food()
+            except NoMoneyError as exc:
+                lgprint(str(exc))
                 self.clean_house()
         elif self.home.cat_food < 20:
-            if not self.buy_cat_food():
+            try:
+                self.buy_cat_food()
+            except NoMoneyError as exc:
+                lgprint(str(exc))
                 self.clean_house()
         elif self.home.dirtiness >= 80:
             self.clean_house()
         elif self.happiness <= 15:
-            if not self.chilling():
+            try:
+                self.chilling()
+            except NoMoneyError as exc:
+                lgprint(str(exc))
                 self.play_with_cat()
         elif 1 <= dice <= 2:
             self.clean_house()
         elif dice == 3:
             self.play_with_cat()
         elif dice == 4:
-            self.eat()
+            try:
+                self.eat()
+            except NoFoodError:
+                try:
+                    self.buy_food()
+                except NoMoneyError as exc:
+                    lgprint(str(exc))
+                    self.clean_house()
         else:
-            self.chilling()
-
-        return 0
+            try:
+                self.chilling()
+            except NoMoneyError as exc:
+                lgprint(str(exc))
+                self.play_with_cat()
 
 
 class YoungerChild(Human):
 
     def act(self):
-        disease = super().act()
-        if disease:
-            return disease
+        super().act()
 
         self.happiness = 100
         dice = randint(1, 6)
         if self.fullness <= 10:
-            if not self.eat():
+            try:
+                self.eat()
+            except NoFoodError as exc:
+                lgprint(str(exc))
                 self.sleep()
         elif dice < 3:
-            if not self.eat():
+            try:
+                self.eat()
+            except NoFoodError as exc:
+                lgprint(str(exc))
                 self.sleep()
         else:
             self.sleep()
 
-        return 0
-
     def eat(self):
-        return super().eat(food_amount=10)
+        super().eat(food_amount=10)
 
     def sleep(self):
         lgprint(f'{self.name} сегодня весь день {self._right_sex_word("спал", "спала")}')
@@ -273,14 +329,11 @@ class Cat:
         return f'Я - кот {self.name}, сытость {self.fullness}'
 
     def eat(self):
-        if self.home.cat_food >= 10:
-            lgprint(f'Кот {self.name} поел')
-            self.fullness += 20
-            self.home.cat_food -= 10
-            return True
-
-        lgprint(f'Мяу! Кот {self.name} нет еды')
-        return False
+        if self.home.cat_food < 10:
+            raise NoCatFoodError(self)
+        lgprint(f'Кот {self.name} поел')
+        self.fullness += 20
+        self.home.cat_food -= 10
 
     def sleep(self):
         lgprint(f'Кот {self.name} целый день дрых как скотина')
@@ -297,27 +350,32 @@ class Cat:
 
     def act(self):
         if self.fullness < 0:
-            lgprint(f'Кот {self.name} умер...')
-            return 3
+            raise HungryResidentError(self)
 
         dice = randint(1, 6)
         if self.fullness < 20:
-            self.eat()
+            try:
+                self.eat()
+            except NoCatFoodError as exc:
+                lgprint(str(exc))
+                self.sleep()
         elif self.fullness > 100:
             if 1 <= dice <= 2:
                 self.rip_wallpapers()
             else:
                 self.sleep()
         elif 1 <= dice <= 2:
-            self.eat()
+            try:
+                self.eat()
+            except NoCatFoodError as exc:
+                lgprint(str(exc))
+                self.sleep()
         elif 3 <= dice <= 4:
             self.rip_wallpapers()
         else:
             self.sleep()
 
         return 0
-
-
 
 
 class Simulation:
@@ -361,36 +419,31 @@ class Simulation:
 
         cats_number: int, default=0
             Количество кошек в доме
-
-        Returns
-        -------
-        True, если семья дожила до конца года и False - если нет
         """
         home = House()
         home.residents.append(Parent(name='Папа Сережа', sex='male', salary=salary, home=home))
         home.residents.append(ElderChild(name='Дочка Маша', sex='female', home=home))
         home.residents.append(YoungerChild(name='Сынок Коля', sex='male', home=home))
-        #  Предполагалось, что это будет осуществляться автоматически при создании "жителя", то есть в __init__
         for _ in range(cats_number):
             home.pets.append(Cat(home=home))
 
         for day in range(1, 366):
-            lgprint(f'=============== {cats_number} кошек - Попытка {attempt} - День {day} ===============', color='red')
+            lgprint(f'============== {cats_number} кошек - Попытка {attempt} - День {day} ==============', color='red')
             if day in self.money_incidents_days:
                 lgprint('Из копилки пропала половина денег!', color='red')
                 home.money //= 2
             if day in self.food_incidents_days:
                 lgprint('Из холодильника пропала половина еды!', color='red')
                 home.food //= 2
-
-            diseases = sum([someone.act() for someone in home.residents + home.pets])
-            if diseases:
-                return False
+            try:
+                for someone in home.residents + home.pets:
+                    someone.act()
+            except ResidentError as exc:
+                lgprint(str(exc), color='red')
+                raise SurviveOneYearError(attempt=attempt, day=day, salary=salary, cats=cats_number)
             home.get_old()
             for someone in home.residents + home.pets + [home]:
                 lgprint(someone, color='cyan')
-
-        return True
 
     def experiment(self, salary):
         """
@@ -418,8 +471,12 @@ class Simulation:
 
             success_attempts = 0
             for attempt in range(1, 4):
-                attempt_result = self.live_a_year(salary=salary, attempt=attempt, cats_number=cats_number)
-                success_attempts += 1 if attempt_result else 0
+                try:
+                    self.live_a_year(salary=salary, attempt=attempt, cats_number=cats_number)
+                except SurviveOneYearError as exc:
+                    lgprint(str(exc), color='red')
+                else:
+                    success_attempts += 1
                 if success_attempts == 1 and attempt == 2:
                     break
                 if success_attempts == 2:
@@ -458,7 +515,6 @@ for salary in range(50, 401, 50):
             life = Simulation(money_incidents=money_incidents, food_incidents=food_incidents)
             max_cats = life.experiment(salary)
             experiment_results[salary][food_incidents][money_incidents] = max_cats
-
 print('')
 for salary, incidents in experiment_results.items():
     cprint('\nЗарплата: ', color='yellow', end='')
