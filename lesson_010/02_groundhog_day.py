@@ -90,3 +90,5 @@ while current_karma < ENLIGHTENMENT_KARMA_LEVEL:
 print(f'\nФил исправился за 1 день и {day} повторов :)')
 
 # https://goo.gl/JnsDqu
+
+# зачет!

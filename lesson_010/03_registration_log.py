@@ -58,7 +58,8 @@ with open(INPUT_RECORDS, mode='r', encoding='utf8') as records:
                     check_record(line)
                 except (ValueError, NotEmailError, NotNameError) as exc:
                     print(f'{exc.__class__.__name__}: {exc}: {line}')
-                    invalids.write(line + '\n')
+                    invalids.write(f'{line}, {exc}\n')
                 else:
                     valids.write(line + '\n')
 
+# зачет!
