@@ -22,13 +22,31 @@ def get_prime_numbers(n):
 
 
 class PrimeNumbers:
-    pass
-    # TODO здесь ваш код
+    def __init__(self, n):
+        self.numbers_count = n
+        self.prime_numbers = []
+        self.last_prime = 1
+
+    def __iter__(self):
+        self.prime_numbers = []
+        self.last_prime = 1
+        return self
+
+    def __next__(self):
+        for number in range(self.last_prime + 1, self.numbers_count + 1):
+            for prime in self.prime_numbers:
+                if number % prime == 0:
+                    break
+            else:
+                self.prime_numbers.append(number)
+                self.last_prime = number
+                return number
+        raise StopIteration()
 
 
-prime_number_iterator = PrimeNumbers(n=10000)
-for number in prime_number_iterator:
-    print(number)
+# prime_number_iterator = PrimeNumbers(n=10000)
+# for number in prime_number_iterator:
+#     print(number)
 
 
 # TODO после подтверждения части 1 преподователем, можно делать
@@ -38,12 +56,19 @@ for number in prime_number_iterator:
 
 
 def prime_numbers_generator(n):
-    pass
-    # TODO здесь ваш код
+    prime_numbers = []
+    for number in range(2, n + 1):
+        for prime in prime_numbers:
+            if number % prime == 0:
+                break
+        else:
+            prime_numbers.append(number)
+            yield number
+    return prime_numbers
 
 
-for number in prime_numbers_generator(n=10000):
-    print(number)
+# for number in prime_numbers_generator(n=10000):
+#     print(number)
 
 
 # Часть 3
@@ -61,3 +86,34 @@ for number in prime_numbers_generator(n=10000):
 # простых счастливых палиндромных чисел и так далее. Придумать не менее 2х способов.
 #
 # Подсказка: возможно, нужно будет добавить параметр в итератор/генератор.
+
+
+def is_lucky(number):
+    number = str(number)
+    left_half = number[:len(number) // 2]
+    right_half = number[-(len(number) // 2):]
+    left_sum = sum([int(digit) for digit in left_half])
+    right_sum = sum([int(digit) for digit in right_half])
+    return left_sum == right_sum
+
+
+def is_palindrome(number):
+    return str(number) == str(number)[::-1]
+
+
+# TODO хотел сначала извиниться и отделаться каким-нибудь простым алгоритмом вроде проверки числа на квадрат
+#  (находим корень от числа, а потом проверяем у него наличие дробной части с помощью math.modf),
+#  но потом наткнулся на полупростые числа (https://vk.cc/atWbrH),
+#  разработка алгоритма поиска которых показалась мне простой, но интересной
+def is_semiprime(number):
+    primes = []
+    for prime in prime_numbers_generator(n=number):
+        primes.append(prime)
+        if number / prime in primes:
+            return True
+    return False
+
+
+print(is_lucky(92083))
+print(is_palindrome(92028))
+print(is_semiprime(920))
