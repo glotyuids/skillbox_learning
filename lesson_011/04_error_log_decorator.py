@@ -6,26 +6,29 @@
 # Имя файла лога - function_errors.log
 # Формат лога: <имя функции> <параметры вызова> <тип ошибки> <текст ошибки>
 # Лог файл открывать каждый раз при ошибке в режиме 'a'
+from os.path import normpath
 
 
-def log_errors(func):
-    def surrogate(*args, **kwargs):
-        try:
-            func(*args, **kwargs)
-        except BaseException as exc:
-            with open('function_errors.log', mode='a', encoding='utf-8') as log:
-                log.write(f'{func.__name__} {args} {kwargs} {exc.__class__.__name__} {exc}\n')
-            raise exc
-    return surrogate
+def log_errors(log_filename):
+    def log_errors_to_file(func):
+        def surrogate(*args, **kwargs):
+            try:
+                func(*args, **kwargs)
+            except BaseException as exc:
+                with open(normpath(log_filename), mode='a', encoding='utf-8') as log:
+                    log.write(f'{func.__name__} {args} {kwargs} {exc.__class__.__name__} {exc}\n')
+                raise exc
+        return surrogate
+    return log_errors_to_file
 
 
 # Проверить работу на следующих функциях
-@log_errors
+@log_errors('function_errors.log')
 def perky(param):
     return param / 0
 
 
-@log_errors
+@log_errors('function_errors.log')
 def check_line(line):
     name, email, age = line.split(' ')
     if not name.isalpha():
