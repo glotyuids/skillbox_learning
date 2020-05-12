@@ -9,8 +9,14 @@
 
 
 def log_errors(func):
-    pass
-    # TODO здесь ваш код
+    def surrogate(*args, **kwargs):
+        try:
+            func(*args, **kwargs)
+        except BaseException as exc:
+            with open('function_errors.log', mode='a', encoding='utf-8') as log:
+                log.write(f'{func.__name__} {args} {kwargs} {exc.__class__.__name__} {exc}\n')
+            raise exc
+    return surrogate
 
 
 # Проверить работу на следующих функциях
