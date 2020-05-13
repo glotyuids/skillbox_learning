@@ -70,8 +70,10 @@ def get_polygon(n):
     return draw_polygon
 
 
-draw_triangle = get_polygon(n=3)
-draw_triangle(point=sd.get_point(200, 200), angle=13, length=100)
+draw_triangle = get_polygon(n=27)
+draw_triangle(point=sd.get_point(300, 100), angle=13, length=100)
 
 
 sd.pause()
+
+# зачет! Интересная работа! Но почему-то при числе граней 21-23 и 25-28 рисует не точно
