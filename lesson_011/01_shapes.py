@@ -14,7 +14,7 @@
 #  то здесь придётся поработать несколько больше, переопределив 4 метода (и два попутно) в двух классах
 #  -
 #  Корректность работы можете проверить, увеличив количество сторон полигона хотя бы до 30
-
+import numpy
 import simple_draw as sd
 
 
@@ -58,13 +58,15 @@ class FloatVector(sd.Vector):
 
 
 def get_polygon(n):
-    def draw_polygon(point=None, angle=0, length=10):
+    def draw_polygon(point=None, angle=0.0, length=10):
         if not isinstance(point, (sd.Point, FloatPoint)):
             raise TypeError(f'Incorrect point object: expected Point or FloatPoint, got {type(point).__name__}')
-        angle_step = round(360 / n)
+        angle_step = 360 / n
         next_start_point = point
-        for next_angle in range(angle, 360 + angle, angle_step):
-            v = FloatVector(start_point=next_start_point, direction=next_angle, length=length)
+        # если итерироваться по numpy.arange(angle, 360 + angle, angle_step), то точность будет несколько выше,
+        # но разница пляшет в районе 12 знака после запятой, поэтому смысла тащить сюда numpy нет
+        for i in range(1, n + 1):
+            v = FloatVector(start_point=next_start_point, direction=angle + angle_step * i, length=length)
             v.draw(color=sd.COLOR_YELLOW, width=1)
             next_start_point = v.end_point
     return draw_polygon
