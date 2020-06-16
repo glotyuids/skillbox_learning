@@ -75,8 +75,6 @@
 
 import os
 import csv
-from collections import defaultdict
-
 
 TRADES_DIR = 'trades'
 
@@ -92,7 +90,8 @@ class TTradeAnalyzer:
     def run(self):
         with open(self.ticker_filename) as ticker_file:
             trades = csv.DictReader(ticker_file)
-            min_price, max_price = float(next(trades)['PRICE']), 0.0
+            price = float(next(trades)['PRICE'])
+            min_price, max_price = price, price
             for trade in trades:
                 price = float(trade['PRICE'])
                 min_price = price if price < min_price else min_price
@@ -101,13 +100,33 @@ class TTradeAnalyzer:
             self.volatility = ((max_price - min_price) / half_sum) * 100
 
 
+# Обработка файлов
 trades_list = [os.path.join(TRADES_DIR, ticker) for ticker in os.listdir(TRADES_DIR)]
 trades_list = [ticker for ticker in trades_list if os.path.isfile(ticker)]
-volatility_list = defaultdict(float)
-for ticker in trades_list[:1]:
+volatility_list = []
+for ticker in trades_list:
     trade_analyzer = TTradeAnalyzer(ticker)
     trade_analyzer.run()
-    volatility_list[trade_analyzer.ticker_name] = trade_analyzer.volatility
+    volatility_list.append({'name': trade_analyzer.ticker_name, 'volatility': trade_analyzer.volatility})
 
-for ticker, volatility in volatility_list.items():
-    print(f'{ticker} - {volatility:6.2f} %')
+# Извлечение необходимых данных из результатов обработки
+volatility_list.sort(key=lambda x: x['volatility'], reverse=True)
+max_volat_list = volatility_list[:3]
+null_volat_list = []
+for ticker in volatility_list[::-1]:
+    if ticker['volatility'] > 0:
+        break
+    null_volat_list.append(ticker['name'])
+null_volat_list.sort()
+min_volat_list = volatility_list[-(len(null_volat_list)+3):-(len(null_volat_list))]
+
+# Вывод данных
+print('    Максимальная волатильность:')
+for ticker in max_volat_list:
+    print(f'        {ticker["name"]} - {ticker["volatility"]:6.2f} %')
+print('    Минимальная волатильность:')
+for ticker in min_volat_list:
+    print(f'        {ticker["name"]} - {ticker["volatility"]:6.2f} %')
+print('    Нулевая волатильность:')
+print(f'        {", ".join(null_volat_list)}')
+
