@@ -73,4 +73,41 @@
 #     def run(self):
 #         <обработка данных>
 
-# TODO написать код в однопоточном/однопроцессорном стиле
+import os
+import csv
+from collections import defaultdict
+
+
+TRADES_DIR = 'trades'
+
+
+class TTradeAnalyzer:
+    def __init__(self, ticker_filename):
+        self.ticker_filename = ticker_filename
+        self.volatility = None
+        with open(self.ticker_filename) as ticker_file:
+            trades = csv.DictReader(ticker_file)
+            self.ticker_name = next(trades)['SECID']
+
+    def run(self):
+        with open(self.ticker_filename) as ticker_file:
+            trades = csv.DictReader(ticker_file)
+            min_price, max_price = float(next(trades)['PRICE']), 0.0
+            for trade in trades:
+                price = float(trade['PRICE'])
+                min_price = price if price < min_price else min_price
+                max_price = price if price > max_price else max_price
+            half_sum = (max_price + min_price) / 2
+            self.volatility = ((max_price - min_price) / half_sum) * 100
+
+
+trades_list = [os.path.join(TRADES_DIR, ticker) for ticker in os.listdir(TRADES_DIR)]
+trades_list = [ticker for ticker in trades_list if os.path.isfile(ticker)]
+volatility_list = defaultdict(float)
+for ticker in trades_list[:1]:
+    trade_analyzer = TTradeAnalyzer(ticker)
+    trade_analyzer.run()
+    volatility_list[trade_analyzer.ticker_name] = trade_analyzer.volatility
+
+for ticker, volatility in volatility_list.items():
+    print(f'{ticker} - {volatility:6.2f} %')
