@@ -130,3 +130,4 @@ for ticker in min_volat_list:
 print('    Нулевая волатильность:')
 print(f'        {", ".join(null_volat_list)}')
 
+# зачет!
