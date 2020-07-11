@@ -9,12 +9,14 @@
 # Подходящий шрифт искать на сайте ofont.ru
 import random
 import string
+import argparse
 
 from PIL import Image, ImageFont, ImageDraw, ImageColor
 from pdf417gen import encode
 from pdf417gen import render_image as render_barcode
-from ticket_template_cp import template
 from transliterate import translit
+
+from ticket_template_cp import template
 
 
 class TTicket:
@@ -91,15 +93,26 @@ class TTicket:
         self.image.save(file_name)
 
 
-def make_ticket(fio, from_, to, date):
+def make_ticket(fio, from_, to, date, filename=None):
     ticket = TTicket(fio, from_, to, date, template)
     ticket.generate()
-    ticket.show()
-    # ticket.save_to('new_ticket.png')
+    if filename:
+        ticket.save_to(filename)
+    else:
+        ticket.show()
 
 
 if __name__ == '__main__':
-    make_ticket('Иванов Иван Иванович', 'London Gatwick (LGW)', 'Naples International (NAP)', '15/02/2020')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--fio', action="store", dest="fio")
+    parser.add_argument('--from', action="store", dest="from_")
+    parser.add_argument('--to', action="store", dest="to")
+    parser.add_argument('--date', action="store", dest="date")
+    parser.add_argument('--save_to', action="store", dest="save_to", default=None)
+    args = parser.parse_args()
+
+    # make_ticket('Иванов Иван Иванович', 'London Gatwick (LGW)', 'Naples International (NAP)', '15/02/2020')
+    make_ticket(args.fio, args.from_, args.to, args.date, args.save_to)
 
 # Усложненное задание (делать по желанию).
 # Написать консольный скрипт c помощью встроенного python-модуля argparse.
