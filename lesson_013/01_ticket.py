@@ -53,7 +53,7 @@ class TTicket:
 
     def _generate_barcode_data(self):
         barcode_data = 'M1'
-        barcode_data += translit(self.name, 'ru', reversed=True).upper() + ' '
+        barcode_data += translit(self.name.replace(' ', '/'), 'ru', reversed=True).upper() + ' '
         barcode_data += 'E' + ''.join([random.choice(string.ascii_uppercase + string.digits) for _ in range(0, 6)])
         barcode_data += ' ' + translit(self.origin, 'ru', reversed=True)[:3].upper()
         barcode_data += translit(self.dest, 'ru', reversed=True)[:3].upper()
