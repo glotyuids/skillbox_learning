@@ -11,7 +11,7 @@ import random
 import string
 import argparse
 
-from PIL import Image, ImageFont, ImageDraw, ImageColor
+from PIL import Image, ImageFont, ImageDraw, ImageColor, features
 from pdf417gen import encode
 from pdf417gen import render_image as render_barcode
 from transliterate import translit
@@ -81,11 +81,14 @@ class TTicket:
                 self.image.paste(barcode, field['pos'])
                 continue
             font = ImageFont.truetype(field['font'], field['font_size'])
-            max_length = field['max_length']
+            field_width = field['width']
             text = self._get_data(field['data_type'])
-            text = text[:max_length]
             text = text.upper() if field['capital'] else text
+            if field_width:
+                while font.getsize(text)[0] > field_width:
+                    text = text[:-1]
             canvas.text(field['pos'], text, font=font, fill=ImageColor.colormap['black'])
+
 
     def show(self):
         self.image.show()
@@ -112,7 +115,8 @@ if __name__ == '__main__':
     parser.add_argument('--save_to', action="store", dest="save_to", default=None)
     args = parser.parse_args()
 
-    # make_ticket('Иванов Иван Иванович', 'London Gatwick (LGW)', 'Naples International (NAP)', '15/02/2020')
+    # make_ticket('Иванов И.И.', 'London Gatwick (LGW)', 'Naples International (NAP)', '15/02/2020')
+    # make_ticket('Валько Дмитрий Олегович12345678901234567890', 'Белгород12345678901234567890', 'Москва12345678901234567890', '15/03/2020')
     make_ticket(args.fio, args.from_, args.to, args.date, args.save_to)
 
 # Усложненное задание (делать по желанию).
