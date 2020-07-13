@@ -11,7 +11,7 @@ import random
 import string
 import argparse
 
-from PIL import Image, ImageFont, ImageDraw, ImageColor, features
+from PIL import Image, ImageFont, ImageDraw, ImageColor
 from pdf417gen import encode
 from pdf417gen import render_image as render_barcode
 from transliterate import translit
@@ -88,7 +88,6 @@ class TTicket:
                 while font.getsize(text)[0] > field_width:
                     text = text[:-1]
             canvas.text(field['pos'], text, font=font, fill=ImageColor.colormap['black'])
-
 
     def show(self):
         self.image.show()
