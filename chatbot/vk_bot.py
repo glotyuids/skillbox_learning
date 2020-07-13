@@ -45,7 +45,10 @@ class Bot:
 
     def _on_message(self, event):
         bot_logger.info(f'Bot: Message received. Peer ID: {event.message.peer_id}. Message: {event.message.text}')
-        self.send_message(event.message.peer_id,event.message.text.upper())
+        if 'отключ' in event.message.text.lower():
+            self.send_message(event.message.peer_id, 'Ну ладно тебе. Нормально ж общались(')
+        else:
+            self.send_message(event.message.peer_id, event.message.text.upper())
 
     def send_message(self, peer_id, message):
         self.api.messages.send(user_id=peer_id, message=message, random_id=randint(0, self.max_random_id))
