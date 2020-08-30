@@ -1,4 +1,8 @@
 
+class FrameCountError(Exception):
+    pass
+
+
 class ScoreCounter:
     _state = None
 
@@ -28,6 +32,8 @@ class State:
 
 class FirstRoll(State):
     def count_score(self, roll):
+        if len(self.context.frame_results) > 10:
+            raise FrameCountError('Количество фреймов в последовательности больше 10')
         if roll in 'XxХх':
             result = 20
         else:
@@ -49,6 +55,12 @@ class SecondRoll(State):
                 result = 0
             else:
                 result = int(roll)
+
+                if self.context.frame_results[-1] + result > 10:
+                    raise ValueError(f'Количество кеглей, сбитых за один фрейм, не должно быть больше 10. '
+                                     f'Количество кеглей за этот фрейм: {self.context.frame_results[-1]} + {result} = '
+                                     f'{self.context.frame_results[-1] + result}')
+
             self.context.frame_results[-1] += result
 
         self.context.set_state(FirstRoll())
