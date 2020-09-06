@@ -15,14 +15,14 @@ class BowlingTest(unittest.TestCase):
         with self.assertRaises(ValueError) as cm:
             bowling.get_score('aХ4/34-4')
         exc = cm.exception
-        self.assertEqual('Некорректный символ в последовательности. Состояние: FirstRoll. Полученный символ: a',
+        self.assertEqual('Некорректный символ в последовательности. Фрейм 1. Бросок 1. Полученный символ: a',
                          exc.args[0])
 
     def test_incorrect_symbol_second_roll(self):
         with self.assertRaises(ValueError) as cm:
             bowling.get_score('Х4X')
         exc = cm.exception
-        self.assertEqual('Некорректный символ в последовательности. Состояние: SecondRoll. Полученный символ: X',
+        self.assertEqual('Некорректный символ в последовательности. Фрейм 2. Бросок 2. Полученный символ: X',
                          exc.args[0])
 
     def test_long_sequence(self):
