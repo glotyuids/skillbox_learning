@@ -39,8 +39,12 @@ class FirstRoll(State):
         else:
             if roll == '-':
                 result = 0
-            else:
+            elif roll.isdigit():
                 result = int(roll)
+            else:
+                raise ValueError(f'Некорректный символ в последовательности. '
+                                 f'Состояние: {__class__.__name__}. Полученный символ: {roll}')
+
             self.context.set_state(SecondRoll())
 
         self.context.frame_results.append(result)
@@ -53,22 +57,20 @@ class SecondRoll(State):
         else:
             if roll == '-':
                 result = 0
-            else:
+            elif roll.isdigit():
                 result = int(roll)
 
                 if self.context.frame_results[-1] + result > 10:
                     raise ValueError(f'Количество кеглей, сбитых за один фрейм, не должно быть больше 10. '
                                      f'Количество кеглей за этот фрейм: {self.context.frame_results[-1]} + {result} = '
                                      f'{self.context.frame_results[-1] + result}')
+            else:
+                raise ValueError(f'Некорректный символ в последовательности. '
+                                 f'Состояние: {__class__.__name__}. Полученный символ: {roll}')
 
             self.context.frame_results[-1] += result
 
         self.context.set_state(FirstRoll())
-
-
-
-
-
 
 
 def get_score(game_result):
