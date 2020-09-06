@@ -29,6 +29,13 @@ class BowlingTest(unittest.TestCase):
         with self.assertRaises(bowling.FrameCountError):
             bowling.get_score('Х2/3/4/5/6/7/8/9/0/X')
 
+    def test_incomplete_last_frame(self):
+        with self.assertRaises(IndexError) as cm:
+            bowling.get_score('Х4')
+        exc = cm.exception
+        self.assertEqual('Последний фрейм не завершён - нет второго броска',
+                         exc.args[0])
+
 
 if __name__ == '__main__':
     unittest.main()
