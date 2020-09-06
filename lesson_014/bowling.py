@@ -32,7 +32,7 @@ class State:
 
 class FirstRoll(State):
     def count_score(self, roll):
-        if len(self.context.frame_results) > 10:
+        if len(self.context.frame_results) >= 10:
             raise FrameCountError('Количество фреймов в последовательности больше 10')
         if roll in 'XxХх':
             result = 20
