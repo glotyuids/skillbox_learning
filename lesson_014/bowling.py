@@ -31,6 +31,8 @@ class State:
 
 class FirstRoll(State):
     def count_score(self, roll):
+        if roll == '\0':
+            return
         if len(self.context.frame_results) >= 10:
             raise FrameCountError('Количество фреймов в последовательности больше 10')
         if roll in 'XxХх':
@@ -51,6 +53,8 @@ class FirstRoll(State):
 
 class SecondRoll(State):
     def count_score(self, roll):
+        if roll == '\0':
+            raise IndexError('Последний фрейм не завершён - нет второго броска')
         if roll == '/':
             self.context.frame_results[-1] = 15
         else:
@@ -74,7 +78,7 @@ class SecondRoll(State):
 
 
 def get_score(game_result):
-    counter = ScoreCounter(game_result)
+    counter = ScoreCounter(game_result + '\0')
     return counter.get_score()
 
 
