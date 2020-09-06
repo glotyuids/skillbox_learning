@@ -10,7 +10,6 @@ class ScoreCounter:
         self.set_state(FirstRoll())
         self.game_result = game_result
 
-        self.frame_score = 0
         self.frame_results = []
 
     def set_state(self, state):
@@ -43,7 +42,7 @@ class FirstRoll(State):
                 result = int(roll)
             else:
                 raise ValueError(f'Некорректный символ в последовательности. '
-                                 f'Состояние: {__class__.__name__}. Полученный символ: {roll}')
+                                 f'Фрейм {len(self.context.frame_results) + 1}. Бросок 1. Полученный символ: {roll}')
 
             self.context.set_state(SecondRoll())
 
@@ -62,11 +61,12 @@ class SecondRoll(State):
 
                 if self.context.frame_results[-1] + result > 10:
                     raise ValueError(f'Количество кеглей, сбитых за один фрейм, не должно быть больше 10. '
+                                     f'Фрейм {len(self.context.frame_results)}. '
                                      f'Количество кеглей за этот фрейм: {self.context.frame_results[-1]} + {result} = '
                                      f'{self.context.frame_results[-1] + result}')
             else:
                 raise ValueError(f'Некорректный символ в последовательности. '
-                                 f'Состояние: {__class__.__name__}. Полученный символ: {roll}')
+                                 f'Фрейм {len(self.context.frame_results)}. Бросок 2. Полученный символ: {roll}')
 
             self.context.frame_results[-1] += result
 
