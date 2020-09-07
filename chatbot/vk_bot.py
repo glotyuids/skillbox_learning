@@ -25,15 +25,31 @@ def logging_config():
 
 
 class Bot:
+    """
+    Echo bot для vk.com
+
+    use python3.7
+    """
     max_random_id = int('1'*63, 2)      # Int64
 
     def __init__(self, token, group_id):
+        """
+
+        Parameters
+        ----------
+        token: str
+            Ключ доступа к сообществу
+        group_id: str
+            ID сообщества
+
+        """
         self.session = VkApi(token=token)
         self.vk_bot = bot_longpoll.VkBotLongPoll(self.session, group_id)
         self.api = self.session.get_api()
         bot_logger.info('Bot: Initialized')
 
     def start(self):
+        """ Запуск бота """
         bot_logger.info('Bot: Start listening')
         for event in self.vk_bot.listen():
             try:
@@ -42,12 +58,28 @@ class Bot:
                 bot_logger.exception('Event handling error')
 
     def _on_event(self, event):
+        """
+        Основной обработчик прилетевших из вк событий
+
+        Parameters
+        ----------
+        event: VkBotEvent
+
+        """
         if event.type == bot_longpoll.VkBotEventType.MESSAGE_NEW:
             self._on_message(event)
         else:
             bot_logger.debug(f'Bot: Unknown event type {event.type}')
 
     def _on_message(self, event):
+        """
+        Обработчик прилетевших из вк событий сообщений. Отвечает отправителю капсом его же сообщением
+
+        Parameters
+        ----------
+        event: VkBotMessageEvent
+
+        """
         bot_logger.info(f'Bot: Message received. Peer ID: {event.message.peer_id}. Message: {event.message.text}')
         if 'отключ' in event.message.text.lower():
             self.send_message(event.message.peer_id, 'Ну ладно тебе. Нормально ж общались(')
@@ -55,8 +87,20 @@ class Bot:
             self.send_message(event.message.peer_id, event.message.text.upper())
 
     def send_message(self, peer_id, message):
+        """
+        Метод для отправки текстовых сообщений
+
+        Parameters
+        ----------
+        peer_id: str or int
+            ID получателя
+        message: str
+            Текст сообщения
+
+        """
         self.api.messages.send(user_id=peer_id, message=message, random_id=randint(0, self.max_random_id))
         bot_logger.info(f'Bot: Message sent. Peer ID: {peer_id}. Message: {message}')
+
 
 if __name__ == '__main__':
     # Подтягиваем чувствительные данные из переменных окружения
@@ -69,4 +113,3 @@ if __name__ == '__main__':
 
     echo_bot = Bot(DEV_VK_TOKEN, DEV_GROUP_ID)
     echo_bot.start()
-
