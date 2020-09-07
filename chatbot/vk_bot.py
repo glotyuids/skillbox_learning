@@ -6,18 +6,22 @@ from random import randint
 
 from vk_api import bot_longpoll, VkApi
 
-# Подтягиваем чувствительные данные из переменных окружения
-assert 'VK_TEST_BOT_TOKEN' in os.environ, 'Environment variable VK_TEST_BOT_TOKEN is not exist'
-assert 'VK_TEST_BOT_GROUP_ID' in os.environ, 'Environment variable VK_TEST_BOT_TOKEN is not exist'
-DEV_VK_TOKEN = os.environ.get('VK_TEST_BOT_TOKEN')
-DEV_GROUP_ID = os.environ.get('VK_TEST_BOT_GROUP_ID')
 
-# Настраиваем логгер
-bot_logger = logging.Logger(__name__, logging.DEBUG)
-console_handler = logging.StreamHandler()
-console_formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s')
-console_handler.setFormatter(console_formatter)
-bot_logger.addHandler(console_handler)
+bot_logger = logging.Logger('vk_bot', logging.DEBUG)
+
+
+def logging_config():
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.INFO)
+    console_formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s')
+    console_handler.setFormatter(console_formatter)
+    bot_logger.addHandler(console_handler)
+
+    file_handler = logging.FileHandler('bot.log', mode='a', delay=True)
+    file_handler.setLevel(logging.DEBUG)
+    file_formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s', datefmt='%d-%m-%Y %H:%M')
+    file_handler.setFormatter(file_formatter)
+    bot_logger.addHandler(file_handler)
 
 
 class Bot:
@@ -34,8 +38,8 @@ class Bot:
         for event in self.vk_bot.listen():
             try:
                 self._on_event(event)
-            except Exception as exc:
-                bot_logger.error(exc)
+            except Exception:
+                bot_logger.exception('Event handling error')
 
     def _on_event(self, event):
         if event.type == bot_longpoll.VkBotEventType.MESSAGE_NEW:
@@ -54,7 +58,15 @@ class Bot:
         self.api.messages.send(user_id=peer_id, message=message, random_id=randint(0, self.max_random_id))
         bot_logger.info(f'Bot: Message sent. Peer ID: {peer_id}. Message: {message}')
 
+if __name__ == '__main__':
+    # Подтягиваем чувствительные данные из переменных окружения
+    assert 'VK_TEST_BOT_TOKEN' in os.environ, 'Environment variable VK_TEST_BOT_TOKEN is not exist'
+    assert 'VK_TEST_BOT_GROUP_ID' in os.environ, 'Environment variable VK_TEST_BOT_TOKEN is not exist'
+    DEV_VK_TOKEN = os.environ.get('VK_TEST_BOT_TOKEN')
+    DEV_GROUP_ID = os.environ.get('VK_TEST_BOT_GROUP_ID')
 
-echo_bot = Bot(DEV_VK_TOKEN, DEV_GROUP_ID)
-echo_bot.start()
+    logging_config()
+
+    echo_bot = Bot(DEV_VK_TOKEN, DEV_GROUP_ID)
+    echo_bot.start()
 
