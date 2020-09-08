@@ -83,4 +83,7 @@ def get_score(game_result):
 
 
 if __name__ == '__main__':
-    print(get_score('Х4/34-4'))
+    # TODO ваше решение не обрабатывает след. неправильные для 10 фреймовой игры по 10 кеглей на фрейм данные
+    input = 'X' * 9
+    input = 'X' * 9 + '55'
+    print(get_score(input))
