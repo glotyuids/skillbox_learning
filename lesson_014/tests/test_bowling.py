@@ -4,7 +4,7 @@ import bowling
 
 class BowlingTest(unittest.TestCase):
     def test_scoring(self):
-        result = bowling.get_score('Х4/34-4')
+        result = bowling.get_score('Х4/34-4------------')
         # TODO везде говорится, что эначение для проверки передаётся первым параметром, аожидаемый результат - вторым.
         #  Но если посмотреть результат теста, то будет видно,
         #  что значение Expected берётся из первого параметра, а Actual - из второго.
@@ -25,9 +25,18 @@ class BowlingTest(unittest.TestCase):
         self.assertEqual('Некорректный символ в последовательности. Фрейм 2. Бросок 2. Полученный символ: X',
                          exc.args[0])
 
-    def test_long_sequence(self):
+        with self.assertRaises(ValueError) as cm:
+            bowling.get_score('Х55')
+        exc = cm.exception
+        self.assertEqual('За фрейм сбито 10 кеглей, но результат записан не как спейр, а как два числа. '
+                         'Фрейм 2. Количество кеглей за этот фрейм: 5 + 5 = 10',
+                         exc.args[0])
+
+    def test_incorrect_sequence_length(self):
         with self.assertRaises(bowling.FrameCountError):
-            bowling.get_score('Х2/3/4/5/6/7/8/9/0/X')
+            bowling.get_score('X' * 9)
+        with self.assertRaises(bowling.FrameCountError):
+            bowling.get_score('Х' * 11)
 
     def test_incomplete_last_frame(self):
         with self.assertRaises(IndexError) as cm:
