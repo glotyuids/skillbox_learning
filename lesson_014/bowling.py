@@ -1,10 +1,10 @@
-
 class FrameCountError(Exception):
     pass
 
 
 class ScoreCounter:
     _state = None
+    frames_count = 10
 
     def __init__(self, game_result):
         self.set_state(FirstRoll())
@@ -19,6 +19,8 @@ class ScoreCounter:
     def get_score(self):
         for roll in self.game_result:
             self._state.count_score(roll)
+        if len(self.frame_results) < self.frames_count:
+            raise FrameCountError(f'Количество фреймов в последовательности меньше {self.frames_count}')
         return sum(self.frame_results)
 
 
@@ -33,8 +35,8 @@ class FirstRoll(State):
     def count_score(self, roll):
         if roll == '\0':
             return
-        if len(self.context.frame_results) >= 10:
-            raise FrameCountError('Количество фреймов в последовательности больше 10')
+        if len(self.context.frame_results) >= self.context.frames_count:
+            raise FrameCountError(f'Количество фреймов в последовательности больше {self.context.frames_count}')
         if roll in 'XxХх':
             result = 20
         else:
@@ -63,6 +65,11 @@ class SecondRoll(State):
             elif roll.isdigit():
                 result = int(roll)
 
+                if self.context.frame_results[-1] + result == 10:
+                    raise ValueError(f'За фрейм сбито 10 кеглей, но результат записан не как спейр, а как два числа. '
+                                     f'Фрейм {len(self.context.frame_results)}. '
+                                     f'Количество кеглей за этот фрейм: {self.context.frame_results[-1]} + {result} = '
+                                     f'{self.context.frame_results[-1] + result}')
                 if self.context.frame_results[-1] + result > 10:
                     raise ValueError(f'Количество кеглей, сбитых за один фрейм, не должно быть больше 10. '
                                      f'Фрейм {len(self.context.frame_results)}. '
@@ -83,7 +90,7 @@ def get_score(game_result):
 
 
 if __name__ == '__main__':
-    # TODO ваше решение не обрабатывает след. неправильные для 10 фреймовой игры по 10 кеглей на фрейм данные
+    # ваше решение не обрабатывает след. неправильные для 10 фреймовой игры по 10 кеглей на фрейм данные
     input = 'X' * 9
     input = 'X' * 9 + '55'
     print(get_score(input))
