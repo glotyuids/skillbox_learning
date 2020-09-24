@@ -1,3 +1,6 @@
+import os
+from collections import defaultdict
+
 from bowling import get_score
 
 
@@ -32,21 +35,26 @@ class Tour:
         """
         return {name: (score if score != -1 else 0) for (name, score) in self._scores.items()}
 
-    def get_total_log(self):
+    def get_total_log(self, name_field_width=10):
         """
         Возвращает список строк итоговым логом тура (входные строки, очки и победитель)
 
+        Parameters
+        ----------
+        name_field_width: int, default=10
+            Ширина поля для имени
+
         Returns
         -------
-        total_log: list of strings
+        total_log: list[str]
         """
         total_log = [self.tour_results[0]]
         for line in self.tour_results[1:-1]:
-            name, _ = line.split()
+            name, rolls = line.split()
             if name in self.errors.keys():
-                total_log.append(line[:-1] + '  \t' + str(self.errors[name]) + '\n')
+                total_log.append(name.ljust(name_field_width + 2) + rolls.ljust(22) + str(self.errors[name]) + '\n')
             else:
-                total_log.append(line[:-1] + '  \t' + str(self._scores[name]) + '\n')
+                total_log.append(name.ljust(name_field_width + 2) + rolls.ljust(22) + str(self._scores[name]) + '\n')
         winners = self.winners
         winners = ['Никто: у всех игроков в этом туре имеются ошибки в записи ходов'] if len(winners) == 0 else winners
         total_log.append('winner is ' + ', '.join(winners) + '\n\n')
@@ -74,6 +82,9 @@ class Tournament:
 
     def __init__(self, results_filename):
         self.results_file = results_filename
+        self.wins_count = defaultdict(int)
+        self.tours_count = defaultdict(int)
+        self.name_field_width = self._get_longest_name_length()
 
     def tours(self):
         """
@@ -82,7 +93,7 @@ class Tournament:
 
         Yields
         -------
-        tour_results: list of strings
+        tour_results: list[str]
         """
         with open(self.results_file, mode='r') as results:
             tour_results = []
@@ -97,19 +108,39 @@ class Tournament:
             if len(tour_results) > 0 and tour_results[-1] != '\n':
                 yield tour_results
 
-    def run(self):
-        with open('bowling_results.txt', mode='w') as out_file:
+    def _get_longest_name_length(self):
+        """
+        Находит длину самого большого имени в турнире
+
+        Returns
+        -------
+        max_length: int
+        """
+        max_length = 0
+        with open(self.results_file, mode='r') as results:
+            for line in results:
+                if not(line.startswith(('### Tour', 'winner', '\n'))):
+                    name, _ = line.split()
+                    max_length = len(name) if len(name) > max_length else max_length
+        return max_length
+
+    def count_scores(self, out_file_name=os.devnull):
+        with open(out_file_name, mode='w') as out_file:
             tour_number = 0
             for tour_results in self.tours():
                 tour = Tour(tour_results)
-                tour_log = tour.get_total_log()
+                # считаем количество игр и количество побед для каждого игрока
+                for name in tour.scores.keys():
+                    self.tours_count[name] += 1
+                for name in tour.winners:
+                    self.wins_count[name] += 1
+                # выводим лог тура в файл
+                tour_log = tour.get_total_log(self.name_field_width)
                 out_file.writelines(tour_log)
-                tour_number += 1
-                print(str(tour_number), tour.scores)
 
 
 if __name__ == '__main__':
     world_cup = Tournament('tournament.txt')
-    world_cup.run()
+    world_cup.count_scores(out_file_name='bowling_results.txt')
 
 
