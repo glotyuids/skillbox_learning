@@ -80,10 +80,14 @@ class Tour:
 
 class Tournament:
 
+    NAME = -1
+    PLAYS = 0
+    SCORE = 1
+    WINS = 2
+
     def __init__(self, results_filename):
         self.results_file = results_filename
-        self.wins_count = defaultdict(int)
-        self.tours_count = defaultdict(int)
+        self.stats = defaultdict(lambda: [0, 0, 0])
         self.name_field_width = self._get_longest_name_length()
 
     def tours(self):
@@ -142,16 +146,50 @@ class Tournament:
                 tour = Tour(tour_results)
                 # считаем количество игр и количество побед для каждого игрока
                 for name in tour.scores.keys():
-                    self.tours_count[name] += 1
+                    self.stats[name][Tournament.SCORE] += tour.scores[name]
+                    self.stats[name][Tournament.PLAYS] += 1
                 for name in tour.winners:
-                    self.wins_count[name] += 1
+                    self.stats[name][Tournament.WINS] += 1
                 # выводим лог тура в файл
                 tour_log = tour.get_total_log(self.name_field_width)
                 out_file.writelines(tour_log)
 
+    def print_stats(self, sort_by=-1, reverse=False):
+        """
+        Выводит на консоль статистику по турниру
+
+        Parameters
+        ----------
+        sort_by: int, default=Tournament.NAME
+            Способ сортировки:
+                Tournament.NAME - по имени игрока (по алфавиту)
+                Tournament.PLAYS - по количеству сыгранных туров
+                Tournament.SCORE - по количеству очков
+                Tournament.WINS - по количеству побед
+
+        reverse: bool, default=False
+            Сортировка в обратном порядке
+        """
+        if sort_by == -1:
+            sorted_stats = sorted(self.stats.items(), key=lambda player: player[0], reverse=reverse)
+        else:
+            sorted_stats = sorted(self.stats.items(), key=lambda player: player[1][sort_by], reverse=not(reverse))
+
+        print('╔══{}══╤══════════╤═════════╤═════════╗'.format("═" * self.name_field_width))
+        print('║  {}  │  Матчей  │  Очков  │  Побед  ║'.format("Игрок".center(self.name_field_width)))
+        print('╟──{}──┼──────────┼─────────┼─────────╢'.format("─" * self.name_field_width))
+
+        for name, (plays, score, wins) in sorted_stats:
+            print('║  {}  │{}│{}│{}║'
+                  .format(name.center(self.name_field_width), str(plays).center(10),
+                          str(score).center(9), str(wins).center(9)))
+
+        print('╚══{}══╧══════════╧═════════╧═════════╝'.format("═" * self.name_field_width))
+
 
 if __name__ == '__main__':
     world_cup = Tournament('tournament.txt')
-    world_cup.count_scores(out_file_name='bowling_results.txt')
+    world_cup.count_scores()
+    world_cup.print_stats()
 
 
