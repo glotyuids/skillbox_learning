@@ -6,9 +6,22 @@ import io
 class Tour:
     def __init__(self, tour_results):
         self.tour_results = tour_results
-        self.scores = {}
+        self._scores = {}
+        self.errors = {}
         self._get_scores()
-        self.winner = max(self.scores, key=self.scores.get)
+        self.winner = max(self._scores, key=self._scores.get)
+        if self.winner in self.errors.keys():
+            self.winner = 'Никто: у всех игроков в этом туре имеются ошибки в записи ходов'
+
+    @property
+    def scores(self):
+        """
+        Возвращает словарь с итогами тура
+        Returns
+        -------
+        Словарь вида {имя_игрока: набранные_очки}. Если была ошибка парсинга, то возвращается 0 очков
+        """
+        return {name: (score if score != -1 else 0) for (name, score) in self._scores.items()}
 
     def get_total_log(self):
         """
@@ -21,9 +34,12 @@ class Tour:
         total_log = io.StringIO()
         self.tour_results.seek(0)
         total_log.write(self.tour_results.readline())
-        for line in self.tour_results.readlines()[1:-1]:
+        for line in self.tour_results.readlines()[:-1]:
             name, _ = line.split()
-            total_log.write(line[:-1] + '  \t' + str(self.scores[name]) + '\n')
+            if name in self.errors.keys():
+                total_log.write(line[:-1] + '  \t' + str(self.errors[name]) + '\n')
+            else:
+                total_log.write(line[:-1] + '  \t' + str(self._scores[name]) + '\n')
         total_log.write('winner is ' + self.winner + '\n\n')
         total_log.seek(0)
         return total_log
@@ -31,12 +47,19 @@ class Tour:
     def _get_scores(self):
         """
         Считает очки игроков в этом туре.
-        Собирает словарь вида {имя_игрока: набранные_очки}
+        Собирает словарь вида {имя_игрока: набранные_очки}.
+        Если была ошибка парсинга, то ошибка откладывается в отдельный словарь вида {имя_игрока: текст_ошибки},
+        а в словарь очков добавляется запись {имя_игрока: -1}
         """
         for line in self.tour_results.readlines()[1:-1]:
             name, game_result = line.split()
-            score = get_score(game_result)
-            self.scores[name] = score
+            try:
+                score = get_score(game_result)
+            except Exception as exc:
+                self._scores[name] = -1
+                self.errors[name] = 'Error: ' + str(exc)
+            else:
+                self._scores[name] = score
 
 
 class Tournament:
@@ -70,6 +93,7 @@ class Tournament:
             tour_log = another_tour.get_total_log()
             for line in tour_log:
                 print(line, end='')
+            print(another_tour.scores)
             break
 
 
