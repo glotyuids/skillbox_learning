@@ -94,7 +94,8 @@ class Tournament:
                 else:
                     yield tour_results
                     tour_results = []
-            yield tour_results
+            if len(tour_results) > 0 and tour_results[-1] != '\n':
+                yield tour_results
 
     def run(self):
         with open('bowling_results.txt', mode='w') as out_file:
