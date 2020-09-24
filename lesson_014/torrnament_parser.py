@@ -1,7 +1,5 @@
 from bowling import get_score
 
-import io
-
 
 class Tour:
     def __init__(self, tour_results):
@@ -9,10 +7,20 @@ class Tour:
         self._scores = {}
         self.errors = {}
         self._get_scores()
-        self.winner = max(self._scores, key=self._scores.get)
-        if self.winner in self.errors.keys():
-            self.winner = 'Никто: у всех игроков в этом туре имеются ошибки в записи ходов'
-        # TODO отработать несколько победителей
+
+    @property
+    def winners(self):
+        """
+        Возвращает список победителей
+        Returns
+        -------
+        list of strings
+        """
+        max_score = max(self._scores.values())
+        if max_score == -1:
+            return []
+        else:
+            return [name for (name, score) in self._scores.items() if score == max_score]
 
     @property
     def scores(self):
@@ -39,7 +47,9 @@ class Tour:
                 total_log.append(line[:-1] + '  \t' + str(self.errors[name]) + '\n')
             else:
                 total_log.append(line[:-1] + '  \t' + str(self._scores[name]) + '\n')
-        total_log.append('winner is ' + self.winner + '\n\n')
+        winners = self.winners
+        winners = ['Никто: у всех игроков в этом туре имеются ошибки в записи ходов'] if len(winners) == 0 else winners
+        total_log.append('winner is ' + ', '.join(winners) + '\n\n')
         return total_log
 
     def _get_scores(self):
