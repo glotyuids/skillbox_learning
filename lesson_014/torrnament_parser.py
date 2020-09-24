@@ -12,6 +12,7 @@ class Tour:
         self.winner = max(self._scores, key=self._scores.get)
         if self.winner in self.errors.keys():
             self.winner = 'Никто: у всех игроков в этом туре имеются ошибки в записи ходов'
+        # TODO отработать несколько победителей
 
     @property
     def scores(self):
@@ -25,23 +26,20 @@ class Tour:
 
     def get_total_log(self):
         """
-        Возвращает file-like текстовый объект с итоговым логом тура (входные строки, очки и победитель)
+        Возвращает список строк итоговым логом тура (входные строки, очки и победитель)
 
         Returns
         -------
-        total_log: io.StringIO
+        total_log: list of strings
         """
-        total_log = io.StringIO()
-        self.tour_results.seek(0)
-        total_log.write(self.tour_results.readline())
-        for line in self.tour_results.readlines()[:-1]:
+        total_log = [self.tour_results[0]]
+        for line in self.tour_results[1:-1]:
             name, _ = line.split()
             if name in self.errors.keys():
-                total_log.write(line[:-1] + '  \t' + str(self.errors[name]) + '\n')
+                total_log.append(line[:-1] + '  \t' + str(self.errors[name]) + '\n')
             else:
-                total_log.write(line[:-1] + '  \t' + str(self._scores[name]) + '\n')
-        total_log.write('winner is ' + self.winner + '\n\n')
-        total_log.seek(0)
+                total_log.append(line[:-1] + '  \t' + str(self._scores[name]) + '\n')
+        total_log.append('winner is ' + self.winner + '\n\n')
         return total_log
 
     def _get_scores(self):
@@ -51,7 +49,7 @@ class Tour:
         Если была ошибка парсинга, то ошибка откладывается в отдельный словарь вида {имя_игрока: текст_ошибки},
         а в словарь очков добавляется запись {имя_игрока: -1}
         """
-        for line in self.tour_results.readlines()[1:-1]:
+        for line in self.tour_results[1:-1]:
             name, game_result = line.split()
             try:
                 score = get_score(game_result)
@@ -70,31 +68,33 @@ class Tournament:
     def tours(self):
         """
         Генератор туров.
-        Берет из файла каждый тур и возвращает его как отдельный текстовый file-like объект
+        Берет из файла каждый тур и возвращает его как отдельный список строк
 
         Yields
         -------
-        tour_results: io.StringIO
+        tour_results: list of strings
         """
         with open(self.results_file, mode='r') as results:
-            tour_results = io.StringIO()
+            tour_results = []
             for line in results:
                 if line != '\n':
-                    tour_results.write(line)
+                    tour_results.append(line)
+                elif len(tour_results) == 0 or tour_results[-1] == '\n':
+                    continue
                 else:
-                    tour_results.seek(0)
                     yield tour_results
-                    tour_results = io.StringIO()
+                    tour_results = []
             yield tour_results
 
     def run(self):
-        for tour_results in self.tours():
-            another_tour = Tour(tour_results)
-            tour_log = another_tour.get_total_log()
-            for line in tour_log:
-                print(line, end='')
-            print(another_tour.scores)
-            break
+        with open('bowling_results.txt', mode='w') as out_file:
+            tour_number = 0
+            for tour_results in self.tours():
+                tour = Tour(tour_results)
+                tour_log = tour.get_total_log()
+                out_file.writelines(tour_log)
+                tour_number += 1
+                print(str(tour_number), tour.scores)
 
 
 if __name__ == '__main__':
