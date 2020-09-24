@@ -125,6 +125,17 @@ class Tournament:
         return max_length
 
     def count_scores(self, out_file_name=os.devnull):
+        """
+        Метод перебирает все туры в файле, находит набранные игроками очки, победителя и записывает это в out_file_name.
+        Если имя файла не указано, то лог турнира никуда не пишется.
+        Также считает для каждого игрока количество сыгранных туров и побед.
+
+        Parameters
+        ----------
+        out_file_name: str, default=os.devnull
+            Имя файла для записи результатов турнира
+
+        """
         with open(out_file_name, mode='w') as out_file:
             tour_number = 0
             for tour_results in self.tours():
