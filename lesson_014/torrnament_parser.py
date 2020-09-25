@@ -1,5 +1,6 @@
 import os
 from collections import defaultdict
+from tabulate import tabulate
 
 from bowling import get_score
 
@@ -170,26 +171,22 @@ class Tournament:
         reverse: bool, default=False
             Сортировка в обратном порядке
         """
-        if sort_by == -1:
-            sorted_stats = sorted(self.stats.items(), key=lambda player: player[0], reverse=reverse)
-        else:
-            sorted_stats = sorted(self.stats.items(), key=lambda player: player[1][sort_by], reverse=not(reverse))
+        # Распаковываем словарь вида {name:[plays, score, wins], } в список [[name, plays, score, wins], ]
+        # и сортируем статистику по выбранному критерию. По умолчанию сортировка происходит по возрастанию,
+        # соответственно, сортировка по имени происходит как должна.
+        # А вот сортировку по другим параметрам по умолчанию неплохо было бы делать по убыванию,
+        # поэтому в остальных случаях реверс инвертируем
+        sorted_stats = [(name, plays, score, wins) for name, (plays, score, wins) in self.stats.items()]
+        sorted_stats = sorted(sorted_stats, key=lambda player: player[sort_by + 1],
+                              reverse=reverse if sort_by == Tournament.NAME else not reverse)
 
-        print('╔══{}══╤══════════╤═════════╤═════════╗'.format("═" * self.name_field_width))
-        print('║  {}  │  Матчей  │  Очков  │  Побед  ║'.format("Игрок".center(self.name_field_width)))
-        print('╟──{}──┼──────────┼─────────┼─────────╢'.format("─" * self.name_field_width))
-
-        for name, (plays, score, wins) in sorted_stats:
-            print('║  {}  │{}│{}│{}║'
-                  .format(name.center(self.name_field_width), str(plays).center(10),
-                          str(score).center(9), str(wins).center(9)))
-
-        print('╚══{}══╧══════════╧═════════╧═════════╝'.format("═" * self.name_field_width))
+        print(tabulate(sorted_stats, headers=['Игрок', 'сыграно матчей', 'заработано очков', 'всего побед'],
+                       tablefmt="pretty", colalign=('left',)))
 
 
 if __name__ == '__main__':
     world_cup = Tournament('tournament.txt')
     world_cup.count_scores()
-    world_cup.print_stats()
+    world_cup.print_stats(sort_by=Tournament.WINS)
 
 
