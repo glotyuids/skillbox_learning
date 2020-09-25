@@ -142,7 +142,6 @@ class Tournament:
 
         """
         with open(out_file_name, mode='w') as out_file:
-            tour_number = 0
             for tour_results in self.tours():
                 tour = Tour(tour_results)
                 # считаем количество игр и количество побед для каждого игрока
@@ -188,5 +187,3 @@ if __name__ == '__main__':
     world_cup = Tournament('tournament.txt')
     world_cup.count_scores()
     world_cup.print_stats(sort_by=Tournament.WINS)
-
-
