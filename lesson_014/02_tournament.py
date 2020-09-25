@@ -26,7 +26,33 @@
 # Из текущего файла сделать консольный скрипт для формирования файла с результатами турнира.
 # Параметры скрипта: --input <файл протокола турнира> и --output <файл результатов турнира>
 
-# TODO тут ваш код
+from tournament_parser import Tournament
+import argparse
+
+
+if __name__ == '__main__':
+    # форматирование хелпа сделано аналогично первому заданию.
+    nbsp = '\u00A0'
+    parser = argparse.ArgumentParser(description='Утилита считает результаты турнира и выводит их в файл')
+    parser.add_argument('--input', action='store', dest='tournament_file', required=True,
+                        help=(f'Текстовый протокол турнира.{nbsp * 27} '
+                              f'Туры записываются в формате:{nbsp * 26} '
+                              f'### Tour 1{nbsp * 44} '
+                              f'Имя_игрока_1 броки_игрока_1{nbsp * 27} '
+                              f'Имя_игрока_2 броки_игрока_2{nbsp * 27} '
+                              f'...{nbsp * 51} '
+                              f'Имя_игрока_n броки_игрока_n{nbsp * 27} '
+                              f'winner is .........{nbsp * 35} '
+                              f'\n{nbsp * 53} '
+                              f'### Tour 2{nbsp * 44} '
+                              f'...{nbsp * 52} '))
+    parser.add_argument('--output', action='store', dest='results_file', required=True,
+                        help=f'Текстовый файл, в который запишутся результаты турнира')
+    args = parser.parse_args()
+
+    tournament = Tournament(args.tournament_file)
+    tournament.count_scores(args.results_file)
+    tournament.print_stats(sort_by=Tournament.WINS)
 
 # Усложненное задание (делать по желанию)
 #
