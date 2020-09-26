@@ -53,6 +53,7 @@ class Tour:
         for line in self.tour_results[1:-1]:
             name, rolls = line.split()
             if name in self.errors.keys():
+                  # TODO f"" удобнее и быстрее
                 total_log.append(name.ljust(name_field_width + 2) + rolls.ljust(22) + str(self.errors[name]) + '\n')
             else:
                 total_log.append(name.ljust(name_field_width + 2) + rolls.ljust(22) + str(self._scores[name]) + '\n')
@@ -122,7 +123,7 @@ class Tournament:
         max_length: int
         """
         max_length = 0
-        with open(self.results_file, mode='r') as results:
+        with open(self.results_file, mode='r') as results:  # TODO а можно всю собрать за один проход по файлу?
             for line in results:
                 if not(line.startswith(('### Tour', 'winner', '\n'))):
                     name, _ = line.split()
@@ -175,7 +176,7 @@ class Tournament:
         # соответственно, сортировка по имени происходит как должна.
         # А вот сортировку по другим параметрам по умолчанию неплохо было бы делать по убыванию,
         # поэтому в остальных случаях реверс инвертируем
-        sorted_stats = [(name, plays, score, wins) for name, (plays, score, wins) in self.stats.items()]
+        sorted_stats = [(name, *value) for name, value in self.stats.items()]
         sorted_stats = sorted(sorted_stats, key=lambda player: player[sort_by + 1],
                               reverse=reverse if sort_by == Tournament.NAME else not reverse)
 
