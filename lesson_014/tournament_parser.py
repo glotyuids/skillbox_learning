@@ -11,6 +11,7 @@ class Tour:
         self._scores = {}
         self.errors = {}
         self._get_scores()
+        self.name_field_width = max([len(name) for name in self._scores.keys()])
 
     @property
     def winners(self):
@@ -36,7 +37,7 @@ class Tour:
         """
         return {name: (score if score != -1 else 0) for (name, score) in self._scores.items()}
 
-    def get_total_log(self, name_field_width=10):
+    def get_total_log(self, name_field_width=None):
         """
         Возвращает список строк итоговым логом тура (входные строки, очки и победитель)
 
@@ -49,6 +50,7 @@ class Tour:
         -------
         total_log: list[str]
         """
+        name_field_width = name_field_width if name_field_width is not None else self.name_field_width
         total_log = [self.tour_results[0]]
         for line in self.tour_results[1:-1]:
             name, rolls = line.split()
@@ -93,7 +95,6 @@ class Tournament:
     def __init__(self, results_filename):
         self.results_file = results_filename
         self.stats = defaultdict(lambda: [0, 0, 0])
-        self.name_field_width = self._get_longest_name_length()
 
     def tours(self):
         """
@@ -117,31 +118,6 @@ class Tournament:
             if len(tour_results) > 0 and tour_results[-1] != '\n':
                 yield tour_results
 
-    def _get_longest_name_length(self):
-        """
-        Находит длину самого большого имени в турнире
-
-        Returns
-        -------
-        max_length: int
-        """
-        max_length = 0
-        with open(self.results_file, mode='r') as results:
-            # а можно всю собрать за один проход по файлу?
-            # TODO Я такой возможности не увидел, поскольку не хочу хранить весь файл (список всех туров) в памяти,
-            #  а для красивого форматирования по столбцам необходимо найти максимальную длину имени
-            #  среди всех участников турнира.
-            #  Единственное, что приходит в голову - это делать выравнивание в каждом туре независимо от других.
-            #  Поедет общая вёрстка, но можно будет обойтись одним проходом по файлу.
-            #  Я уже сталкивался с логами по 5-10 гигов и видел программы, которые пытались
-            #  за один раз затолкать это добро в память. Душераздирающее зрелище с закономерным итогом.
-            #  Я не хочу наступать на те же грабли
-            for line in results:
-                if not(line.startswith(('### Tour', 'winner', '\n'))):
-                    name, _ = line.split()
-                    max_length = len(name) if len(name) > max_length else max_length
-        return max_length
-
     def count_scores(self, out_file_name=os.devnull):
         """
         Метод перебирает все туры в файле, находит набранные игроками очки, победителя и записывает это в out_file_name.
@@ -164,7 +140,7 @@ class Tournament:
                 for name in tour.winners:
                     self.stats[name][Tournament.WINS] += 1
                 # выводим лог тура в файл
-                tour_log = tour.get_total_log(self.name_field_width)
+                tour_log = tour.get_total_log()
                 out_file.writelines(tour_log)
 
     def print_stats(self, sort_by=-1, reverse=False):
