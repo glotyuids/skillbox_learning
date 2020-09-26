@@ -53,10 +53,13 @@ class Tour:
         for line in self.tour_results[1:-1]:
             name, rolls = line.split()
             if name in self.errors.keys():
-                  # TODO f"" удобнее и быстрее
-                total_log.append(name.ljust(name_field_width + 2) + rolls.ljust(22) + str(self.errors[name]) + '\n')
+                # f"" удобнее и быстрее
+                # TODO Поправил. Я изначально хотел использовать f-строки, но не до конца разобрался с переменными
+                #  в спецификаторе формата (вернее увидел ошибку, но не стал разбираться и пошёл другим путём).
+                #  Сейчас наконец-то дошли руки, спасибо)
+                total_log.append(f'{name:<{name_field_width}}  {rolls:<20}  {self.errors[name]}\n')
             else:
-                total_log.append(name.ljust(name_field_width + 2) + rolls.ljust(22) + str(self._scores[name]) + '\n')
+                total_log.append(f'{name:<{name_field_width}}  {rolls:<20}  {self._scores[name]}\n')
         winners = self.winners
         winners = ['Никто: у всех игроков в этом туре имеются ошибки в записи ходов'] if len(winners) == 0 else winners
         total_log.append('winner is ' + ', '.join(winners) + '\n\n')
@@ -123,7 +126,16 @@ class Tournament:
         max_length: int
         """
         max_length = 0
-        with open(self.results_file, mode='r') as results:  # TODO а можно всю собрать за один проход по файлу?
+        with open(self.results_file, mode='r') as results:
+            # а можно всю собрать за один проход по файлу?
+            # TODO Я такой возможности не увидел, поскольку не хочу хранить весь файл (список всех туров) в памяти,
+            #  а для красивого форматирования по столбцам необходимо найти максимальную длину имени
+            #  среди всех участников турнира.
+            #  Единственное, что приходит в голову - это делать выравнивание в каждом туре независимо от других.
+            #  Поедет общая вёрстка, но можно будет обойтись одним проходом по файлу.
+            #  Я уже сталкивался с логами по 5-10 гигов и видел программы, которые пытались
+            #  за один раз затолкать это добро в память. Душераздирающее зрелище с закономерным итогом.
+            #  Я не хочу наступать на те же грабли
             for line in results:
                 if not(line.startswith(('### Tour', 'winner', '\n'))):
                     name, _ = line.split()
