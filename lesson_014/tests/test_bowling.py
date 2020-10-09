@@ -9,7 +9,10 @@ class BowlingTest(unittest.TestCase):
         #  Но если посмотреть результат теста, то будет видно,
         #  что значение Expected берётся из первого параметра, а Actual - из второго.
         #  Исходя из этого я и писал остальные тесты
-        self.assertEqual(46, result, 'Некорректный подсчёт очков')
+        self.assertEqual(46, result, 'Некорректный подсчёт очков по старым правилам')
+
+        result = bowling.get_score('Х4/34-4------------', new_rules=True)
+        self.assertEqual(44, result, 'Некорректный подсчёт очков по новым правилам')
 
     def test_incorrect_symbol_first_roll(self):
         with self.assertRaises(ValueError) as cm:
