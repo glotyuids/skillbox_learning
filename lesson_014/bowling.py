@@ -105,13 +105,11 @@ class SecondRoll(State):
         self.context.pins.append(pins)
 
 
-def get_score(game_result):
-    counter = ScoreCounter(game_result + '\0', new_rules=True)
+def get_score(game_result, new_rules=False):
+    counter = ScoreCounter(game_result + '\0', new_rules=new_rules)
     return counter.get_score()
 
 
 if __name__ == '__main__':
-    # ваше решение не обрабатывает след. неправильные для 10 фреймовой игры по 10 кеглей на фрейм данные
     input = 'Х4/34--------------'
-    #input = 'X' * 9 + '55'
     print(get_score(input))
