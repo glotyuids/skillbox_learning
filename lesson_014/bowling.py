@@ -11,6 +11,8 @@ class ScoreCounter:
         self.game_result = game_result
 
         self.frame_results = []
+        self.pins = []
+        self.multipliers = [0, 0]
 
     def set_state(self, state):
         self._state = state
@@ -39,11 +41,12 @@ class FirstRoll(State):
             raise FrameCountError(f'Количество фреймов в последовательности больше {self.context.frames_count}')
         if roll in 'XxХх':
             result = 20
+            pins = 10
         else:
             if roll == '-':
-                result = 0
+                result = pins = 0
             elif roll.isdigit():
-                result = int(roll)
+                result = pins = int(roll)
             else:
                 raise ValueError(f'Некорректный символ в последовательности. '
                                  f'Фрейм {len(self.context.frame_results) + 1}. Бросок 1. Полученный символ: {roll}')
@@ -51,6 +54,7 @@ class FirstRoll(State):
             self.context.set_state(SecondRoll())
 
         self.context.frame_results.append(result)
+        self.context.pins.append(pins)
 
 
 class SecondRoll(State):
@@ -59,11 +63,12 @@ class SecondRoll(State):
             raise IndexError('Последний фрейм не завершён - нет второго броска')
         if roll == '/':
             self.context.frame_results[-1] = 15
+            pins = 10 - self.context.pins[-1]
         else:
             if roll == '-':
-                result = 0
+                result = pins = 0
             elif roll.isdigit():
-                result = int(roll)
+                result = pins = int(roll)
 
                 if self.context.frame_results[-1] + result == 10:
                     raise ValueError(f'За фрейм сбито 10 кеглей, но результат записан не как спейр, а как два числа. '
@@ -82,6 +87,7 @@ class SecondRoll(State):
             self.context.frame_results[-1] += result
 
         self.context.set_state(FirstRoll())
+        self.context.pins.append(pins)
 
 
 def get_score(game_result):
@@ -91,6 +97,6 @@ def get_score(game_result):
 
 if __name__ == '__main__':
     # ваше решение не обрабатывает след. неправильные для 10 фреймовой игры по 10 кеглей на фрейм данные
-    input = 'X' * 9
+    input = 'X' * 3 + '252/' + 'X' * 5
     #input = 'X' * 9 + '55'
     print(get_score(input))
