@@ -53,10 +53,12 @@ if __name__ == '__main__':
                               f'{nbsp * 20}во второй – 4 кегли;{nbsp * 14} '
                               f'{nbsp * 2}- - прочерк, ни одной кегли не было сбито{nbsp * 11} '
                               f'{nbsp * 20}за первый бросок'))
+    parser.add_argument('-new_rules', action='store_const', const=True, dest='new_rules', default=False,
+                        help='Флаг включает подсчёт очков игры по новым правилам')
     args = parser.parse_args()
 
     try:
-        result = get_score(args.game_result)
+        result = get_score(args.game_result, args.new_rules)
     except Exception as exc:
         print(exc)
         exit()
