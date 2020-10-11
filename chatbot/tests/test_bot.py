@@ -48,6 +48,26 @@ class VKBotTestCase(unittest.TestCase):
         self.assertEqual(True, on_message_mock.called)
         on_message_mock.assert_called_with(event)
 
+    def test_on_message(self):
+        message_event = VkBotMessageEvent(raw=self.RAW_EVENT)
+        send_message_mock = Mock()
+        vk_bot.Bot.send_message = send_message_mock
+
+        with patch('vk_bot.VkApi'):
+            with patch('vk_bot.bot_longpoll.VkBotLongPoll'):
+                bot = vk_bot.Bot('', '')
+                bot._on_message(event=message_event)
+
+                self.assertEqual(True, send_message_mock.called)
+                send_message_mock.assert_called_with(message_event.message.peer_id, message_event.message.text.upper())
+
+                message_event.message.text = 'отключу'
+                bot._on_message(event=message_event)
+
+                send_message_mock.assert_called_with(message_event.message.peer_id,
+                                                     'Ну ладно тебе. Нормально ж общались(')
+
+
 
 
 
