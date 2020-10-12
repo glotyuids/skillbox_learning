@@ -71,9 +71,6 @@ class VKBotTestCase(unittest.TestCase):
 
     def test_send_message(self):
         peer_id, message = 5001, 'Hello'
-        random_id = 1000
-        random_mock = Mock(return_value=random_id)
-        vk_bot.randint = random_mock
         send_message_mock = Mock()
         with patch('vk_bot.VkApi'):
             with patch('vk_bot.bot_longpoll.VkBotLongPoll'):
@@ -83,9 +80,10 @@ class VKBotTestCase(unittest.TestCase):
                 bot.send_message(peer_id=peer_id, message=message)
 
                 self.assertEqual(True, send_message_mock.called)
-                self.assertEqual(True, random_mock.called)
-                random_mock.assert_called_with(0, vk_bot.Bot.max_random_id)
-                send_message_mock.assert_called_with(user_id=peer_id, message=message, random_id=random_id)
+                send_kwargs = send_message_mock.call_args_list[0][1]
+                self.assertEqual((peer_id, message, True),
+                                 (send_kwargs['user_id'], send_kwargs['message'],
+                                  send_kwargs['random_id'] in range(0, vk_bot.Bot.max_random_id + 1)))
 
 
 if __name__ == '__main__':
