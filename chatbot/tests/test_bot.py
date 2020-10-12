@@ -50,11 +50,11 @@ class VKBotTestCase(unittest.TestCase):
     def test_on_message(self):
         message_event = VkBotMessageEvent(raw=self.RAW_EVENT)
         send_message_mock = Mock()
-        vk_bot.Bot.send_message = send_message_mock
 
         with patch('vk_bot.VkApi'):
             with patch('vk_bot.bot_longpoll.VkBotLongPoll'):
                 bot = vk_bot.Bot('', '')
+                bot.send_message = send_message_mock
                 bot._on_message(event=message_event)
 
                 self.assertEqual(True, send_message_mock.called)
