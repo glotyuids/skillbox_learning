@@ -67,6 +67,9 @@ class VKBotTestCase(unittest.TestCase):
                 send_message_mock.assert_called_with(message_event.message.peer_id,
                                                      'Ну ладно тебе. Нормально ж общались(')
 
+    def test_send_message(self):
+        pass
+
 
 
 
