@@ -37,16 +37,15 @@ class VKBotTestCase(unittest.TestCase):
 
     def test_on_event(self):
         event = VkBotMessageEvent(raw=self.RAW_EVENT)
-        on_message_mock = Mock()
-        vk_bot.Bot._on_message = on_message_mock
 
         with patch('vk_bot.VkApi'):
             with patch('vk_bot.bot_longpoll.VkBotLongPoll'):
-                bot = vk_bot.Bot('', '')
-                bot._on_event(event=event)
+                with patch('vk_bot.Bot._on_message') as on_message_mock:
+                    bot = vk_bot.Bot('', '')
+                    bot._on_event(event=event)
 
-        self.assertEqual(True, on_message_mock.called)
-        on_message_mock.assert_called_with(event)
+                    self.assertEqual(True, on_message_mock.called)
+                    on_message_mock.assert_called_with(event)
 
     def test_on_message(self):
         message_event = VkBotMessageEvent(raw=self.RAW_EVENT)
