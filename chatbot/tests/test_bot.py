@@ -80,6 +80,10 @@ class VKBotTestCase(unittest.TestCase):
                 bot.send_message(peer_id=peer_id, message=message)
 
                 self.assertEqual(True, send_message_mock.called)
+                # Можно было бы просто замокать рандинт, либо использовать ANY,
+                # но в данном случае мне важно, чтобы на сторонний сервис уходили корректные данные.
+                # Конечно, остаётся неопределённость с тем, будет ли корректно передаваться random_id каждый раз,
+                # но можно хотя бы убедиться, что random_id входит в диапазон, требуемый сервисом
                 send_kwargs = send_message_mock.call_args_list[0][1]
                 self.assertEqual((peer_id, message, True),
                                  (send_kwargs['user_id'], send_kwargs['message'],
