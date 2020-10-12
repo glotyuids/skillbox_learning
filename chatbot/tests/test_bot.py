@@ -35,6 +35,16 @@ class VKBotTestCase(unittest.TestCase):
                 self.assertEqual(count, bot._on_event.call_count)
                 bot._on_event.assert_called_with(obj)
 
+                # Проверяем, что отлавливается исключение
+                with patch('vk_bot.bot_logger.exception') as exc_logger_mock:
+                    bot._on_event = Mock(side_effect=ValueError())
+                    bot.start()
+                    self.assertEqual(True, exc_logger_mock.called)
+                    exc_logger_mock.assert_called_with('Event handling error')
+
+
+
+
     def test_on_event(self):
         event = VkBotMessageEvent(raw=self.RAW_EVENT)
 
