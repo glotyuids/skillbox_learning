@@ -61,9 +61,11 @@ class VKBotTestCase(unittest.TestCase):
                 self.assertEqual(True, send_message_mock.called)
                 send_message_mock.assert_called_with(message_event.message.peer_id, message_event.message.text.upper())
 
+                send_message_mock.reset_mock()
                 message_event.message.text = 'отключу'
                 bot._on_message(event=message_event)
 
+                self.assertEqual(True, send_message_mock.called)
                 send_message_mock.assert_called_with(message_event.message.peer_id,
                                                      'Ну ладно тебе. Нормально ж общались(')
 
