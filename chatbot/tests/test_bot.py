@@ -42,9 +42,6 @@ class VKBotTestCase(unittest.TestCase):
                     self.assertEqual(True, exc_logger_mock.called)
                     exc_logger_mock.assert_called_with('Event handling error')
 
-
-
-
     def test_on_event(self):
         event = VkBotMessageEvent(raw=self.RAW_EVENT)
 
@@ -56,6 +53,14 @@ class VKBotTestCase(unittest.TestCase):
 
                     self.assertEqual(True, on_message_mock.called)
                     on_message_mock.assert_called_with(event)
+
+                    # Проверяем обработку незнакомого ивента
+                    event.type = 'bad_event_for_test'
+                    with patch('vk_bot.bot_logger.debug') as logger_mock:
+                        bot._on_event(event=event)
+                        self.assertEqual(True, logger_mock.called)
+                        logger_mock.assert_called_with(f'Bot: Unknown event type {event.type}')
+
 
     def test_on_message(self):
         message_event = VkBotMessageEvent(raw=self.RAW_EVENT)
