@@ -68,10 +68,22 @@ class VKBotTestCase(unittest.TestCase):
                                                      'Ну ладно тебе. Нормально ж общались(')
 
     def test_send_message(self):
-        pass
+        peer_id, message = 5001, 'Hello'
+        random_id = 1000
+        random_mock = Mock(return_value=random_id)
+        vk_bot.randint = random_mock
+        send_message_mock = Mock()
+        with patch('vk_bot.VkApi'):
+            with patch('vk_bot.bot_longpoll.VkBotLongPoll'):
+                bot = vk_bot.Bot('', '')
+                bot.api = Mock()
+                bot.api.messages.send = send_message_mock
+                bot.send_message(peer_id=peer_id, message=message)
 
-
-
+                self.assertEqual(True, send_message_mock.called)
+                self.assertEqual(True, random_mock.called)
+                random_mock.assert_called_with(0, vk_bot.Bot.max_random_id)
+                send_message_mock.assert_called_with(user_id=peer_id, message=message, random_id=random_id)
 
 
 if __name__ == '__main__':
