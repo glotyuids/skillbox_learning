@@ -91,12 +91,52 @@
 #  ...
 #
 # и так далее...
-
+import json
+import re
 
 remaining_time = '123456.0987654321'
 # если изначально не писать число в виде строки - теряется точность!
 field_names = ['current_location', 'current_experience', 'current_date']
 
-# TODO тут ваш код
 
+
+
+class Player:
+    def __init__(self, location, time_left):
+        self.experience = 0
+        self.time_left = time_left
+        self.current_location = location
+
+    def goto(self, location: dict):
+        self.current_location = list(location.values())[0]
+        # location_name
+
+        time = re.search(r'Location_\d+_tm(\d+)', location_name).group(1)
+
+        # TODO Вычисление времени через Decimal
+        self.time_left -= time
+
+    def attack(self, npc: str):
+        pass
+
+
+class Location:
+    def __init__(self, location_dict):
+        self.name = list(location_dict.keys())[0]
+        self.npcs = [element for element in location_dict[self.name] if type(element) == str]
+        self.locations = [Location(element) for element in location_dict[self.name] if type(element) == dict]
+
+    def __repr__(self):
+        return self.name
+
+    # @property
+    # def locations_names(self):
+    #     return [list(location.keys())[0] for location in self.locations]
+
+
+with open('rpg.json', 'r') as level_file:
+    location = Location(json.load(level_file))
+print('aaa')
 # Учитывая время и опыт, не забывайте о точности вычислений!
+
+
