@@ -183,6 +183,26 @@ class State:
     def menu(self):
         pass
 
+    @abstractmethod
+    def get_avail_actions(self):
+        pass
+
+    def print_actions(self):
+        for _, action in self.avail_actions.items():
+            if action['enabled']:
+                print(action['text'])
+
+    def handle_input(self):
+        while True:
+            user_input = input('>: ')
+            if user_input not in self.avail_actions.keys():
+                print('Такое действие в данный момент недоступно. Попробуйте ещё раз:')
+            else:
+                break
+        payload = self.avail_actions[user_input]['payload']
+        args = self.avail_actions[user_input]['payload_args']
+        payload(*args)
+
 
 class MainMenu(State):
     def print_stats(self):
@@ -223,22 +243,6 @@ class MainMenu(State):
                 'payload_args': []
             }
         }
-
-    def print_actions(self):
-        for _, action in self.avail_actions.items():
-            if action['enabled']:
-                print(action['text'])
-
-    def handle_input(self):
-        while True:
-            user_input = input('>: ')
-            if user_input not in self.avail_actions.keys():
-                print('Такое действие в данный момент недоступно. Попробуйте ещё раз:')
-            else:
-                break
-        payload = self.avail_actions[user_input]['payload']
-        args = self.avail_actions[user_input]['payload_args']
-        payload(*args)
 
     def menu(self):
         self.print_stats()
