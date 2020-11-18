@@ -107,11 +107,11 @@ class Player:
         self.time_left = time_left
         self.current_location = location
 
-    def goto(self, location: dict):
-        self.current_location = list(location.values())[0]
+    def goto(self, location):
+        self.current_location = location
         # location_name
 
-        time = re.search(r'Location_\d+_tm(\d+)', location_name).group(1)
+        # time = re.search(r'.+_\d+_tm(\d+)', location.name).group(1)
 
         # TODO Вычисление времени через Decimal
         self.time_left -= time
@@ -129,9 +129,29 @@ class Location:
     def __repr__(self):
         return self.name
 
-    # @property
-    # def locations_names(self):
-    #     return [list(location.keys())[0] for location in self.locations]
+
+class NPC:
+    def __init__(self, name):
+        self.name = name
+        self._fight_time = None
+        self._experience = None
+
+    def _get_ftime_and_axp(self):
+        search = re.search(r'.+_exp(?P<exp>\d+)_tm(?P<time>\d+\.?\d*)', self.name)
+        self._fight_time = search.group('time')
+        self._experience = search.group('exp')
+
+    @property
+    def fight_time(self):
+        if self._fight_time is None:
+            self._get_ftime_and_axp()
+        return self._fight_time
+
+    @property
+    def experience(self):
+        if self._experience is None:
+            self._get_ftime_and_axp()
+        return self._experience
 
 
 with open('rpg.json', 'r') as level_file:
