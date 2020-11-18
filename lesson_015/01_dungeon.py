@@ -110,12 +110,12 @@ class Player:
     def goto(self, location):
         self.current_location = location
         # TODO Вычисление времени через Decimal
-        self.time_left -= self.current_location.travel_time
+        # self.time_left -= self.current_location.travel_time
 
     def attack(self, npc):
         # TODO Вычисление времени через Decimal
-        self.time_left -= npc.fight_time
-        self.experience += npc.experience
+        # self.time_left -= npc.fight_time
+        self.experience += int(npc.experience)
 
 
 class Location:
