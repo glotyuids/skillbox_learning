@@ -139,7 +139,7 @@ class NPC:
         self._fight_time = None
         self._experience = None
 
-    def _get_ftime_and_axp(self):
+    def _get_ftime_and_exp(self):
         search = re.search(r'.+_exp(?P<exp>\d+)_tm(?P<time>\d+\.?\d*)', self.name)
         self._fight_time = search.group('time')
         self._experience = search.group('exp')
@@ -147,13 +147,13 @@ class NPC:
     @property
     def fight_time(self):
         if self._fight_time is None:
-            self._get_ftime_and_axp()
+            self._get_ftime_and_exp()
         return self._fight_time
 
     @property
     def experience(self):
         if self._experience is None:
-            self._get_ftime_and_axp()
+            self._get_ftime_and_exp()
         return self._experience
 
 
@@ -161,5 +161,3 @@ with open('rpg.json', 'r') as level_file:
     location = Location(json.load(level_file))
 print('aaa')
 # Учитывая время и опыт, не забывайте о точности вычислений!
-
-
