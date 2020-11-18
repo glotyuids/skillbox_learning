@@ -97,6 +97,7 @@ from abc import abstractmethod
 from collections import OrderedDict
 
 remaining_time = '123456.0987654321'
+exp_required = 200
 # если изначально не писать число в виде строки - теряется точность!
 field_names = ['current_location', 'current_experience', 'current_date']
 
@@ -160,8 +161,9 @@ class NPC:
 
 
 class Game:
-    def __init__(self, player):
+    def __init__(self, player, target_exp):
         self.player = player
+        self.target_exp = target_exp
         self.state = None
 
     def set_state(self, state):
@@ -221,19 +223,19 @@ class MainMenu(State):
         self.avail_actions = OrderedDict()
         self.avail_actions = {
             '1': {
-                'text': '1.Атаковать',
+                'text': '1. Атаковать',
                 'enabled': True if npcs else False,
                 'payload': self.context.set_state,
                 'payload_args': [AttackMenu]
             },
             '2': {
-                'text': '2.Перейти в другую локацию',
+                'text': '2. Перейти в другую локацию',
                 'enabled': True if locations else False,
                 'payload': self.context.set_state,
                 'payload_args': [TravelMenu]
             },
             '3': {
-                'text': '3.Сдаться и выйти из игры',
+                'text': '3. Сдаться и выйти из игры',
                 'enabled': True,
                 'payload': exit,
                 'payload_args': []
@@ -265,7 +267,7 @@ class AttackMenu(State):
             number += 1
             self.avail_actions.update({
                 str(number): {
-                    'text': f'{number}.{npc.name}',
+                    'text': f'{number}. {npc.name}',
                     'enabled': True,
                     'payload': self.attack_handler,
                     'payload_args': [number - 1]
@@ -274,13 +276,13 @@ class AttackMenu(State):
 
         self.avail_actions.update({
             str(number + 1): {
-                'text': f'{number + 1}.Назад',
+                'text': f'{number + 1}. Назад',
                 'enabled': True,
                 'payload': self.context.set_state,
                 'payload_args': [MainMenu]
             },
             str(number + 2): {
-                'text': f'{number + 2}.Сдаться и выйти из игры',
+                'text': f'{number + 2}. Сдаться и выйти из игры',
                 'enabled': True,
                 'payload': exit,
                 'payload_args': []
@@ -307,7 +309,7 @@ class TravelMenu(State):
             number += 1
             self.avail_actions.update({
                 str(number): {
-                    'text': f'{number}.{location.name}',
+                    'text': f'{number}. {location.name}',
                     'enabled': True,
                     'payload': self.travel_handler,
                     'payload_args': [location]
@@ -316,13 +318,13 @@ class TravelMenu(State):
 
         self.avail_actions.update({
             str(number + 1): {
-                'text': f'{number + 1}.Назад',
+                'text': f'{number + 1}. Назад',
                 'enabled': True,
                 'payload': self.context.set_state,
                 'payload_args': [MainMenu]
             },
             str(number + 2): {
-                'text': f'{number + 2}.Сдаться и выйти из игры',
+                'text': f'{number + 2}. Сдаться и выйти из игры',
                 'enabled': True,
                 'payload': exit,
                 'payload_args': []
@@ -340,9 +342,7 @@ with open('rpg.json', 'r') as level_file:
     location = Location(json.load(level_file))
 
 player = Player(location, remaining_time)
-game = Game(player)
+game = Game(player, exp_required)
 game.run()
 
-# print(my_location.npcs[0].fight_time, my_location.npcs[0].experience)
-# print('aaa')
 # Учитывая время и опыт, не забывайте о точности вычислений!
