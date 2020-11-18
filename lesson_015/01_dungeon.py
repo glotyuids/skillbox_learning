@@ -168,9 +168,10 @@ class Game:
         self.state = state()
         self.state.context = self
 
-    def play(self):
+    def run(self):
         self.set_state(MainMenu)
-        self.state.menu()
+        while True:
+            self.state.menu()
 
 
 class State:
@@ -206,15 +207,21 @@ class MainMenu(State):
             '1': {
                 'text': '1.Атаковать',
                 'enabled': True if npcs else False,
-                'payload': exit},
+                'payload': self.context.set_state,
+                'payload_args': [AttackMenu]
+            },
             '2': {
                 'text': '2.Перейти в другую локацию',
                 'enabled': True if locations else False,
-                'payload': exit},
+                'payload': self.context.set_state,
+                'payload_args': [TravelMenu]
+            },
             '3': {
                 'text': '3.Сдаться и выйти из игры',
                 'enabled': True if locations else False,
-                'payload': exit}
+                'payload': exit,
+                'payload_args': []
+            }
         }
 
     def print_actions(self):
@@ -230,7 +237,8 @@ class MainMenu(State):
             else:
                 break
         payload = self.avail_actions[user_input]['payload']
-        payload()
+        args = self.avail_actions[user_input]['payload_args']
+        payload(*args)
 
     def menu(self):
         self.print_stats()
@@ -258,7 +266,7 @@ with open('rpg.json', 'r') as level_file:
 
 player = Player(location, remaining_time)
 game = Game(player)
-game.play()
+game.run()
 
 # print(my_location.npcs[0].fight_time, my_location.npcs[0].experience)
 # print('aaa')
