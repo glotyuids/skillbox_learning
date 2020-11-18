@@ -93,6 +93,7 @@
 # и так далее...
 import json
 import re
+from abc import abstractmethod
 
 remaining_time = '123456.0987654321'
 # если изначально не писать число в виде строки - теряется точность!
@@ -157,7 +158,74 @@ class NPC:
         return self._experience
 
 
+class Game:
+    def __init__(self, player):
+        self.player = player
+        self.state = None
+
+    def set_state(self, state):
+        self.state = state()
+        self.state.context = self
+
+    def play(self):
+        self.set_state(MainMenu)
+        self.state.menu()
+
+
+class State:
+    def __init__(self):
+        self.context = None
+
+    @abstractmethod
+    def menu(self):
+        pass
+
+
+class MainMenu(State):
+    def print_stats(self):
+        print(f'Вы находитесь в {self.context.player.current_location.name}\n'
+              f'У вас {self.context.player.experience} опыта '
+              f'и осталось {self.context.player.time_left} секунд до наводнения.\n'
+              f'Прошло времени: 00:00')
+
+    def print_npcs(self):
+        for npc in self.context.player.current_location.npcs:
+            print(f'- Монстра {npc.name}')
+
+    def print_locations(self):
+        for location in self.context.player.current_location.locations:
+            print(f'- Вход в локацию: {location}')
+
+    def menu(self):
+        self.print_stats()
+        print('Внутри вы видите:')
+        self.print_npcs()
+        self.print_locations()
+        print('Выберите действие:')
+        if self.context.player.current_location.npcs:
+            print('1.Атаковать монстра')
+        if self.context.player.current_location.locations:
+            print('2.Перейти в другую локацию')
+        print('3.Сдаться и выйти из игры')
+
+
+class AttackMenu(State):
+    def menu(self):
+        pass
+
+
+class TravelMenu(State):
+    def menu(self):
+        pass
+
+
 with open('rpg.json', 'r') as level_file:
     location = Location(json.load(level_file))
-print('aaa')
+
+player = Player(location, remaining_time)
+game = Game(player)
+game.play()
+
+# print(my_location.npcs[0].fight_time, my_location.npcs[0].experience)
+# print('aaa')
 # Учитывая время и опыт, не забывайте о точности вычислений!
