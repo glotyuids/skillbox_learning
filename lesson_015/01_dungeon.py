@@ -252,8 +252,46 @@ class MainMenu(State):
 
 
 class AttackMenu(State):
+    def attack_handler(self, index):
+        npcs = self.context.player.current_location.npcs
+        self.context.player.attack(npcs.pop(index))
+        self.context.set_state(MainMenu)
+
+    def get_avail_actions(self):
+        npcs = self.context.player.current_location.npcs
+        self.avail_actions = OrderedDict()
+        number = 0
+        for npc in npcs:
+            number += 1
+            self.avail_actions.update({
+                str(number): {
+                    'text': f'{number}.{npc.name}',
+                    'enabled': True,
+                    'payload': self.attack_handler,
+                    'payload_args': [number - 1]
+                }
+            })
+
+        self.avail_actions.update({
+            str(number + 1): {
+                'text': f'{number + 1}.Назад',
+                'enabled': True,
+                'payload': self.context.set_state,
+                'payload_args': [MainMenu]
+            },
+            str(number + 2): {
+                'text': f'{number + 2}.Сдаться и выйти из игры',
+                'enabled': True,
+                'payload': exit,
+                'payload_args': []
+            }
+        })
+
     def menu(self):
-        pass
+        self.get_avail_actions()
+        print('\nКакого монстра атаковать?')
+        self.print_actions()
+        self.handle_input()
 
 
 class TravelMenu(State):
