@@ -295,8 +295,45 @@ class AttackMenu(State):
 
 
 class TravelMenu(State):
+    def travel_handler(self, location):
+        self.context.player.goto(location)
+        self.context.set_state(MainMenu)
+
+    def get_avail_actions(self):
+        locations = self.context.player.current_location.locations
+        self.avail_actions = OrderedDict()
+        number = 0
+        for location in locations:
+            number += 1
+            self.avail_actions.update({
+                str(number): {
+                    'text': f'{number}.{location.name}',
+                    'enabled': True,
+                    'payload': self.travel_handler,
+                    'payload_args': [location]
+                }
+            })
+
+        self.avail_actions.update({
+            str(number + 1): {
+                'text': f'{number + 1}.Назад',
+                'enabled': True,
+                'payload': self.context.set_state,
+                'payload_args': [MainMenu]
+            },
+            str(number + 2): {
+                'text': f'{number + 2}.Сдаться и выйти из игры',
+                'enabled': True,
+                'payload': exit,
+                'payload_args': []
+            }
+        })
+
     def menu(self):
-        pass
+        self.get_avail_actions()
+        print('Куда вы хотите перейти:')
+        self.print_actions()
+        self.handle_input()
 
 
 with open('rpg.json', 'r') as level_file:
