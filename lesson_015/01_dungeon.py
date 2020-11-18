@@ -123,8 +123,16 @@ class Player:
 class Location:
     def __init__(self, location_dict):
         self.name = list(location_dict.keys())[0]
-        self.npcs = [element for element in location_dict[self.name] if type(element) == str]
+
+        self.npcs = [NPC(element) for element in location_dict[self.name] if type(element) == str]
         self.locations = [Location(element) for element in location_dict[self.name] if type(element) == dict]
+        self._travel_time = None
+
+    @property
+    def travel_time(self):
+        if self._travel_time is None:
+            self._travel_time = re.search(r'.+_\d+_tm(?P<time>\d+\.?\d*)', self.name).group('time')
+        return self._travel_time
 
     def __repr__(self):
         return self.name
