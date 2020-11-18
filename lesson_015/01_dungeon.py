@@ -94,6 +94,7 @@
 import json
 import re
 from abc import abstractmethod
+from collections import OrderedDict
 
 remaining_time = '123456.0987654321'
 # если изначально не писать число в виде строки - теряется точность!
@@ -175,6 +176,7 @@ class Game:
 class State:
     def __init__(self):
         self.context = None
+        self.avail_actions = None
 
     @abstractmethod
     def menu(self):
@@ -183,7 +185,7 @@ class State:
 
 class MainMenu(State):
     def print_stats(self):
-        print(f'Вы находитесь в {self.context.player.current_location.name}\n'
+        print(f'\nВы находитесь в {self.context.player.current_location.name}\n'
               f'У вас {self.context.player.experience} опыта '
               f'и осталось {self.context.player.time_left} секунд до наводнения.\n'
               f'Прошло времени: 00:00')
@@ -196,17 +198,49 @@ class MainMenu(State):
         for location in self.context.player.current_location.locations:
             print(f'- Вход в локацию: {location}')
 
+    def get_avail_actions(self):
+        npcs = self.context.player.current_location.npcs
+        locations = self.context.player.current_location.locations
+        self.avail_actions = OrderedDict()
+        self.avail_actions = {
+            '1': {
+                'text': '1.Атаковать',
+                'enabled': True if npcs else False,
+                'payload': exit},
+            '2': {
+                'text': '2.Перейти в другую локацию',
+                'enabled': True if locations else False,
+                'payload': exit},
+            '3': {
+                'text': '3.Сдаться и выйти из игры',
+                'enabled': True if locations else False,
+                'payload': exit}
+        }
+
+    def print_actions(self):
+        for _, action in self.avail_actions.items():
+            if action['enabled']:
+                print(action['text'])
+
+    def handle_input(self):
+        while True:
+            user_input = input('>: ')
+            if user_input not in self.avail_actions.keys():
+                print('Такое действие в данный момент недоступно. Попробуйте ещё раз:')
+            else:
+                break
+        payload = self.avail_actions[user_input]['payload']
+        payload()
+
     def menu(self):
         self.print_stats()
         print('Внутри вы видите:')
         self.print_npcs()
         self.print_locations()
         print('Выберите действие:')
-        if self.context.player.current_location.npcs:
-            print('1.Атаковать монстра')
-        if self.context.player.current_location.locations:
-            print('2.Перейти в другую локацию')
-        print('3.Сдаться и выйти из игры')
+        self.get_avail_actions()
+        self.print_actions()
+        self.handle_input()
 
 
 class AttackMenu(State):
