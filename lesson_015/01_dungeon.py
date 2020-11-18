@@ -99,8 +99,6 @@ remaining_time = '123456.0987654321'
 field_names = ['current_location', 'current_experience', 'current_date']
 
 
-
-
 class Player:
     def __init__(self, location, time_left):
         self.experience = 0
@@ -109,21 +107,18 @@ class Player:
 
     def goto(self, location):
         self.current_location = location
-        # location_name
-
-        # time = re.search(r'.+_\d+_tm(\d+)', location.name).group(1)
-
         # TODO Вычисление времени через Decimal
-        self.time_left -= time
+        self.time_left -= self.current_location.travel_time
 
-    def attack(self, npc: str):
-        pass
+    def attack(self, npc):
+        # TODO Вычисление времени через Decimal
+        self.time_left -= npc.fight_time
+        self.experience += npc.experience
 
 
 class Location:
     def __init__(self, location_dict):
         self.name = list(location_dict.keys())[0]
-
         self.npcs = [NPC(element) for element in location_dict[self.name] if type(element) == str]
         self.locations = [Location(element) for element in location_dict[self.name] if type(element) == dict]
         self._travel_time = None
