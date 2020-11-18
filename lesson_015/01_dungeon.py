@@ -183,10 +183,6 @@ class State:
     def menu(self):
         pass
 
-    @abstractmethod
-    def get_avail_actions(self):
-        pass
-
     def print_actions(self):
         for _, action in self.avail_actions.items():
             if action['enabled']:
