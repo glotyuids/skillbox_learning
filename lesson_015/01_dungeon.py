@@ -238,7 +238,7 @@ class MainMenu(State):
             },
             '3': {
                 'text': '3.Сдаться и выйти из игры',
-                'enabled': True if locations else False,
+                'enabled': True,
                 'payload': exit,
                 'payload_args': []
             }
