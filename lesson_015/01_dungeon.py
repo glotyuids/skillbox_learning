@@ -163,6 +163,11 @@ class Game:
         self.remaining_time = Decimal(remaining_time)
         self.state = None
 
+    def check_victory(self):
+        return (self.player.current_location.is_exit and
+                self.player.experience >= self.target_exp and
+                self.player.journey_time <= self.remaining_time)
+
     def set_state(self, state):
         self.state = state()
         self.state.context = self
@@ -170,6 +175,28 @@ class Game:
     def run(self):
         self.set_state(MainMenu)
         while True:
+            if self.check_victory():
+                print("\nThanks Link, you're the hero of Hyrule.\n"
+                      "Finally, peace returns to Hyrule.\n"
+                      "This ends the story.\n\n"
+                      "You are great.\n"
+                      "You have an amazing wisdom and power.")
+                exit()
+            if self.player.journey_time > self.remaining_time:
+                print('\nВы не успели открыть люк!!! НАВОДНЕНИЕ!!! Алярм!\n'
+                      'У вас темнеет в глазах... прощай, принцесса...\n'
+                      'Но что это?! Вы воскресли у входа в пещеру... Не зря матушка дала вам оберег :)\n'
+                      'Ну, на этот-то раз у вас все получится! Трепещите, монстры!\n'
+                      'Вы осторожно входите в пещеру...')
+                break
+            if not self.player.current_location.locations:
+                print('\nТупик! И обратно дороги нет! Вы попали в западню.\n'
+                      'Вода поднимается всё выше. Надежды нет...\n'
+                      'У вас темнеет в глазах... прощай, принцесса...\n'
+                      'Но что это?! Вы воскресли у входа в пещеру... Не зря матушка дала вам оберег :)\n'
+                      'Ну, на этот-то раз у вас все получится! Трепещите, монстры!\n'
+                      'Вы осторожно входите в пещеру...')
+                break
             self.state.menu()
 
 
@@ -338,8 +365,9 @@ class TravelMenu(Menu):
 with open('rpg.json', 'r') as level_file:
     location = Location(json.load(level_file))
 
-player = Player(location, remaining_time)
-game = Game(player, exp_required)
-game.run()
+while True:
+    player = Player(location)
+    game = Game(player, exp_required, remaining_time)
+    game.run()
 
 # Учитывая время и опыт, не забывайте о точности вычислений!
