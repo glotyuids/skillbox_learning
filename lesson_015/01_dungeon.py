@@ -128,7 +128,7 @@ class Location:
     @property
     def travel_time(self):
         if self._travel_time is None:
-            self._travel_time = re.search(r'.+_\d+_tm(?P<time>\d+\.?\d*)', self.name).group('time')
+            self._travel_time = re.search(r'tm(?P<time>\d+\.?\d*)', self.name).group('time')
         return self._travel_time
 
     def __repr__(self):
@@ -141,21 +141,16 @@ class NPC:
         self._fight_time = None
         self._experience = None
 
-    def _get_ftime_and_exp(self):
-        search = re.search(r'.+_exp(?P<exp>\d+)_tm(?P<time>\d+\.?\d*)', self.name)
-        self._fight_time = search.group('time')
-        self._experience = search.group('exp')
-
     @property
     def fight_time(self):
         if self._fight_time is None:
-            self._get_ftime_and_exp()
+            self._fight_time = re.search(r'tm(?P<time>\d+\.?\d*)', self.name).group('time')
         return self._fight_time
 
     @property
     def experience(self):
         if self._experience is None:
-            self._get_ftime_and_exp()
+            self._experience = re.search(r'exp(?P<exp>\d+)', self.name).group('exp')
         return self._experience
 
 
