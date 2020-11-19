@@ -98,7 +98,7 @@ from collections import OrderedDict
 from decimal import Decimal
 
 remaining_time = '123456.0987654321'
-exp_required = 200
+exp_required = 280
 # если изначально не писать число в виде строки - теряется точность!
 field_names = ['current_location', 'current_experience', 'current_date']
 
@@ -357,7 +357,7 @@ class TravelMenu(Menu):
 
     def menu(self):
         self.get_avail_actions()
-        print('Куда вы хотите перейти:')
+        print('\nКуда вы хотите перейти:')
         self.print_actions()
         self.handle_input()
 
