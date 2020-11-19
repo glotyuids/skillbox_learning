@@ -104,17 +104,17 @@ field_names = ['current_location', 'current_experience', 'current_date']
 
 
 class Player:
-    def __init__(self, location, time_left):
+    def __init__(self, location):
         self.experience = 0
-        self.time_left = Decimal(time_left)
+        self.journey_time = Decimal(0)
         self.current_location = location
 
     def goto(self, location):
         self.current_location = location
-        self.time_left -= Decimal(self.current_location.travel_time)
+        self.journey_time += Decimal(self.current_location.travel_time)
 
     def attack(self, npc):
-        self.time_left -= Decimal(npc.fight_time)
+        self.journey_time += Decimal(npc.fight_time)
         self.experience += int(npc.experience)
 
 
@@ -155,9 +155,10 @@ class NPC:
 
 
 class Game:
-    def __init__(self, player, target_exp):
+    def __init__(self, player, target_exp, remaining_time):
         self.player = player
         self.target_exp = target_exp
+        self.remaining_time = Decimal(remaining_time)
         self.state = None
 
     def set_state(self, state):
@@ -200,7 +201,7 @@ class MainMenu(Menu):
     def print_stats(self):
         print(f'\nВы находитесь в {self.context.player.current_location.name}\n'
               f'У вас {self.context.player.experience} опыта '
-              f'и осталось {self.context.player.time_left:f} секунд до наводнения.\n'
+              f'и осталось {self.context.remaining_time - self.context.player.journey_time:f} секунд до наводнения.\n'
               f'Прошло времени: 00:00')
 
     def print_npcs(self):
