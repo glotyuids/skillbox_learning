@@ -176,7 +176,7 @@ class Game:
             self.state.menu()
 
 
-class State:
+class Menu:
     def __init__(self):
         self.context = None
         self.avail_actions = None
@@ -202,7 +202,7 @@ class State:
         payload(*args)
 
 
-class MainMenu(State):
+class MainMenu(Menu):
     def print_stats(self):
         print(f'\nВы находитесь в {self.context.player.current_location.name}\n'
               f'У вас {self.context.player.experience} опыта '
@@ -253,7 +253,7 @@ class MainMenu(State):
         self.handle_input()
 
 
-class AttackMenu(State):
+class AttackMenu(Menu):
     def attack_handler(self, index):
         npcs = self.context.player.current_location.npcs
         self.context.player.attack(npcs.pop(index))
@@ -296,7 +296,7 @@ class AttackMenu(State):
         self.handle_input()
 
 
-class TravelMenu(State):
+class TravelMenu(Menu):
     def travel_handler(self, location):
         self.context.player.goto(location)
         self.context.set_state(MainMenu)
