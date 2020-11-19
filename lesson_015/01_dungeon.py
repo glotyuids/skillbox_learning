@@ -121,8 +121,10 @@ class Player:
 class Location:
     def __init__(self, location_dict):
         self.name = list(location_dict.keys())[0]
-        self.npcs = [NPC(element) for element in location_dict[self.name] if type(element) == str]
-        self.locations = [Location(element) for element in location_dict[self.name] if type(element) == dict]
+        self.is_exit = location_dict[self.name] == 'You are winner'
+        if not self.is_exit:
+            self.npcs = [NPC(element) for element in location_dict[self.name] if type(element) == str]
+            self.locations = [Location(element) for element in location_dict[self.name] if type(element) == dict]
         self._travel_time = None
 
     @property
