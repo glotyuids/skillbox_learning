@@ -95,6 +95,7 @@ import json
 import re
 from abc import abstractmethod
 from collections import OrderedDict
+from decimal import Decimal
 
 remaining_time = '123456.0987654321'
 exp_required = 200
@@ -105,17 +106,15 @@ field_names = ['current_location', 'current_experience', 'current_date']
 class Player:
     def __init__(self, location, time_left):
         self.experience = 0
-        self.time_left = time_left
+        self.time_left = Decimal(time_left)
         self.current_location = location
 
     def goto(self, location):
         self.current_location = location
-        # TODO Вычисление времени через Decimal
-        # self.time_left -= self.current_location.travel_time
+        self.time_left -= Decimal(self.current_location.travel_time)
 
     def attack(self, npc):
-        # TODO Вычисление времени через Decimal
-        # self.time_left -= npc.fight_time
+        self.time_left -= Decimal(npc.fight_time)
         self.experience += int(npc.experience)
 
 
@@ -206,7 +205,7 @@ class MainMenu(Menu):
     def print_stats(self):
         print(f'\nВы находитесь в {self.context.player.current_location.name}\n'
               f'У вас {self.context.player.experience} опыта '
-              f'и осталось {self.context.player.time_left} секунд до наводнения.\n'
+              f'и осталось {self.context.player.time_left:f} секунд до наводнения.\n'
               f'Прошло времени: 00:00')
 
     def print_npcs(self):
