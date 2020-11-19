@@ -164,9 +164,51 @@ class Game:
         self.state = None
 
     def check_victory(self):
-        return (self.player.current_location.is_exit and
-                self.player.experience >= self.target_exp and
-                self.player.journey_time <= self.remaining_time)
+        if not self.player.current_location.is_exit:
+            return True
+
+        if not self.player.experience >= self.target_exp:
+            print('\nВы оказались слишком слабы, чтобы открыть эту дверь.\n'
+                  'Вам не хватило опыта. Тупик! И обратно дороги нет! Вы попали в западню.\n'
+                  'Вода поднимается всё выше. Надежды нет...\n'
+                  'У вас темнеет в глазах... прощай, принцесса...\n'
+                  'Но что это?! Вы воскресли у входа в пещеру... Не зря матушка дала вам оберег :)\n'
+                  'Ну, на этот-то раз у вас все получится! Трепещите, монстры!\n'
+                  'Вы осторожно входите в пещеру...')
+            return False
+
+        if not self.player.journey_time <= self.remaining_time:
+            print('\nВы не успели открыть люк!!! НАВОДНЕНИЕ!!! Алярм!\n'
+                  'У вас темнеет в глазах... прощай, принцесса...\n'
+                  'Но что это?! Вы воскресли у входа в пещеру... Не зря матушка дала вам оберег :)\n'
+                  'Ну, на этот-то раз у вас все получится! Трепещите, монстры!\n'
+                  'Вы осторожно входите в пещеру...')
+            return False
+
+        print("\nThanks Link, you're the hero of Hyrule.\n"
+              "Finally, peace returns to Hyrule.\n"
+              "This ends the story.\n\n"
+              "You are great.\n"
+              "You have an amazing wisdom and power.")
+        exit()
+
+    def check_gameover(self):
+        if self.player.journey_time > self.remaining_time:
+            print('\nВы не успели открыть люк!!! НАВОДНЕНИЕ!!! Алярм!\n'
+                  'У вас темнеет в глазах... прощай, принцесса...\n'
+                  'Но что это?! Вы воскресли у входа в пещеру... Не зря матушка дала вам оберег :)\n'
+                  'Ну, на этот-то раз у вас все получится! Трепещите, монстры!\n'
+                  'Вы осторожно входите в пещеру...')
+            return True
+        if not self.player.current_location.locations:
+            print('\nТупик! И обратно дороги нет! Вы попали в западню.\n'
+                  'Вода поднимается всё выше. Надежды нет...\n'
+                  'У вас темнеет в глазах... прощай, принцесса...\n'
+                  'Но что это?! Вы воскресли у входа в пещеру... Не зря матушка дала вам оберег :)\n'
+                  'Ну, на этот-то раз у вас все получится! Трепещите, монстры!\n'
+                  'Вы осторожно входите в пещеру...')
+            return True
+        return False
 
     def set_state(self, state):
         self.state = state()
@@ -175,28 +217,11 @@ class Game:
     def run(self):
         self.set_state(MainMenu)
         while True:
-            if self.check_victory():
-                print("\nThanks Link, you're the hero of Hyrule.\n"
-                      "Finally, peace returns to Hyrule.\n"
-                      "This ends the story.\n\n"
-                      "You are great.\n"
-                      "You have an amazing wisdom and power.")
-                exit()
-            if self.player.journey_time > self.remaining_time:
-                print('\nВы не успели открыть люк!!! НАВОДНЕНИЕ!!! Алярм!\n'
-                      'У вас темнеет в глазах... прощай, принцесса...\n'
-                      'Но что это?! Вы воскресли у входа в пещеру... Не зря матушка дала вам оберег :)\n'
-                      'Ну, на этот-то раз у вас все получится! Трепещите, монстры!\n'
-                      'Вы осторожно входите в пещеру...')
+            if not self.check_victory():
                 break
-            if not self.player.current_location.locations:
-                print('\nТупик! И обратно дороги нет! Вы попали в западню.\n'
-                      'Вода поднимается всё выше. Надежды нет...\n'
-                      'У вас темнеет в глазах... прощай, принцесса...\n'
-                      'Но что это?! Вы воскресли у входа в пещеру... Не зря матушка дала вам оберег :)\n'
-                      'Ну, на этот-то раз у вас все получится! Трепещите, монстры!\n'
-                      'Вы осторожно входите в пещеру...')
+            if self.check_gameover():
                 break
+
             self.state.menu()
 
 
