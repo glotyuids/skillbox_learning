@@ -251,6 +251,8 @@ class Menu:
             user_input = input('>: ')
             if user_input not in self.avail_actions.keys():
                 print('Такое действие в данный момент недоступно. Попробуйте ещё раз:')
+            elif not self.avail_actions[user_input]['enabled']:
+                print('Такое действие в данный момент недоступно. Попробуйте ещё раз:')
             else:
                 break
         payload = self.avail_actions[user_input]['payload']
