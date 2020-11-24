@@ -397,12 +397,23 @@ class TravelMenu(Menu):
 # TODO Представьте, что человек захочет импортировать ваше творение
 # TODO С каждым новым действием, которое необходимо для запуска - его желание будет всё меньше
 # TODO так что все начальные приготовление и сам главный цикл - стоит поместить внутрь класса
-with open('rpg.json', 'r') as level_file:
-    location = Location(json.load(level_file))
 
-while True:
-    player = Player(location)
-    game = Game(player, exp_required, remaining_time)
-    game.run()
+# TODO в данном случае про if __name__ == '__main__' просто забыл. Исправил)
+
+# TODO Классы стараюсь писать так, чтобы для их инициализации и завода требовалось
+#  минимум лишних действий.
+#  В данном случае оборачивание циклом инициализации игрока и игры обусловлено
+#  необходимостью сбрасывать игрока и игру при геймовере и запускать игру снова.
+#  То есть, если бы при геймовере нужно было завершать игру, то цикла не было бы.
+
+
+if __name__ == '__main__':
+    with open('rpg.json', 'r') as level_file:
+        location = Location(json.load(level_file))
+
+    while True:
+        player = Player(location)
+        game = Game(player, exp_required, remaining_time)
+        game.run()
 
 # Учитывая время и опыт, не забывайте о точности вычислений!
