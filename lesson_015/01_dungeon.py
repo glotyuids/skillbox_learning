@@ -95,6 +95,7 @@ import json
 import re
 from abc import abstractmethod
 from collections import OrderedDict
+from copy import deepcopy
 from decimal import Decimal
 
 remaining_time = '123456.0987654321'
@@ -157,16 +158,19 @@ class NPC:
 
 
 class Game:
-    def __init__(self, player, target_exp, remaining_time):
-        self.player = player
+    def __init__(self, raw_location, target_exp, remaining_time):
+        self.root_location = Location(raw_location)
         self.target_exp = target_exp
         self.remaining_time = Decimal(remaining_time)
+        self.player = None
         self.state = None
+        self.reset()
+
+    def reset(self):
+        self.player = Player(deepcopy(self.root_location))
+        self.set_state(MainMenu)
 
     def check_victory(self):
-        if not self.player.current_location.is_exit:
-            return True
-
         if not self.player.experience >= self.target_exp:
             print('\nВы оказались слишком слабы, чтобы открыть эту дверь.\n'
                   'Вам не хватило опыта. Тупик! И обратно дороги нет! Вы попали в западню.\n'
@@ -190,13 +194,7 @@ class Game:
               "This ends the story.\n\n"
               "You are great.\n"
               "You have an amazing wisdom and power.")
-        exit()
-        # TODO При вызове этого метода нужно гарантировать, что все финализаторы всяких объектов отработают.
-        # TODO Это прокатит при их вызове в __del__, но не везде это возможно.
-        # TODO Старайтесь избегать вызова exit, давайте программе штатно завершиться
-        # TODO (exit(), sys.exit(), quit() - все эти операции хороши в учебном/тестовом коде,
-        # TODO но на практике они приводят к проблемам, т.к. такой выход сработает и на ту программу,
-        # TODO внутри которой запускается метод).
+        return True
 
     def check_gameover(self):
         if self.player.journey_time > self.remaining_time:
@@ -221,12 +219,15 @@ class Game:
         self.state.context = self
 
     def run(self):
-        self.set_state(MainMenu)
         while True:
-            if not self.check_victory():
-                break
+            if self.player.current_location.is_exit:
+                if self.check_victory():
+                    break
+                else:
+                    self.reset()
+
             if self.check_gameover():
-                break
+                self.reset()
 
             self.state.menu()
 
@@ -409,11 +410,9 @@ class TravelMenu(Menu):
 
 if __name__ == '__main__':
     with open('rpg.json', 'r') as level_file:
-        location = Location(json.load(level_file))
+        location = json.load(level_file)
 
-    while True:
-        player = Player(location)
-        game = Game(player, exp_required, remaining_time)
-        game.run()
+    game = Game(location, exp_required, remaining_time)
+    game.run()
 
 # Учитывая время и опыт, не забывайте о точности вычислений!
