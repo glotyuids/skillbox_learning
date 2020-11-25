@@ -123,7 +123,6 @@ class CSVLogger:
         self.log_file.close()
 
 
-
 class Player:
     def __init__(self, location):
         self._experience = 0
@@ -138,7 +137,6 @@ class Player:
     def experience(self, value):
         self._experience = value
         logger.debug(self._current_location, self._experience, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-
 
     @property
     def current_location(self):
