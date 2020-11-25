@@ -91,6 +91,7 @@
 #  ...
 #
 # и так далее...
+import csv
 import json
 import re
 from abc import abstractmethod
@@ -105,11 +106,48 @@ exp_required = 280
 field_names = ['current_location', 'current_experience', 'current_date']
 
 
+class CSVLogger:
+    def __init__(self, headers, filename):
+        self.log_file = open(filename, 'w')
+        self.writer = csv.DictWriter(self.log_file, delimiter=',', fieldnames=headers)
+        self.writer.writeheader()
+        self.fields = headers
+
+    def debug(self, *args):
+        if len(args) != len(self.fields):
+            raise ValueError(f'Args count {"bigger" if len(args) > len(self.fields) else "smaller"} than fields count')
+        record = {field: data for field, data in zip(self.fields, args)}
+        self.writer.writerow(record)
+
+    def __del__(self):
+        self.log_file.close()
+
+
+
 class Player:
     def __init__(self, location):
-        self.experience = 0
+        self._experience = 0
         self.journey_time = Decimal(0)
-        self.current_location = location
+        self._current_location = location
+
+    @property
+    def experience(self):
+        return self._experience
+
+    @experience.setter
+    def experience(self, value):
+        self._experience = value
+        logger.debug(self._current_location, self._experience, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+
+
+    @property
+    def current_location(self):
+        return self._current_location
+
+    @current_location.setter
+    def current_location(self, value):
+        self._current_location = value
+        logger.debug(self._current_location, self._experience, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
     def goto(self, location):
         self.current_location = location
@@ -415,6 +453,8 @@ class TravelMenu(Menu):
 #  То есть, если бы при геймовере нужно было завершать игру, то цикла не было бы.
 #  Переписал, закинув иннициализацию игрока в класс Game
 
+
+logger = CSVLogger(field_names, 'log.csv')
 
 if __name__ == '__main__':
     with open('rpg.json', 'r') as level_file:
