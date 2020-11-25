@@ -201,6 +201,7 @@ class Game:
         self.root_location = Location(raw_location)
         self.target_exp = target_exp
         self.remaining_time = Decimal(remaining_time)
+        self.wants_exit = False
         self.player = None
         self.state = None
         self.start_time = None
@@ -260,7 +261,7 @@ class Game:
         self.state.context = self
 
     def run(self):
-        while True:
+        while not self.wants_exit:
             if self.player.current_location.is_exit:
                 if self.check_victory():
                     break
@@ -338,8 +339,8 @@ class MainMenu(Menu):
             '3': {
                 'text': '3. Сдаться и выйти из игры',
                 'enabled': True,
-                'payload': exit,
-                'payload_args': []
+                'payload': self.context.set_state,
+                'payload_args': [ExitMenu]
             }
         }
 
@@ -385,8 +386,8 @@ class AttackMenu(Menu):
             str(number + 2): {
                 'text': f'{number + 2}. Сдаться и выйти из игры',
                 'enabled': True,
-                'payload': exit,
-                'payload_args': []
+                'payload': self.context.set_state,
+                'payload_args': [ExitMenu]
             }
         })
 
@@ -427,14 +428,41 @@ class TravelMenu(Menu):
             str(number + 2): {
                 'text': f'{number + 2}. Сдаться и выйти из игры',
                 'enabled': True,
-                'payload': exit,
-                'payload_args': []
+                'payload': self.context.set_state,
+                'payload_args': [ExitMenu]
             }
         })
 
     def menu(self):
         self.get_avail_actions()
         print('\nКуда вы хотите перейти:')
+        self.print_actions()
+        self.handle_input()
+
+
+class ExitMenu(Menu):
+    def exit_handler(self):
+        self.context.wants_exit = True
+
+    def get_avail_actions(self):
+        self.avail_actions = {
+            '1': {
+                'text': f'1. Нет, вернуться назад',
+                'enabled': True,
+                'payload': self.context.set_state,
+                'payload_args': [MainMenu]
+            },
+            '2': {
+                'text': f'2. Да, выйти из игры',
+                'enabled': True,
+                'payload': self.exit_handler,
+                'payload_args': []
+            }
+        }
+
+    def menu(self):
+        self.get_avail_actions()
+        print('\nВы уверены?')
         self.print_actions()
         self.handle_input()
 
