@@ -97,6 +97,7 @@ from abc import abstractmethod
 from collections import OrderedDict
 from copy import deepcopy
 from decimal import Decimal
+import datetime
 
 remaining_time = '123456.0987654321'
 exp_required = 280
@@ -164,11 +165,13 @@ class Game:
         self.remaining_time = Decimal(remaining_time)
         self.player = None
         self.state = None
+        self.start_time = None
         self.reset()
 
     def reset(self):
         self.player = Player(deepcopy(self.root_location))
         self.set_state(MainMenu)
+        self.start_time = datetime.datetime.now()
 
     def check_victory(self):
         if not self.player.experience >= self.target_exp:
@@ -262,10 +265,12 @@ class Menu:
 
 class MainMenu(Menu):
     def print_stats(self):
+        elapsed_time = datetime.datetime.now() - self.context.start_time
+        elapsed_time = str(elapsed_time).split('.')[0]  # отбрасываем микросекунды
         print(f'\nВы находитесь в {self.context.player.current_location.name}\n'
               f'У вас {self.context.player.experience} опыта '
               f'и осталось {self.context.remaining_time - self.context.player.journey_time:f} секунд до наводнения.\n'
-              f'Прошло времени: 00:00')
+              f'Прошло времени: {elapsed_time}')
 
     def print_npcs(self):
         for npc in self.context.player.current_location.npcs:
