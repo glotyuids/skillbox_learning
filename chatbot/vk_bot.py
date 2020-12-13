@@ -6,6 +6,9 @@ from random import randint
 
 from vk_api import bot_longpoll, VkApi
 
+import scenarios
+import handlers
+
 
 bot_logger = logging.Logger('vk_bot', logging.DEBUG)
 
@@ -22,6 +25,27 @@ def logging_config():
     file_formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s', datefmt='%d-%m-%Y %H:%M')
     file_handler.setFormatter(file_formatter)
     bot_logger.addHandler(file_handler)
+
+
+class UserState:
+    """
+    Состояние пользователя внутри сценария
+    """
+    def __init__(self, scenario_name, step_name, context):
+        """
+
+        Parameters
+        ----------
+        scenario_name: str
+            имя сценария
+        step_name: str
+            имя шага
+        context: dict
+            контекст - накопленные данные пользователя
+        """
+        self.scenario_name = scenario_name
+        self.step_name = step_name
+        self.context = context
 
 
 class Bot:
@@ -47,6 +71,7 @@ class Bot:
         self.vk_bot = bot_longpoll.VkBotLongPoll(self.session, group_id)
         self.api = self.session.get_api()
         bot_logger.info('Bot: Initialized')
+        self.user_states = dict()       # peer_id -> UserState
 
     def start(self):
         """ Запуск бота """
@@ -80,11 +105,43 @@ class Bot:
         event: VkBotMessageEvent
 
         """
-        bot_logger.info(f'Bot: Message received. Peer ID: {event.message.peer_id}. Message: {event.message.text}')
-        if 'отключ' in event.message.text.lower():
-            self.send_message(event.message.peer_id, 'Ну ладно тебе. Нормально ж общались(')
+        message_text = event.message.text
+        peer_id = event.message.peer_id
+        bot_logger.info(f'Bot: Message received. Peer ID: {peer_id}. Message: {message_text}')
+
+        if peer_id in self.user_states:
+            # continue scenario
+            text_to_send = self.continue_scenario(message_text, peer_id)
+
         else:
-            self.send_message(event.message.peer_id, event.message.text.upper())
+            # search intent
+            pass
+
+        # if 'отключ' in event.message.text.lower():
+        #     self.send_message(event.message.peer_id, 'Ну ладно тебе. Нормально ж общались(')
+        # else:
+        #     self.send_message(event.message.peer_id, event.message.text.upper())
+
+    def continue_scenario(self, message_text, peer_id):
+        state = self.user_states[peer_id]
+        steps = scenarios.SCENARIOS[state.scenario_name]['steps']
+        step = steps[state.step_name]
+        handler = getattr(handlers, step['handler'])
+        if handler(message_text, state.context):
+            # next step
+            next_step = steps[step['next_step']]
+            text_to_send = next_step['text'].format(**state.context)
+            if next_step['next_step']:
+                # switch to next step
+                state.step_name = step['next_step']
+            else:
+                # finish scenario
+                self.user_states.pop(peer_id)
+        else:
+            # retry current step
+            text_to_send = step['failure'].format(**state.context)
+            self.send_message(peer_id, text_to_send)
+        return text_to_send
 
     def send_message(self, peer_id, message):
         """
