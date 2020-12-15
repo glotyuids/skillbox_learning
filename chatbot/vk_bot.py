@@ -3,6 +3,7 @@
 import os
 import logging
 from random import randint
+from dataclasses import dataclass, field
 
 from vk_api import bot_longpoll, VkApi
 
@@ -27,25 +28,14 @@ def logging_config():
     bot_logger.addHandler(file_handler)
 
 
+@dataclass
 class UserState:
     """
     Состояние пользователя внутри сценария
     """
-    def __init__(self, scenario_name, step_name, context=None):
-        """
-
-        Parameters
-        ----------
-        scenario_name: str
-            имя сценария
-        step_name: str
-            имя шага
-        context: dict
-            контекст - накопленные данные пользователя
-        """
-        self.scenario_name = scenario_name
-        self.step_name = step_name
-        self.context = context or {}
+    scenario_name: str
+    step_name: str
+    context: dict = field(default_factory=dict)
 
 
 class Bot:
@@ -133,7 +123,7 @@ class Bot:
         first_step = scenario['first_step']
         step = scenario['steps'][first_step]
         text_to_send = step['text']
-        self.user_states[peer_id] = UserState(scenario_name, first_step)
+        self.user_states[peer_id] = UserState(scenario_name=scenario_name, step_name=first_step)
         return text_to_send
 
     def continue_scenario(self, message_text, peer_id):
