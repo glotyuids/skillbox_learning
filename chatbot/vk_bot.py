@@ -31,7 +31,7 @@ class UserState:
     """
     Состояние пользователя внутри сценария
     """
-    def __init__(self, scenario_name, step_name, context):
+    def __init__(self, scenario_name, step_name, context=None):
         """
 
         Parameters
@@ -45,7 +45,7 @@ class UserState:
         """
         self.scenario_name = scenario_name
         self.step_name = step_name
-        self.context = context
+        self.context = context or {}
 
 
 class Bot:
@@ -115,12 +115,28 @@ class Bot:
 
         else:
             # search intent
-            pass
+            for intent in scenarios.INTENTS:
+                if any(token in message_text for token in intent['tokens']):
+                    # run intent
+                    if intent['answer']:
+                        text_to_send = intent['answer']
+                    else:
+                        # launch new scenario
+                        text_to_send = self.start_scenario(peer_id, intent['scenario'])
+                    break
+                else:
+                    text_to_send = scenarios.DEFAULT_ANSWER
 
-        # if 'отключ' in event.message.text.lower():
-        #     self.send_message(event.message.peer_id, 'Ну ладно тебе. Нормально ж общались(')
-        # else:
-        #     self.send_message(event.message.peer_id, event.message.text.upper())
+        self.send_message(peer_id, text_to_send)
+
+
+    def start_scenario(self, peer_id, scenario_name):
+        scenario = scenarios.SCENARIOS[scenario_name]
+        first_step = scenario['first_step']
+        step = scenario['steps'][first_step]
+        text_to_send = step['text']
+        self.user_states[peer_id] = UserState(scenario_name, first_step)
+        return text_to_send
 
     def continue_scenario(self, message_text, peer_id):
         state = self.user_states[peer_id]
@@ -140,7 +156,6 @@ class Bot:
         else:
             # retry current step
             text_to_send = step['failure'].format(**state.context)
-            self.send_message(peer_id, text_to_send)
         return text_to_send
 
     def send_message(self, peer_id, message):
