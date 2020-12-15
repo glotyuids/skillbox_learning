@@ -123,8 +123,8 @@ class Bot:
                         # launch new scenario
                         text_to_send = self.start_scenario(peer_id, intent['scenario'])
                     break
-                else:
-                    text_to_send = scenarios.DEFAULT_ANSWER
+            else:
+                text_to_send = scenarios.DEFAULT_ANSWER
 
         self.send_message(peer_id, text_to_send)
 
