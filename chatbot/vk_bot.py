@@ -1,5 +1,9 @@
 #!/usr/bin/env python3.7
 
+"""
+Вк-бот, работающий по заданным сценариям
+"""
+
 import os
 import logging
 from random import randint
@@ -15,6 +19,9 @@ bot_logger = logging.Logger('vk_bot', logging.DEBUG)
 
 
 def logging_config():
+    """
+    Настраиваем логгер. Пишем и в файл (дополняем существующий), и на консоль
+    """
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.INFO)
     console_formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s')
@@ -88,7 +95,7 @@ class Bot:
 
     def _on_message(self, event):
         """
-        Обработчик прилетевших из вк событий сообщений. Отвечает отправителю капсом его же сообщением
+        Обработчик прилетевших из вк событий сообщений
 
         Parameters
         ----------
@@ -101,7 +108,7 @@ class Bot:
 
         if peer_id in self.user_states:
             # continue scenario
-            text_to_send = self.continue_scenario(message_text, peer_id)
+            text_to_send = self.continue_scenario(peer_id, message_text)
         else:
             # search intent
             for intent in scenarios.INTENTS:
@@ -119,6 +126,20 @@ class Bot:
         self.send_message(peer_id, text_to_send)
 
     def start_scenario(self, peer_id, scenario_name):
+        """
+        Запускает выбранный сценарий для пользователя
+        Parameters
+        ----------
+        peer_id: str
+            Vk ID пользователя
+        scenario_name: str
+            Имя сценария, который нужно запустить
+
+        Returns
+        -------
+        str
+            Текст сообщения, который берётся из первого шага сценария
+        """
         scenario = scenarios.SCENARIOS[scenario_name]
         first_step = scenario['first_step']
         step = scenario['steps'][first_step]
@@ -126,7 +147,24 @@ class Bot:
         self.user_states[peer_id] = UserState(scenario_name=scenario_name, step_name=first_step)
         return text_to_send
 
-    def continue_scenario(self, message_text, peer_id):
+    def continue_scenario(self, peer_id, message_text):
+        """
+        Пропускает сообщение через хендлер шага,
+        дёргает соответсвующее сообщение из сценария и переключает шаги.
+        Если хендлер шага возвращает False, то возвращаем сообщение failure из текущего шага.
+        Если True - то переключаем пользователя на следубщий шаг и возвращаем из него сообщение text
+        Parameters
+        ----------
+        message_text: str
+            Текст сообщения, присланного пользователем
+        peer_id: str
+            Vk ID пользователя
+
+        Returns
+        -------
+        str
+            Текст сообщения, который берётся из сценария.
+        """
         state = self.user_states[peer_id]
         steps = scenarios.SCENARIOS[state.scenario_name]['steps']
         step = steps[state.step_name]
