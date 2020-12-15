@@ -116,7 +116,7 @@ class Bot:
         else:
             # search intent
             for intent in scenarios.INTENTS:
-                if any(token in message_text for token in intent['tokens']):
+                if any(token in message_text.lower() for token in intent['tokens']):
                     # run intent
                     if intent['answer']:
                         text_to_send = intent['answer']
