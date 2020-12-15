@@ -30,7 +30,8 @@ def logging_config():
 
     file_handler = logging.FileHandler('bot.log', mode='a', delay=True)
     file_handler.setLevel(logging.DEBUG)
-    file_formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s', datefmt='%d-%m-%Y %H:%M')
+    file_formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s',
+                                       datefmt='%d-%m-%Y %H:%M')
     file_handler.setFormatter(file_formatter)
     bot_logger.addHandler(file_handler)
 
@@ -91,7 +92,7 @@ class Bot:
         if event.type == bot_longpoll.VkBotEventType.MESSAGE_NEW:
             self._on_message(event)
         else:
-            bot_logger.debug(f'Bot: Unknown event type {event.type}')
+            bot_logger.debug('Bot: Unknown event type %s', event.type)
 
     def _on_message(self, event):
         """
@@ -104,7 +105,8 @@ class Bot:
         """
         message_text = event.message.text
         peer_id = event.message.peer_id
-        bot_logger.info(f'Bot: Message received. Peer ID: {peer_id}. Message: {message_text}')
+        bot_logger.info('Bot: Message received. Peer ID: %s. Message: %s', peer_id, message_text)
+        text_to_send = ''
 
         if peer_id in self.user_states:
             # continue scenario
@@ -196,8 +198,10 @@ class Bot:
             Текст сообщения
 
         """
-        self.api.messages.send(user_id=peer_id, message=message, random_id=randint(0, self.max_random_id))
-        bot_logger.info(f'Bot: Message sent. Peer ID: {peer_id}. Message: {message}')
+        self.api.messages.send(user_id=peer_id,
+                               message=message,
+                               random_id=randint(0, self.max_random_id))
+        bot_logger.info('Bot: Message sent. Peer ID: %s. Message: %s', peer_id, message)
 
 
 if __name__ == '__main__':
