@@ -174,10 +174,10 @@ class Bot:
 
 if __name__ == '__main__':
     # Подтягиваем чувствительные данные из переменных окружения
-    assert 'VK_TEST_BOT_TOKEN' in os.environ, 'Environment variable VK_TEST_BOT_TOKEN is not exist'
-    assert 'VK_TEST_BOT_GROUP_ID' in os.environ, 'Environment variable VK_TEST_BOT_TOKEN is not exist'
-    DEV_VK_TOKEN = os.environ['VK_TEST_BOT_TOKEN']
-    DEV_GROUP_ID = os.environ['VK_TEST_BOT_GROUP_ID']
+    assert 'VK_BOT_TOKEN' in os.environ, 'Environment variable VK_BOT_TOKEN is not exist'
+    assert 'VK_BOT_GROUP_ID' in os.environ, 'Environment variable VK_BOT_TOKEN is not exist'
+    DEV_VK_TOKEN = os.environ['VK_BOT_TOKEN']
+    DEV_GROUP_ID = os.environ['VK_BOT_GROUP_ID']
 
     logging_config()
 
