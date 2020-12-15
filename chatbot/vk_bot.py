@@ -24,7 +24,7 @@ def logging_config():
     """
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.INFO)
-    console_formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s')
+    console_formatter = logging.Formatter('%(asctime)s [%(levelname)s] [%(name)s] %(message)s')
     console_handler.setFormatter(console_formatter)
     bot_logger.addHandler(console_handler)
 
@@ -68,12 +68,12 @@ class Bot:
         self.session = VkApi(token=token)
         self.vk_bot = bot_longpoll.VkBotLongPoll(self.session, group_id)
         self.api = self.session.get_api()
-        bot_logger.info('Bot: Initialized')
+        bot_logger.info('Initialized')
         self.user_states = dict()       # peer_id -> UserState
 
     def start(self):
         """ Запуск бота """
-        bot_logger.info('Bot: Start listening')
+        bot_logger.info('Start listening')
         for event in self.vk_bot.listen():
             self._on_event(event)
 
@@ -89,7 +89,7 @@ class Bot:
         if event.type == bot_longpoll.VkBotEventType.MESSAGE_NEW:
             self._on_message(event)
         else:
-            bot_logger.debug('Bot: Unknown event type %s', event.type)
+            bot_logger.debug('Unknown event type %s', event.type)
 
     def _on_message(self, event):
         """
@@ -102,7 +102,7 @@ class Bot:
         """
         message_text = event.message.text
         peer_id = event.message.peer_id
-        bot_logger.info('Bot: Message received. Peer ID: %s. Message: %s', peer_id, message_text)
+        bot_logger.info('Message received. Peer ID: %s. Message: %s', peer_id, repr(message_text))
         text_to_send = ''
 
         if peer_id in self.user_states:
@@ -113,6 +113,7 @@ class Bot:
             for intent in scenarios.INTENTS:
                 if any(token in message_text.lower() for token in intent['tokens']):
                     # run intent
+                    bot_logger.info('User %s gets intent %s', peer_id, intent['name'])
                     if intent['answer']:
                         text_to_send = intent['answer']
                     else:
@@ -139,6 +140,7 @@ class Bot:
         str
             Текст сообщения, который берётся из первого шага сценария
         """
+        bot_logger.info('User %s started scenario intent %s', peer_id, scenario_name)
         scenario = scenarios.SCENARIOS[scenario_name]
         first_step = scenario['first_step']
         step = scenario['steps'][first_step]
@@ -177,6 +179,8 @@ class Bot:
                 state.step_name = step['next_step']
             else:
                 # finish scenario
+                bot_logger.info('User %s finished scenario intent %s. Context: %s',
+                                peer_id, state.scenario_name, state.context)
                 self.user_states.pop(peer_id)
         else:
             # retry current step
@@ -198,7 +202,7 @@ class Bot:
         self.api.messages.send(user_id=peer_id,
                                message=message,
                                random_id=randint(0, self.max_random_id))
-        bot_logger.info('Bot: Message sent. Peer ID: %s. Message: %s', peer_id, message)
+        bot_logger.info('Message sent. Peer ID: %s. Message: %s', peer_id, repr(message))
 
 
 if __name__ == '__main__':
