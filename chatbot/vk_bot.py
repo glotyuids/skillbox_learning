@@ -112,7 +112,6 @@ class Bot:
         if peer_id in self.user_states:
             # continue scenario
             text_to_send = self.continue_scenario(message_text, peer_id)
-
         else:
             # search intent
             for intent in scenarios.INTENTS:
@@ -128,7 +127,6 @@ class Bot:
                     text_to_send = scenarios.DEFAULT_ANSWER
 
         self.send_message(peer_id, text_to_send)
-
 
     def start_scenario(self, peer_id, scenario_name):
         scenario = scenarios.SCENARIOS[scenario_name]
@@ -178,8 +176,8 @@ if __name__ == '__main__':
     # Подтягиваем чувствительные данные из переменных окружения
     assert 'VK_TEST_BOT_TOKEN' in os.environ, 'Environment variable VK_TEST_BOT_TOKEN is not exist'
     assert 'VK_TEST_BOT_GROUP_ID' in os.environ, 'Environment variable VK_TEST_BOT_TOKEN is not exist'
-    DEV_VK_TOKEN = os.environ.get('VK_TEST_BOT_TOKEN')
-    DEV_GROUP_ID = os.environ.get('VK_TEST_BOT_GROUP_ID')
+    DEV_VK_TOKEN = os.environ['VK_TEST_BOT_TOKEN']
+    DEV_GROUP_ID = os.environ['VK_TEST_BOT_GROUP_ID']
 
     logging_config()
 
