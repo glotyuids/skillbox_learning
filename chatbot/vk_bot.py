@@ -179,7 +179,7 @@ class Bot:
                 state.step_name = step['next_step']
             else:
                 # finish scenario
-                bot_logger.info('User %s finished scenario intent %s. Context: %s',
+                bot_logger.info('User %s finished scenario %s. Context: %s',
                                 peer_id, state.scenario_name, state.context)
                 self.user_states.pop(peer_id)
         else:
