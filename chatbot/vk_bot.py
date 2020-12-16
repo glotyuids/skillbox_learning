@@ -75,7 +75,10 @@ class Bot:
         """ Запуск бота """
         bot_logger.info('Start listening')
         for event in self.vk_bot.listen():
-            self._on_event(event)
+            try:
+                self._on_event(event)
+            except Exception:
+                bot_logger.exception('Event handling error')
 
     def _on_event(self, event):
         """
