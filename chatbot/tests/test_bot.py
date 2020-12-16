@@ -61,7 +61,7 @@ class VKBotTestCase(unittest.TestCase):
                     with patch('vk_bot.bot_logger.debug') as logger_mock:
                         bot._on_event(event=event)
                         self.assertEqual(True, logger_mock.called)
-                        logger_mock.assert_called_with(f'Bot: Unknown event type {event.type}')
+                        logger_mock.assert_called_with('Unknown event type %s', event.type)
 
     INPUTS = [
         'Привет',
