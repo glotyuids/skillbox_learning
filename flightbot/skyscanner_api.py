@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 import requests
@@ -57,15 +58,15 @@ class Flight:
 
 
 # Подтягиваем чувствительные данные из переменных окружения
-# assert 'RAPIDAPI_KEY' in os.environ, 'Environment variable RAPIDAPI_KEY is not exist'
-# RAPIDAPI_KEY = os.environ['RAPIDAPI_KEY']
+assert 'RAPIDAPI_KEY' in os.environ, 'Environment variable RAPIDAPI_KEY is not exist'
+RAPIDAPI_KEY = os.environ['RAPIDAPI_KEY']
 RAPIDAPI_HOST = 'skyscanner-skyscanner-flight-search-v1.p.rapidapi.com'
 COUNTRY = 'RU'
 CURRENCY = 'RUB'
 LOCALE = 'ru-RU'
 
 HEADERS = {
-    'x-rapidapi-key': 'a00f87e656mshad49d643dd93889p1d9ecbjsn0a7e7b2276a6',
+    'x-rapidapi-key': RAPIDAPI_KEY,
     'x-rapidapi-host': RAPIDAPI_HOST
     }
 
