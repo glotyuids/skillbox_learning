@@ -106,25 +106,26 @@ class Bot:
         message_text = event.message.text
         peer_id = event.message.peer_id
         bot_logger.info('Message received. Peer ID: %s. Message: %s', peer_id, repr(message_text))
-        text_to_send = ''
+        text_to_send = self.commands_handler(peer_id, message_text)
 
-        if peer_id in self.user_states:
-            # continue scenario
-            text_to_send = self.continue_scenario(peer_id, message_text)
-        else:
-            # search intent
-            for intent in scenarios.INTENTS:
-                if any(token in message_text.lower() for token in intent['tokens']):
-                    # run intent
-                    bot_logger.info('User %s gets intent %s', peer_id, intent['name'])
-                    if intent['answer']:
-                        text_to_send = intent['answer']
-                    else:
-                        # launch new scenario
-                        text_to_send = self.start_scenario(peer_id, intent['scenario'])
-                    break
+        if not text_to_send:
+            if peer_id in self.user_states:
+                # continue scenario
+                text_to_send = self.continue_scenario(peer_id, message_text)
             else:
-                text_to_send = scenarios.DEFAULT_ANSWER
+                # search intent
+                for intent in scenarios.INTENTS:
+                    if any(token in message_text.lower() for token in intent['tokens']):
+                        # run intent
+                        bot_logger.info('User %s gets intent %s', peer_id, intent['name'])
+                        if intent['answer']:
+                            text_to_send = intent['answer']
+                        else:
+                            # launch new scenario
+                            text_to_send = self.start_scenario(peer_id, intent['scenario'])
+                        break
+                else:
+                    text_to_send = scenarios.DEFAULT_ANSWER
 
         self.send_message(peer_id, text_to_send)
 
@@ -207,6 +208,18 @@ class Bot:
                                message=message,
                                random_id=randint(0, self.max_random_id))
         bot_logger.info('Message sent. Peer ID: %s. Message: %s', peer_id, repr(message))
+
+    def commands_handler(self, peer_id, message_text):
+        if message_text == '/exit':
+            if peer_id in self.user_states:
+                state = self.user_states[peer_id]
+                bot_logger.info('User %s cancelled scenario %s. Context: %s',
+                                peer_id, state.scenario_name, state.context)
+                self.user_states.pop(peer_id)
+            return scenarios.HELP_ANSWER
+        if message_text == '/help':
+            return scenarios.HELP_ANSWER
+        return None
 
 
 if __name__ == '__main__':
