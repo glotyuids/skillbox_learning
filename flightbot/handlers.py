@@ -3,11 +3,11 @@
 Все хендлеры должны принимать только текст и контекст (словарь) и возвращать только флаг валидности
 """
 import re
-
-import scenarios
 from skyscanner_api import *
 
+MAX_PASS_CAPACITY = 853     # столько пассажиров вмещает А380-800 - рекорд среди самолётов
 re_date = re.compile(r'^(\d{2})-(\d{2})-(\d{4})$')
+re_phone = re.compile(r'^(([7,8]|\+\d{1,3})[\-\s]?)(\(?\d{3}\)?[\-s]?)[\d\-\s]{7,10}$')
 
 
 def handle_origin_city(text, context):
@@ -56,3 +56,36 @@ def check_next_dates(context, date):
         context['dates'] = '\n'.join(flight_dates)
         return 2
     return 3
+
+
+def seats_handler(text, context):
+    if text.isdecimal():
+        if int(text) < MAX_PASS_CAPACITY:
+            context['seats'] = int(text)
+            return 0
+        return 2
+    return 1
+
+
+def comment_handler(text, context):
+    if text == '-':
+        context['comment'] = ''
+    else:
+        context['comment'] = text
+    return 0
+
+
+def verify_data_handler(text, context):
+    if text.lower() == "да":
+        return 0
+    elif text.lower() == "нет":
+        pass    # TODO сбросить сценарий
+    return 1
+
+
+def phone_handler(text, context):
+    match = re.match(re_phone, text)
+    if match:
+        context['phone'] = text
+        return 0
+    return 1
