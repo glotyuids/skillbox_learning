@@ -46,6 +46,32 @@ class UserState:
     context: dict = field(default_factory=dict)
 
 
+class ScenarioResultError(ValueError):
+    """
+    Исключение для отлова невалидных шагов с результатами вида (None, None)
+    """
+    def __init__(self, user_state, result_name):
+        """
+
+        Parameters
+        ----------
+        user_state: UserState
+        result_name: str
+            Строка вида 'result_0'
+        """
+        self.scenario = user_state.scenario_name
+        self.step = user_state.step_name
+        self.result_name = result_name
+        self.result_value = scenarios.SCENARIOS[self.scenario]['steps'][self.step][result_name]
+        self.message = 'Both values in result tuple is None: ' + \
+                       '/'.join(['SCENARIOS', self.scenario, 'steps', self.step, self.result_name]) + \
+                       ': ' + repr(self.result_value)
+        super().__init__(self.message)
+
+    def __str__(self):
+        return self.message
+
+
 class Bot:
     """
     Echo bot для vk.com
