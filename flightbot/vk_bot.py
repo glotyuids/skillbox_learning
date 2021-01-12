@@ -182,8 +182,15 @@ class Bot:
         """
         Пропускает сообщение через хендлер шага,
         дёргает соответсвующее сообщение из сценария и переключает шаги.
-        Если хендлер шага возвращает False, то возвращаем сообщение failure из текущего шага.
-        Если True - то переключаем пользователя на следубщий шаг и возвращаем из него сообщение text
+
+        Хендлер возвращает код результата.
+        Из сценария по этому коду дёргается тьюпл вида (сообщение_для_отправки, следующий_шаг)
+        Если сообщение - это строка, то следующий шаг из этой записи будет игнорироваться,
+        вместо этого повторится текущий шаг.
+        Если же сообщение равно None, то произойдёт переход на следующий шаг.
+        Какая-нибудь из этих позиций обязательно должна присутствовать,
+        иначе бот будет падать со ScenarioResultError
+
         Parameters
         ----------
         message_text: str
@@ -201,22 +208,26 @@ class Bot:
         step = steps[state.step_name]
         handler = getattr(handlers, step['handler'])
         ret_code = handler(message_text, state.context)
-        if ret_code == 0:
-            # next step
-            next_step = steps[step['next_step']]
+
+        text_to_send = step['result_' + str(ret_code)][0]
+        if text_to_send:
+            # retry current step
+            return text_to_send.format(**state.context)
+
+        next_step_name = step['result_' + str(ret_code)][1]
+        if next_step_name:
+            next_step = steps[next_step_name]
             text_to_send = next_step['text'].format(**state.context)
-            if next_step['next_step']:
+            if next_step['handler']:
                 # switch to next step
-                state.step_name = step['next_step']
+                state.step_name = next_step_name
             else:
                 # finish scenario
                 bot_logger.info('User %s finished scenario %s. Context: %s',
                                 peer_id, state.scenario_name, state.context)
                 self.user_states.pop(peer_id)
-        else:
-            # retry current step
-            text_to_send = step['failure_' + str(ret_code)].format(**state.context)
-        return text_to_send
+            return text_to_send
+        raise ScenarioResultError(state, 'result_' + str(ret_code))
 
     def send_message(self, peer_id, message):
         """
