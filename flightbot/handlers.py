@@ -59,12 +59,14 @@ def check_next_dates(context, date):
 
 
 def seats_handler(text, context):
-    if text.isdecimal():
-        if int(text) < MAX_PASS_CAPACITY:
-            context['seats'] = int(text)
-            return 0
+    if not text.isdecimal():
+        return 1
+    if int(text) > MAX_PASS_CAPACITY:
         return 2
-    return 1
+    if int(text) < 1:
+        return 3
+    context['seats'] = int(text)
+    return 0
 
 
 def comment_handler(text, context):
@@ -79,7 +81,7 @@ def verify_data_handler(text, context):
     if text.lower() == "да":
         return 0
     elif text.lower() == "нет":
-        pass    # TODO сбросить сценарий
+        return 2
     return 1
 
 
@@ -89,3 +91,11 @@ def phone_handler(text, context):
         context['phone'] = text
         return 0
     return 1
+
+
+def incorrect_data_handler(text, context):
+    if text.lower() == 'заново':
+        return 0
+    if text.lower() == 'далее':
+        return 1
+    return 2
