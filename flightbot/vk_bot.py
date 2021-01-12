@@ -247,14 +247,19 @@ class Bot:
         bot_logger.info('Message sent. Peer ID: %s. Message: %s', peer_id, repr(message))
 
     def commands_handler(self, peer_id, message_text):
-        if message_text == '/exit':
+        if message_text == '/выход':
             if peer_id in self.user_states:
                 state = self.user_states[peer_id]
                 bot_logger.info('User %s cancelled scenario %s. Context: %s',
                                 peer_id, state.scenario_name, state.context)
                 self.user_states.pop(peer_id)
-            return scenarios.HELP_ANSWER
-        if message_text == '/help':
+            return scenarios.WELCOME_ANSWER
+        if message_text == '/помощь':
+            if peer_id in self.user_states:
+                state = self.user_states[peer_id]
+                scenario_help = scenarios.SCENARIOS[state.scenario_name].get('help')
+                return scenario_help or scenarios.HELP_ANSWER
+
             return scenarios.HELP_ANSWER
         return None
 
