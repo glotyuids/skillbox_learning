@@ -26,6 +26,30 @@ def handle_dest_city(text, context):
     return 1
 
 
+def handle_edit_origin_city(text, context):
+    city = get_city(text.strip())
+    if city:
+        context['origin'] = city
+        ret_code = handle_arrival_date(context['flight'].arrival_date, context)
+        if ret_code == 0:
+            return 0
+        else:
+            return 2
+    return 1
+
+
+def handle_edit_dest_city(text, context):
+    city = get_city(text.strip())
+    if city:
+        context['dest'] = city
+        ret_code = handle_arrival_date(context['flight'].arrival_date, context)
+        if ret_code == 0:
+            return 0
+        else:
+            return 2
+    return 1
+
+
 def reverse_date(date_str):
     components = date_str.split('-')
     return '-'.join(components[::-1])
@@ -78,10 +102,19 @@ def comment_handler(text, context):
 
 
 def verify_data_handler(text, context):
-    if text.lower() == "да":
+    if text.lower() == "далее":
         return 0
-    elif text.lower() == "нет":
+    if text.lower() == "вылет":
         return 2
+    if text.lower() in ["прилёт", "прилет", ]:
+        return 3
+    if text.lower() == "дата":
+        return 4
+    if text.lower() == "места":
+        return 5
+    if text.lower() == "коммент":
+        return 6
+
     return 1
 
 
