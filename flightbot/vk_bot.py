@@ -180,7 +180,7 @@ class Bot:
 
     def continue_scenario(self, peer_id, message_text):
         """
-        Пропускает сообщение через хендлер шага,
+        Пропускает сообщение через обработчик команд и хендлер шага,
         дёргает соответсвующее сообщение из сценария и переключает шаги.
 
         Хендлер возвращает код результата.
@@ -247,6 +247,20 @@ class Bot:
         bot_logger.info('Message sent. Peer ID: %s. Message: %s', peer_id, repr(message))
 
     def commands_handler(self, peer_id, message_text):
+        """
+        Обработчик основных команд, которые доступны из любого места и сценария бота
+        Parameters
+        ----------
+        peer_id: str
+            Vk ID пользователя
+        message_text: str
+            Текст сообщения, присланного пользователем
+
+        Returns
+        -------
+        str or None
+            Текст сообщения или None, если команда не обнаружена
+        """
         if message_text == '/выход':
             if peer_id in self.user_states:
                 state = self.user_states[peer_id]
