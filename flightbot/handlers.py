@@ -33,8 +33,7 @@ def handle_edit_origin_city(text, context):
         ret_code = handle_arrival_date(context['flight'].arrival_date, context)
         if ret_code == 0:
             return 0
-        else:
-            return 2
+        return 2
     return 1
 
 
@@ -45,8 +44,7 @@ def handle_edit_dest_city(text, context):
         ret_code = handle_arrival_date(context['flight'].arrival_date, context)
         if ret_code == 0:
             return 0
-        else:
-            return 2
+        return 2
     return 1
 
 
@@ -65,8 +63,7 @@ def handle_arrival_date(text, context):
         if flight_dates:
             context['flight'] = get_flight(context['origin'], context['dest'], flight_dates[0])
             return 0
-        else:
-            return check_next_dates(context, date)
+        return check_next_dates(context, date)
     return 1
 
 
@@ -103,19 +100,20 @@ def comment_handler(text, context):
 
 def verify_data_handler(text, context):
     if text.lower() == "далее":
-        return 0
-    if text.lower() == "вылет":
-        return 2
-    if text.lower() in ["прилёт", "прилет", ]:
-        return 3
-    if text.lower() == "дата":
-        return 4
-    if text.lower() == "места":
-        return 5
-    if text.lower() == "коммент":
-        return 6
-
-    return 1
+        result = 0
+    elif text.lower() == "вылет":
+        result = 2
+    elif text.lower() in ["прилёт", "прилет", ]:
+        result = 3
+    elif text.lower() == "дата":
+        result = 4
+    elif text.lower() == "места":
+        result = 5
+    elif text.lower() == "коммент":
+        result = 6
+    else:
+        result = 1
+    return result
 
 
 def phone_handler(text, context):
