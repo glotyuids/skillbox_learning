@@ -1,10 +1,12 @@
 import unittest
 from copy import deepcopy
+from datetime import datetime
 from unittest.mock import Mock, patch, call
 
 from vk_api.bot_longpoll import VkBotMessageEvent
 
 import scenarios
+import skyscanner_api as skyapi
 import vk_bot
 
 
@@ -71,15 +73,37 @@ class VKBotTestCase(unittest.TestCase):
                         self.assertEqual(True, logger_mock.called)
                         logger_mock.assert_called_with('Unknown event type %s', event.type)
 
-    INPUTS = [
-        'Привет',
-        'А Когда всё это пройдёт?',
-        'Классно, я как раз свободен. А где всё это будет?',
-        'Всё, хочу купить билет!',
-        'Па',
-        'Паша',
-        'привет@ya.',
-        'hello@яндекс.рф',
+    origin = skyapi.Place('Москва', 'MOW', 'Россия')
+    dest = skyapi.Place('Белгород', 'EGO', 'Россия')
+    flight = skyapi.Flight(
+        price=500, direct=True, origin=origin, dest=dest, arrival=datetime(2021, 2, 12), carrier='S7'
+    )
+    SEATS = '2'
+    COMMENT = 'Это коммент'
+    STEPS = scenarios.SCENARIOS['find_flights']['steps']
+    TEST_DATA = [
+        ('Привет', scenarios.INTENTS[1]['answer']),
+        ('/помощь', scenarios.INTENTS[0]['answer']),
+        ('вапвапв', scenarios.DEFAULT_ANSWER),
+        ('/билет', STEPS['enter_arrival']['text']),
+        ('/помощь', scenarios.SCENARIOS['find_flights']['help']),
+        ('/выход', scenarios.WELCOME_ANSWER),
+        ('/билет', STEPS['enter_arrival']['text']),
+        ('sdfsdfsfd', STEPS['enter_arrival']['result_1'][0]),
+        ('Москва', STEPS['enter_dest']['text'].format(origin)),
+        ('sdfsdfsfd', STEPS['enter_dest']['result_1'][0]),
+        ('Белгород', STEPS['enter_date']['text'].format(dest)),
+        ('sdfsdfsfd', STEPS['enter_date']['result_1'][0]),
+        ('12-02-2021', STEPS['enter_seats']['text'].format(flight)),
+        ('sdfsdfsfd', STEPS['enter_date']['result_1'][0]),
+        ('100000', STEPS['enter_date']['result_2'][0]),
+        ('0', STEPS['enter_date']['result_3'][0]),
+        (SEATS, STEPS['enter_comment']['text']),
+        (COMMENT, STEPS['verify_data']['text'].format(flight, SEATS, COMMENT)),
+        ('далее', STEPS['enter_phone']['text']),
+        ('sdfsdfsfd', STEPS['enter_phone']['result_1'][0]),
+        ('+7 999 123 45 67', STEPS['finish']['text']),
+        ('Привет', scenarios.INTENTS[1]['answer']),
     ]
     EXPECTED_OUTPUTS = [
         scenarios.DEFAULT_ANSWER,
