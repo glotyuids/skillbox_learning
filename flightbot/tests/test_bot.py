@@ -105,16 +105,6 @@ class VKBotTestCase(unittest.TestCase):
         ('+7 999 123 45 67', STEPS['finish']['text']),
         ('Привет', scenarios.INTENTS[1]['answer']),
     ]
-    EXPECTED_OUTPUTS = [
-        scenarios.DEFAULT_ANSWER,
-        scenarios.INTENTS[0]['answer'],
-        scenarios.INTENTS[1]['answer'],
-        scenarios.SCENARIOS['registration']['steps']['step1']['text'],
-        scenarios.SCENARIOS['registration']['steps']['step1']['failure'],
-        scenarios.SCENARIOS['registration']['steps']['step2']['text'],
-        scenarios.SCENARIOS['registration']['steps']['step2']['failure'],
-        scenarios.SCENARIOS['registration']['steps']['step3']['text'].format(name='Паша', email='hello@яндекс.рф'),
-    ]
 
     def test_on_message(self):
         send_message_mock = Mock()
@@ -125,14 +115,14 @@ class VKBotTestCase(unittest.TestCase):
                 bot = vk_bot.Bot('', '')
                 bot.send_message = send_message_mock
 
-                for message_text in self.INPUTS:
+                for message_text, _ in self.TEST_DATA:
                     msg_event['object']['message']['text'] = message_text
                     bot._on_message(event=VkBotMessageEvent(raw=msg_event))
 
                 self.assertEqual(True, send_message_mock.called)
-                self.assertEqual(len(self.EXPECTED_OUTPUTS), send_message_mock.call_count)
+                self.assertEqual(len(self.TEST_DATA), send_message_mock.call_count)
                 expected_calls = [call(msg_event['object']['message']['peer_id'], response)
-                                  for response in self.EXPECTED_OUTPUTS]
+                                  for _, response in self.TEST_DATA]
                 send_message_mock.assert_has_calls(expected_calls, any_order=False)
 
     def test_send_message(self):
