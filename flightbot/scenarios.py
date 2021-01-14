@@ -47,6 +47,12 @@ INTENTS = [
         'answer': '',
     },
     {
+        'name': 'Приветствие',
+        'tokens': ['привет', 'здравствуй', ],
+        'scenario': None,
+        'answer': WELCOME_ANSWER,
+    },
+    {
         'name': 'Регистрация',
         'tokens': ['билет', '/билет', 'купить', ],
         'scenario': 'find_flights',
