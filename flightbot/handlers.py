@@ -3,7 +3,9 @@
 Все хендлеры должны принимать только текст и контекст (словарь) и возвращать только флаг валидности
 """
 import re
-from skyscanner_api import *
+from datetime import datetime
+
+import skyscanner_api as skyapi
 
 MAX_PASS_CAPACITY = 853     # столько пассажиров вмещает А380-800 - рекорд среди самолётов
 re_date = re.compile(r'^(\d{2})-(\d{2})-(\d{4})$')
@@ -11,7 +13,7 @@ re_phone = re.compile(r'^(([7,8]|\+\d{1,3})[\-\s]?)(\(?\d{3}\)?[\-s]?)[\d\-\s]{7
 
 
 def handle_origin_city(text, context):
-    city = get_city(text.strip())
+    city = skyapi.get_city(text.strip())
     if city:
         context['origin'] = city
         return 0
@@ -19,7 +21,7 @@ def handle_origin_city(text, context):
 
 
 def handle_dest_city(text, context):
-    city = get_city(text.strip())
+    city = skyapi.get_city(text.strip())
     if city:
         context['dest'] = city
         return 0
@@ -27,7 +29,7 @@ def handle_dest_city(text, context):
 
 
 def handle_edit_origin_city(text, context):
-    city = get_city(text.strip())
+    city = skyapi.get_city(text.strip())
     if city:
         context['origin'] = city
         ret_code = handle_arrival_date(context['flight'].arrival_date, context)
@@ -38,7 +40,7 @@ def handle_edit_origin_city(text, context):
 
 
 def handle_edit_dest_city(text, context):
-    city = get_city(text.strip())
+    city = skyapi.get_city(text.strip())
     if city:
         context['dest'] = city
         ret_code = handle_arrival_date(context['flight'].arrival_date, context)
@@ -57,18 +59,18 @@ def handle_arrival_date(text, context):
     match = re.match(re_date, text)
     if match:
         date = reverse_date(text)
-        flight_dates = get_dates(context['origin'], context['dest'], date)
+        flight_dates = skyapi.get_dates(context['origin'], context['dest'], date)
         # если на выбранную дату рейс есть, то запоминаем его.
         # если рейсов нет, то подтягиваем рейсы за выбранный месяц и предлагаем пользователю даты после выбранной им
         if flight_dates:
-            context['flight'] = get_flight(context['origin'], context['dest'], flight_dates[0])
+            context['flight'] = skyapi.get_flight(context['origin'], context['dest'], flight_dates[0])
             return 0
         return check_next_dates(context, date)
     return 1
 
 
 def check_next_dates(context, date):
-    flight_dates = get_dates(context['origin'], context['dest'], date[:7])
+    flight_dates = skyapi.get_dates(context['origin'], context['dest'], date[:7])
     if flight_dates:
         user_date = datetime.strptime(date, '%Y-%m-%d')
         flight_dates = [reverse_date(date) for date in flight_dates
@@ -122,11 +124,3 @@ def phone_handler(text, context):
         context['phone'] = text
         return 0
     return 1
-
-
-def incorrect_data_handler(text, context):
-    if text.lower() == 'заново':
-        return 0
-    if text.lower() == 'далее':
-        return 1
-    return 2
