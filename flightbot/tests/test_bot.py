@@ -3,10 +3,10 @@ from copy import deepcopy
 from datetime import datetime
 from unittest.mock import Mock, patch, call
 
-from vk_api.bot_longpoll import VkBotMessageEvent
-
-import scenarios
+patch.dict('os.environ', {'RAPIDAPI_KEY': 'AAA'}, clear=True).start()
 import skyscanner_api as skyapi
+from vk_api.bot_longpoll import VkBotMessageEvent
+import scenarios
 import vk_bot
 
 
