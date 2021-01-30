@@ -2,8 +2,10 @@ import unittest
 from copy import deepcopy
 from unittest.mock import Mock, patch, call
 
+patch.dict('os.environ', {'RAPIDAPI_KEY': 'AAA'}, clear=True).start()
 from vk_api.bot_longpoll import VkBotMessageEvent
 import vk_bot
+import skyscanner_api as skyapi
 
 import test_data as td
 
@@ -113,6 +115,26 @@ class VKBotTestCase(unittest.TestCase):
                 self.assertEqual((peer_id, message, True),
                                  (send_kwargs['user_id'], send_kwargs['message'],
                                   send_kwargs['random_id'] in range(0, vk_bot.Bot.max_random_id + 1)))
+
+
+class FlightAPITestCase(unittest.TestCase):
+    def test_get_city(self):
+        equal = lambda this, other: this.__dict__ == other.__dict__
+        response_mock = Mock()
+        response_mock.text = td.PLACES_RESPONSE
+        with patch('requests.request', return_value=response_mock), \
+             patch('skyscanner_api.Place.__eq__', return_value=equal):
+            city = skyapi.get_city('Москва')
+            self.assertEqual(td.ORIGIN, city)
+
+    def test_get_flight(self):
+        equal = lambda this, other: this.__dict__ == other.__dict__
+        response_mock = Mock()
+        response_mock.text = td.FLIGHTS_RESPONSE
+        with patch('requests.request', return_value=response_mock), \
+             patch('skyscanner_api.Flight.__eq__', return_value=equal):
+            flight = skyapi.get_flight(td.ORIGIN, td.DEST, td.DATE_REV)
+            self.assertEqual(td.FLIGHT, flight)
 
 
 if __name__ == '__main__':
