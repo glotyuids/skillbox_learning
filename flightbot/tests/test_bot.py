@@ -136,6 +136,15 @@ class FlightAPITestCase(unittest.TestCase):
             flight = skyapi.get_flight(td.ORIGIN, td.DEST, td.DATE_REV)
             self.assertEqual(td.FLIGHT, flight)
 
+    def test_get_dates(self):
+        equal = lambda this, other: this.__dict__ == other.__dict__
+        response_mock = Mock()
+        response_mock.text = td.DATES_RESPONSE
+        with patch('requests.request', return_value=response_mock), \
+             patch('skyscanner_api.Flight.__eq__', return_value=equal):
+            dates = skyapi.get_dates(td.ORIGIN, td.DEST, td.DATE_REV)
+            self.assertEqual(td.DATES_RESULT, dates)
+
 
 if __name__ == '__main__':
     unittest.main()

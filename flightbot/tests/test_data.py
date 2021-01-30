@@ -150,3 +150,60 @@ FLIGHTS_RESPONSE = json.dumps({
         }]
     }
 })
+
+DATES_RESPONSE = json.dumps({
+    'Quotes': [{
+        'QuoteId': 1,
+        'MinPrice': 3765,
+        'Direct': True,
+        'OutboundLeg': {
+            'CarrierIds': [1687],
+            'OriginId': 47493,
+            'DestinationId': 49519,
+            'DepartureDate': '2021-02-12T00:00:00'
+        },
+        'QuoteDateTime': '2021-01-30T00:17:00'
+    }],
+    'Carriers': [{
+        'CarrierId': 1687,
+        'Name': 'S7 Airlines'
+    }],
+    'Places': [{
+        'Name': 'Москва Домодедово',
+        'Type': 'Station',
+        'PlaceId': 47493,
+        'IataCode': 'DME',
+        'SkyscannerCode': 'DME',
+        'CityName': 'Москва',
+        'CityId': 'MOSC',
+        'CountryName': 'Россия'
+    }, {
+        'Name': 'Белгород',
+        'Type': 'Station',
+        'PlaceId': 49519,
+        'IataCode': 'EGO',
+        'SkyscannerCode': 'EGO',
+        'CityName': 'Белгород',
+        'CityId': 'BELH',
+        'CountryName': 'Россия'
+    }],
+    'Currencies': [{
+        'Code': 'RUB',
+        'Symbol': '₽',
+        'ThousandsSeparator': ' ',
+        'DecimalSeparator': ',',
+        'SymbolOnLeft': False,
+        'SpaceBetweenAmountAndSymbol': True,
+        'RoundingCoefficient': 0,
+        'DecimalDigits': 2
+    }],
+    'Dates': {
+        'OutboundDates': [{
+            'PartialDate': '2021-02-12',
+            'Price': 3765,
+            'QuoteDateTime': '2021-01-30T00:17:00',
+            'QuoteIds': [1]
+        }]
+    }
+})
+DATES_RESULT = [DATE_REV]
