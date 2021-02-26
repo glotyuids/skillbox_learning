@@ -1,6 +1,9 @@
 from dataclasses import dataclass
 import datetime as dt
-import beautifulsoup4
+from bs4 import BeautifulSoup
+import requests
+import re
+
 
 class WeatherMaker:
     @dataclass
@@ -22,4 +25,19 @@ class WeatherMaker:
         self.city = city
 
     def parse_month(self, year, month):
-        pass
+        response = requests.get('https://pogoda.mail.ru/prognoz/belgorod/february-2009/')
+        if response.status_code == 200:
+            html_doc = BeautifulSoup(response.text, features='html.parser')
+            dates = html_doc.find_all('div', {'class': 'day__date'})
+            dates = [day.text for day in dates]
+
+            temps = html_doc.find_all('div', {'class': 'day__temperature'})
+            temps = [re.findall(r'(?:(-?\d+)°)', temp.text) for temp in temps]
+            day_temps = [temp[0] for temp in temps]
+            night_temps = [temp[1] for temp in temps]
+
+
+            # list_of_names = html_doc.find_all('a', {'class': 'home-link home-link_black_yes inline-stocks__link'})
+
+            # for names, values in zip(list_of_names, list_of_values):
+            #     print(names.text, values.text)
