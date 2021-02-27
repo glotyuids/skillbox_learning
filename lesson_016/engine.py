@@ -5,6 +5,25 @@ import requests
 import re
 
 
+@dataclass
+class Stats:
+    date: dt.date
+    temp_day: int
+    temp_night: int
+    descr: str
+    press: int
+    humidity: int
+    wind_speed: int
+    wind_dir: str
+    temp_units: str = '°C'
+    press_units: str = 'мм'
+    humidity_units: str = '%'
+    wind_speed_units: str = 'м/с'
+
+    def __repr__(self):
+        return f"{self.date.strftime('%d-%m-%y')}, {self.temp_day}/{self.temp_night}{self.temp_units}, {self.descr}"
+
+
 class WeatherMaker:
     @dataclass
     class Stats:
