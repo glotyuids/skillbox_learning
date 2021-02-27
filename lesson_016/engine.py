@@ -5,7 +5,7 @@ import requests
 import re
 import locale
 from contextlib import contextmanager
-
+from dateutil import rrule
 
 @dataclass
 class Stats:
@@ -77,3 +77,11 @@ class WeatherMaker:
             days.append(Stats(*day))
 
         return days
+
+    def get_range(self, start_date, end_date):
+        weather_stats = []
+        for month in rrule.rrule(rrule.MONTHLY, dtstart=start_date, until=end_date):
+            weather_stats.extend(self.parse_month(month))
+        start_offset = (start_date - weather_stats[0].date).days
+        end_offset = (weather_stats[-1].date - end_date).days
+        return weather_stats[start_offset:-end_offset]
