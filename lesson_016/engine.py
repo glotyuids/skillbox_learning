@@ -38,8 +38,8 @@ class WeatherMaker:
     def __init__(self, city):
         self.city = city
 
-    def parse_month(self, year, month):
-        month_name = dt.date(2001, month, 1).strftime('%B').lower()
+    def parse_month(self, date):
+        month_name, year = date.strftime('%B').lower(), date.year
         response = requests.get(f'https://pogoda.mail.ru/prognoz/{self.city}/{month_name}-{str(year)}/')
         if response.status_code != 200:
             return None
