@@ -18,7 +18,7 @@ class Stats:
     humidity: int
     wind_speed: int
     wind_dir: str
-    temp_units: str = '°C'
+    temp_units: str = '°'
     press_units: str = 'мм'
     humidity_units: str = '%'
     wind_speed_units: str = 'м/с'
