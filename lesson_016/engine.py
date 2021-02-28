@@ -30,13 +30,6 @@ class Stats:
 
 class WeatherMaker:
 
-    @staticmethod
-    @contextmanager
-    def setlocale(*args, **kw):
-        current = locale.setlocale(locale.LC_ALL)
-        yield locale.setlocale(*args, **kw)
-        locale.setlocale(locale.LC_ALL, current)
-
     def __init__(self, city):
         self.city = city
 
@@ -52,7 +45,7 @@ class WeatherMaker:
 
         dates = html_doc.find_all('div', {'class': 'day__date'})
         dates = [re.search(r'\d{,2} \w+ \d{4}', date.text)[0] for date in dates]
-        with self.setlocale(locale.LC_ALL, 'ru_RU.UTF-8'):
+        with setlocale(locale.LC_ALL, 'ru_RU.UTF-8'):
             dates = [dt.datetime.strptime(date, '%d %B %Y').date() for date in dates]
 
         temps = html_doc.find_all('div', {'class': 'day__temperature'})
@@ -90,3 +83,10 @@ class WeatherMaker:
         start_offset = (start_date - weather_stats[0].date).days
         end_offset = (weather_stats[-1].date - end_date).days
         return weather_stats[start_offset:-end_offset]
+
+
+@contextmanager
+def setlocale(*args, **kw):
+    current = locale.setlocale(locale.LC_ALL)
+    yield locale.setlocale(*args, **kw)
+    locale.setlocale(locale.LC_ALL, current)
