@@ -6,6 +6,8 @@ import re
 import locale
 from contextlib import contextmanager
 from dateutil import rrule
+import cv2
+from assets import detailed_big_template as template
 
 @dataclass
 class Stats:
@@ -87,6 +89,27 @@ class WeatherMaker:
         start_offset = (start_date - weather_stats[0].date).days
         end_offset = (weather_stats[-1].date - end_date).days
         return weather_stats[start_offset:-end_offset]
+
+
+class ImageMaker:
+
+    def __init__(self):
+        self.font = cv2.freetype.createFreeType2()
+        self.im_template = cv2.imread(template.BACKGROUND_IM)
+
+    def get_image(self, stats):
+        im_color = cv2.applyColorMap(self.im_template, template.CMAPS[stats.descr])
+        with setlocale(locale.LC_ALL, 'ru_RU.UTF-8'):
+            for field in template.fields:
+                self.font.loadFontData(fontFileName=field['font'], id=0)
+                self.font.putText(img=im_color,
+                                  text=field['text'].format(**stats.dict),
+                                  org=field['pos'],
+                                  fontHeight=field['font_size'],
+                                  color=field['color'],
+                                  thickness=-1, line_type=cv2.LINE_AA, bottomLeftOrigin=False)
+
+        return im_color
 
 
 @contextmanager
