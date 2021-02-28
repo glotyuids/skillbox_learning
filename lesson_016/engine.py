@@ -27,6 +27,10 @@ class Stats:
         return f"{self.city}, {self.date.strftime('%d-%m-%y')}, " \
                f"{self.temp_day}/{self.temp_night}{self.temp_units}, {self.descr}"
 
+    @property
+    def dict(self):
+        return self.__dict__
+
 
 class WeatherMaker:
 
