@@ -9,6 +9,7 @@ from dateutil import rrule
 
 @dataclass
 class Stats:
+    city: str
     date: dt.date
     temp_day: int
     temp_night: int
@@ -23,7 +24,8 @@ class Stats:
     wind_speed_units: str = 'м/с'
 
     def __repr__(self):
-        return f"{self.date.strftime('%d-%m-%y')}, {self.temp_day}/{self.temp_night}{self.temp_units}, {self.descr}"
+        return f"{self.city}, {self.date.strftime('%d-%m-%y')}, " \
+               f"{self.temp_day}/{self.temp_night}{self.temp_units}, {self.descr}"
 
 
 class WeatherMaker:
@@ -45,6 +47,9 @@ class WeatherMaker:
             return None
 
         html_doc = BeautifulSoup(response.text, features='html.parser')
+
+        city = re.search(r"name: 'citiesDropdown',\W+text: '(.+)',", response.text)[1]
+
         dates = html_doc.find_all('div', {'class': 'day__date'})
         dates = [re.search(r'\d{,2} \w+ \d{4}', date.text)[0] for date in dates]
         with self.setlocale(locale.LC_ALL, 'ru_RU.UTF-8'):
@@ -73,9 +78,9 @@ class WeatherMaker:
         wind_dirs = [wind['dir'] for wind in winds]
 
         days = []
-        for day in zip(dates, day_temps, night_temps, descriptions, pressures, humidities, wind_speeds, wind_dirs):
+        for day in zip([city]*len(dates), dates, day_temps, night_temps,
+                       descriptions, pressures, humidities, wind_speeds, wind_dirs):
             days.append(Stats(*day))
-
         return days
 
     def get_range(self, start_date, end_date):
