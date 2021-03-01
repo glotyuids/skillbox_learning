@@ -35,7 +35,7 @@ WHITE = (255, 255, 255)
 fields = [
     # data
     {'text': '{city}', 'pos': (46, 61), 'font': FONT_REGULAR, 'font_size': 30, 'color': WHITE},
-    {'text': '{date:%d %b %Y}', 'pos': (46, 96), 'font': FONT_REGULAR, 'font_size': 23, 'color': WHITE},
+    {'text': '{date.day} {date:%b %Y}', 'pos': (46, 96), 'font': FONT_REGULAR, 'font_size': 23, 'color': WHITE},
     {'text': '{temp_day}{temp_units}  {temp_night}{temp_units}',
         'pos': (46, 182), 'font': FONT_BOLD, 'font_size': 70, 'color': WHITE},
     {'text': '{descr}', 'pos': (46, 230), 'font': FONT_REGULAR, 'font_size': 32, 'color': WHITE},
