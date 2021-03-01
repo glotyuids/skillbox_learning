@@ -101,6 +101,7 @@ class ImageMaker:
         im_color = cv2.applyColorMap(self.im_template, template.CMAPS[stats.descr])
         with setlocale(locale.LC_ALL, 'ru_RU.UTF-8'):
             for field in template.fields:
+                text = field['text'].format(weather_icon=template.ICONS[stats.descr], **stats.dict)
                 self.font.loadFontData(fontFileName=field['font'], id=0)
                 self.font.putText(img=im_color,
                                   text=field['text'].format(**stats.dict),
