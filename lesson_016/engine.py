@@ -103,12 +103,18 @@ class ImageMaker:
             for field in template.fields:
                 text = field['text'].format(weather_icon=template.ICONS[stats.descr], **stats.dict)
                 self.font.loadFontData(fontFileName=field['font'], id=0)
+
+                if field.get('v_center', False):
+                    (text_width, text_height), _ = self.font.getTextSize(text, field['font_size'], -1)
+                else:
+                    text_height = 0
+
                 self.font.putText(img=im_color,
-                                  text=field['text'].format(**stats.dict),
-                                  org=field['pos'],
+                                  text=text,
+                                  org=(field['pos'][0], field['pos'][1] + text_height//2),
                                   fontHeight=field['font_size'],
                                   color=field['color'],
-                                  thickness=-1, line_type=cv2.LINE_AA, bottomLeftOrigin=False)
+                                  thickness=-1, line_type=cv2.LINE_AA, bottomLeftOrigin=True)
 
         return im_color
 
