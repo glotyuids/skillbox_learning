@@ -9,6 +9,7 @@ from tempfile import NamedTemporaryFile
 from bs4 import BeautifulSoup
 from dateutil import rrule
 import cv2
+import imgkit
 import requests
 
 from assets import detailed_big_template as template
