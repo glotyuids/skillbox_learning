@@ -130,6 +130,6 @@ day = """
     <div class="date">{day}</div>
     <div class="icon">{weather_icon}</div>
     <div class="descr">{descr}</div>
-    <div class="temp">{temp_day}°  {temp_night}°</div>
+    <div class="temp">{temp_day}{temp_units}  {temp_night}{temp_units}</div>
   </td>
 """

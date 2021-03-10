@@ -13,6 +13,7 @@ import imgkit
 import requests
 
 from assets import calendar_template as html_tmpl
+import defaults
 from assets import detailed_big_template as template
 
 
@@ -27,14 +28,10 @@ class Stats:
     humidity: int
     wind_speed: int
     wind_dir: str
-    temp_units: str = '°'
-    press_units: str = 'мм'
-    humidity_units: str = '%'
-    wind_speed_units: str = 'м/с'
 
     def __repr__(self):
         return f"{self.city}, {self.date.strftime('%d-%m-%y')}, " \
-               f"{self.temp_day}/{self.temp_night}{self.temp_units}, {self.descr}"
+               f"{self.temp_day}/{self.temp_night}, {self.descr}"
 
     @property
     def dict(self):
@@ -58,7 +55,7 @@ class WeatherMaker:
 
         dates = html_doc.find_all('div', {'class': 'day__date'})
         dates = [re.search(r'\d{,2} \w+ \d{4}', date.text)[0] for date in dates]
-        with setlocale(locale.LC_ALL, 'ru_RU.UTF-8'):
+        with setlocale(locale.LC_ALL, defaults.locale):
             dates = [dt.datetime.strptime(date, '%d %B %Y').date() for date in dates]
 
         temps = html_doc.find_all('div', {'class': 'day__temperature'})
@@ -113,9 +110,12 @@ class ImageMaker:
         :return:  ndarray/cv2 image
         """
         im_color = cv2.applyColorMap(self.im_template, template.CMAPS[stat.descr])
-        with setlocale(locale.LC_ALL, 'ru_RU.UTF-8'):
+        with setlocale(locale.LC_ALL, defaults.locale):
             for field in template.fields:
-                text = field['text'].format(weather_icon=template.ICONS[stat.descr], **stat.dict)
+                params = dict(defaults.units, **stat.dict)
+                params.update(weather_icon=template.ICONS[stat.descr])
+                text = field['text'].format(**params)
+
                 self.font.loadFontData(fontFileName=field['font'], id=0)
 
                 if field.get('v_center', False):
@@ -150,21 +150,6 @@ class ImageMaker:
 
 
 class CalendarMaker(calendar.HTMLCalendar):
-    month_name = {          # в локали месяцы лежат в родительном падеже, а мне нужен именительный
-        1: 'январь',
-        2: 'февраль',
-        3: 'март',
-        4: 'апрель',
-        5: 'май',
-        6: 'июнь',
-        7: 'июль',
-        8: 'август',
-        9: 'сентябрь',
-        10: 'октябрь',
-        11: 'ноябрь',
-        12: 'декабрь',
-    }
-
     def formatday(self, day, weekday, **kwargs):
         """
         Возвращает HTML код ячейки календаря
@@ -188,8 +173,11 @@ class CalendarMaker(calendar.HTMLCalendar):
             return '<td class="noday">&nbsp;</td>' \
                    % {"weekday": self.cssclasses[weekday]}
 
-        return html_tmpl.day.format(weekday=self.cssclasses[weekday], day=day,
-                                    weather_icon=template.ICONS[stat.descr], **stat.dict)
+        params = dict(defaults.units, **stat.dict)
+        params.update(day=day,
+                      weekday=self.cssclasses[weekday],
+                      weather_icon=template.ICONS[stat.descr])
+        return html_tmpl.day.format(**params)
 
     def formatweek(self, theweek, **kwargs):
         """
@@ -249,9 +237,9 @@ class CalendarMaker(calendar.HTMLCalendar):
         """
         city = kwargs['stats'][0].city
         if withyear:
-            s = '%s %s' % (self.month_name[themonth], theyear)
+            s = '%s %s' % (defaults.month_name[themonth], theyear)
         else:
-            s = '%s' % self.month_name[themonth]
+            s = '%s' % defaults.month_name[themonth]
         return html_tmpl.month_header.format(month=s, city=city)
 
     def formatrange(self, stats):
