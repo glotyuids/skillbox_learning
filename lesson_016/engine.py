@@ -274,7 +274,10 @@ class DatabaseUpdater:
     def add_stats(self, stats):
         stats = [stats, ] if not isinstance(stats, list) else stats
         for stat in stats:
-            _ = WeatherStats.create(**stat.dict)
+            _ = (WeatherStats
+                 .insert(**stat.dict)
+                 .on_conflict('replace')
+                 .execute())
 
     def get_stats(self, city, start_date, end_date=None):
         if end_date:
