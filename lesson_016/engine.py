@@ -11,8 +11,10 @@ from dateutil import rrule
 import cv2
 import imgkit
 import requests
+from playhouse.db_url import connect
 
 from assets import calendar_template as html_tmpl
+from db_models import WeatherStats, db_proxy
 import defaults
 from assets import detailed_big_template as template
 
@@ -261,6 +263,31 @@ class CalendarMaker(calendar.HTMLCalendar):
         cal = cal[:-4] + '</div>'
         cal += html_tmpl.footer
         return cal
+
+
+class DatabaseUpdater:
+    def __init__(self, db_url):
+        db = connect(db_url)
+        db_proxy.initialize(db)
+        WeatherStats.create_table()
+
+    def add_stats(self, stats):
+        stats = [stats, ] if not isinstance(stats, list) else stats
+        for stat in stats:
+            _ = WeatherStats.create(**stat.dict)
+
+    def get_stats(self, city, start_date, end_date=None):
+        if end_date:
+            stats = WeatherStats.select().where(
+                WeatherStats.city == city and
+                start_date <= WeatherStats.date <= end_date
+            )
+        else:
+            stats = WeatherStats.get(
+                WeatherStats.city == city and
+                start_date == WeatherStats.date
+            )
+        return stats
 
 
 @contextmanager
