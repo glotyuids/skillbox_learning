@@ -197,7 +197,7 @@ class CalendarMaker(calendar.HTMLCalendar):
 
     def formatmonth(self, theyear, themonth, withyear=True, **kwargs):
         """
-        Возвращает готовый HTML код месяца
+        Возвращает готовый HTML код месяца. Если в кваргах нет дат этого месяца, то пустую строку
 
         :param theyear: номер года
         :param themonth: номер месяца
@@ -209,6 +209,12 @@ class CalendarMaker(calendar.HTMLCalendar):
         stats = kwargs.get('stats', None)
         if not stats:
             return '<h1>&nbsp;&nbsp;Error. No weather stats&nbsp;&nbsp;</h1>'
+
+        stat = next((stat for stat in stats
+                     if (stat.date.year, stat.date.month) == (theyear, themonth)),
+                    None)
+        if not stat:
+            return ''
 
         v = []
         a = v.append
