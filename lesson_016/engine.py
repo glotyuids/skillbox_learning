@@ -252,20 +252,20 @@ class CalendarMaker(calendar.HTMLCalendar):
 
     def formatrange(self, stats):
         """
-        Возвращает html код календарей (один за другим) в диапазоне дат от в stats[0] до stats[-1]
+        Возвращает html код календарей (один за другим) в диапазоне дат от самой меньшей в списке до самой большей
 
         :param stats: список объектов класса Stats
 
         :return: str
         """
-        start_date = stats[0].date
-        end_date = stats[-1].date
+        start_date = min(stats, key=lambda stat: stat.date).date
+        end_date = max(stats, key=lambda stat: stat.date).date
         cal = html_tmpl.header + html_tmpl.css
         cal += '<div class="wrapper"><br>'
         for month in rrule.rrule(rrule.MONTHLY, dtstart=start_date, until=end_date):
             with setlocale(locale.LC_ALL, 'ru_RU.UTF-8'):
-                cal += self.formatmonth(theyear=month.year, themonth=month.month, withyear=True, stats=stats)
-                cal += '<br><br>'
+                month = self.formatmonth(theyear=month.year, themonth=month.month, withyear=True, stats=stats)
+                cal += month + '<br><br>' if month else ''
         cal = cal[:-4] + '</div>'
         cal += html_tmpl.footer
         return cal
