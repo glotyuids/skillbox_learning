@@ -2,6 +2,7 @@ import calendar
 from contextlib import contextmanager
 import datetime as dt
 from dataclasses import dataclass
+import json
 import locale
 import re
 from tempfile import NamedTemporaryFile
@@ -17,6 +18,14 @@ from assets import calendar_template as html_tmpl
 from db_models import WeatherStats, db_proxy
 import defaults
 from assets import detailed_big_template as template
+
+
+class BadResponseException(Exception):
+    pass
+
+
+class EmptyResponseException(Exception):
+    pass
 
 
 @dataclass
@@ -43,11 +52,22 @@ class Stats:
 class WeatherMaker:
 
     def __init__(self, city):
-        self.city = city
+        self.city, self.city_url = '', ''
+        self.set_city(city)
+
+    def set_city(self, city):
+        response = requests.get(f'https://pogoda.mail.ru/ext/suggest/?q={city}')
+        if response.status_code != 200:
+            raise BadResponseException('Response status code is ' + str(response.status_code))
+        response = json.loads(response.text)
+        if not response:
+            raise EmptyResponseException('Город не найден')
+        self.city_url = response[0]['url']
+        self.city = response[0]['name']
 
     def parse_month(self, date):
         month_name, year = date.strftime('%B').lower(), date.year
-        response = requests.get(f'https://pogoda.mail.ru/prognoz/{self.city}/{month_name}-{str(year)}/')
+        response = requests.get(f'https://pogoda.mail.ru{self.city_url}{month_name}-{str(year)}/')
         if response.status_code != 200:
             return None
 
