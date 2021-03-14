@@ -1,25 +1,25 @@
 import calendar
-from contextlib import contextmanager
 import datetime as dt
-from dataclasses import dataclass
 import json
 import locale
 import os
 import re
 import sys
+from contextlib import contextmanager
+from dataclasses import dataclass
 from tempfile import NamedTemporaryFile
 
-from bs4 import BeautifulSoup
-from dateutil import rrule
 import cv2
 import imgkit
 import requests
+from bs4 import BeautifulSoup
+from dateutil import rrule
 from playhouse.db_url import connect
 
-from assets import calendar_template as html_tmpl
-from db_models import WeatherStats, db_proxy
 import defaults
+from assets import calendar_template as html_tmpl
 from assets import detailed_big_template as template
+from db_models import WeatherStats, db_proxy
 
 
 class BadResponseException(Exception):
