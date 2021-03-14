@@ -121,6 +121,8 @@ class WeatherMaker:
 
 class ImageMaker:
 
+    save_image = cv2.imwrite
+
     def __init__(self):
         self.font = cv2.freetype.createFreeType2()
         self.im_template = cv2.imread(template.BACKGROUND_IM)
