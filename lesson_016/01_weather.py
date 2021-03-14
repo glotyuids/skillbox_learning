@@ -197,13 +197,11 @@ class ExitMenu(Menu):
         self.avail_actions = {
             '1': {
                 'text': '1. Нет, вернуться назад',
-                'enabled': True,
                 'payload': self.context.set_state,
                 'payload_args': [MainMenu]
             },
             '2': {
                 'text': '2. Да, выйти из программы',
-                'enabled': True,
                 'payload': self.exit_handler,
                 'payload_args': []
             }
