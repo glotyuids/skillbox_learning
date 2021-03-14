@@ -310,13 +310,14 @@ class DatabaseUpdater:
     def get_stats(self, city, start_date, end_date=None):
         if end_date:
             stats = WeatherStats.select().where(
-                WeatherStats.city == city and
-                start_date <= WeatherStats.date <= end_date
+                (WeatherStats.city == city) &
+                (WeatherStats.date >= start_date) &
+                (WeatherStats.date <= end_date)
             )
         else:
             stats = WeatherStats.get(
-                WeatherStats.city == city and
-                start_date == WeatherStats.date
+                (WeatherStats.city == city) &
+                (start_date == WeatherStats.date)
             )
         return stats
 
