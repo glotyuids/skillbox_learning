@@ -123,6 +123,27 @@ class Menu:
         args = self.avail_actions[user_input]['payload_args']
         payload(*args)
 
+    def set_dates(self):
+        while True:
+            user_input = input('>: ')
+            if user_input.lower() == 'назад':
+                return False
+            mtch = re.match(r'^(\d{1,2}-\d{1,2}-\d{4})(/(\d{1,2}-\d{1,2}-\d{4}))?$', user_input)
+            if not mtch:
+                print('Ошибка в дате. Попробуйте ещё раз')
+                continue
+
+            dates = user_input.split('/')
+            try:
+                dates = [dt.datetime.strptime(date, '%d-%m-%Y').date() for date in dates]
+            except ValueError:
+                print('Ошибка в дате. Попробуйте ещё раз')
+                continue
+
+            self.context.start_date = min(dates)
+            self.context.end_date = max(dates)
+            return True
+
     @abstractmethod
     def menu(self):
         pass
@@ -196,26 +217,6 @@ class ExitMenu(Menu):
 
 
 class AddToDBMenu(Menu):
-    def set_dates(self):
-        while True:
-            user_input = input('>: ')
-            if user_input.lower() == 'назад':
-                return False
-            mtch = re.match(r'^(\d{1,2}-\d{1,2}-\d{4})(/(\d{1,2}-\d{1,2}-\d{4}))?$', user_input)
-            if not mtch:
-                print('Ошибка в дате. Попробуйте ещё раз')
-                continue
-
-            dates = user_input.split('/')
-            try:
-                dates = [dt.datetime.strptime(date, '%d-%m-%Y').date() for date in dates]
-            except ValueError:
-                print('Ошибка в дате. Попробуйте ещё раз')
-                continue
-
-            self.context.start_date = min(dates)
-            self.context.end_date = max(dates)
-            return True
 
     def menu(self):
         context = self.context
