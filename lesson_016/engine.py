@@ -85,8 +85,6 @@ class WeatherMaker:
 
         html_doc = BeautifulSoup(response.text, features='html.parser')
 
-        city = re.search(r"name: 'citiesDropdown',\W+text: '(.+)',", response.text)[1]
-
         dates = html_doc.find_all('div', {'class': 'day__date'})
         dates = [re.search(r'\d{,2} \w+ \d{4}', date.text)[0] for date in dates]
         with setlocale(locale.LC_ALL, defaults.locale):
@@ -115,7 +113,7 @@ class WeatherMaker:
         wind_dirs = [wind['dir'] for wind in winds]
 
         days = []
-        for day in zip([city]*len(dates), dates, day_temps, night_temps,
+        for day in zip([self.city]*len(dates), dates, day_temps, night_temps,
                        descriptions, pressures, humidities, wind_speeds, wind_dirs):
             days.append(Stats(*day))
         return days
