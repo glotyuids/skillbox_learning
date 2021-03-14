@@ -46,7 +46,7 @@
 # Приконнектится по полученному url-пути к базе данных
 # Инициализировать её через DatabaseProxy()
 # https://peewee.readthedocs.io/en/latest/peewee/database.html#dynamically-defining-a-database
-
+import re
 from abc import abstractmethod
 import datetime as dt
 
@@ -131,11 +131,11 @@ class Menu:
 class MainMenu(Menu):
     def get_avail_actions(self):
         self.avail_actions = {
-            # '1': {
-            #     'text': '1. Добавить прогнозы в базу данных',
-            #     'payload': self.context.set_state,
-            #     'payload_args': [AddToDBMenu]
-            # },
+            '1': {
+                'text': '1. Добавить прогнозы в базу данных',
+                'payload': self.context.set_state,
+                'payload_args': [AddToDBMenu]
+            },
             # '2': {
             #     'text': '2. Получить прогнозы из базы данных',
             #     'payload': self.context.set_state,
@@ -192,6 +192,47 @@ class ExitMenu(Menu):
         print('\nВы уверены?')
         self.print_actions()
         self.handle_input()
+
+
+class AddToDBMenu(Menu):
+    def set_dates(self):
+        while True:
+            user_input = input('>: ')
+            if user_input.lower() == 'назад':
+                return False
+            mtch = re.match(r'^(\d{1,2}-\d{1,2}-\d{4})(/(\d{1,2}-\d{1,2}-\d{4}))?$', user_input)
+            if not mtch:
+                print('Ошибка в дате. Попробуйте ещё раз')
+                continue
+
+            dates = user_input.split('/')
+            try:
+                dates = [dt.datetime.strptime(date, '%d-%m-%Y').date() for date in dates]
+            except ValueError:
+                print('Ошибка в дате. Попробуйте ещё раз')
+                continue
+
+            self.context.start_date = min(dates)
+            self.context.end_date = max(dates)
+            return True
+
+    def menu(self):
+        context = self.context
+        print('\nВведите дату, либо диапазон дат через косую черту')
+        print('в формате дд-мм-гггг/дд-мм-гггг, '
+              'либо введите "назад" для возвращения в главное меню')
+        stats = []
+        while not stats:
+            result = self.set_dates()
+            if not result:
+                continue
+
+            stats = context.weather.get_range(context.start_date, context.end_date)
+            if not stats:
+                print('Погода в данном диапазоне дат на сервере не найдена.\n'
+                      'Попробуйте ещё раз')
+        context.stats = stats
+        context.set_state(MainMenu)
 
 
 if __name__ == '__main__':

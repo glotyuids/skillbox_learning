@@ -112,6 +112,8 @@ class WeatherMaker:
         weather_stats = []
         for month in rrule.rrule(rrule.MONTHLY, dtstart=start_date, until=end_date):
             weather_stats.extend(self.parse_month(month))
+        if not weather_stats:
+            return []
         start_offset = (start_date - weather_stats[0].date).days if start_date > weather_stats[0].date else None
         end_offset = (end_date - weather_stats[-1].date).days if weather_stats[-1].date > end_date else None
         return weather_stats[start_offset:end_offset]
