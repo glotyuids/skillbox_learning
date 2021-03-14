@@ -61,7 +61,8 @@ class Utility:
     def __init__(self, db_url=None):
         self.wants_exit = False
         self.state = None
-        self.weather = self.get_weather()
+        self.weather = None
+        self.get_weather()
         self.db = engine.DatabaseUpdater(db_url or 'sqlite:///weather.db')
         self.img_maker = engine.ImageMaker()
         self.start_date = dt.datetime.now().date() - dt.timedelta(days=6)
@@ -76,7 +77,7 @@ class Utility:
     def get_weather(self):
         weather = None
         while not weather:
-            city = input('Введите ваш город: ')
+            city = input('Введите город: ')
             try:
                 weather = engine.WeatherMaker(city)
             except engine.BadResponseException as exc:
@@ -84,7 +85,7 @@ class Utility:
                 print('Проверьте соединение с интернетом')
             except engine.EmptyResponseException as exc:
                 print(f'{exc}. Попробуйте ещё раз')
-        return weather
+        self.weather = weather
 
     def print_weather(self):
         data = [list(stat.dict.values()) for stat in self.stats]
@@ -94,7 +95,9 @@ class Utility:
                        headers=['Дата', 'Дневная t', 'Ночная t', 'Погода',
                                 'Давление', 'Влажность', 'Скорость ветра', 'Направление ветра']))
 
-    def run(self):
+    def get_last_week(self):
+        self.start_date = dt.datetime.now().date() - dt.timedelta(days=6)
+        self.end_date = dt.datetime.now().date()
         self.stats = self.db.get_stats(city=self.weather.city,
                                        start_date=self.start_date,
                                        end_date=self.end_date)
@@ -102,6 +105,9 @@ class Utility:
             self.stats = self.weather.get_range(self.start_date, self.end_date)
             self.db.add_stats(self.stats)
         self.print_weather()
+
+    def run(self):
+        self.get_last_week()
         while not self.wants_exit:
             self.state.menu()
 
@@ -153,6 +159,10 @@ class Menu:
 
 
 class MainMenu(Menu):
+    def get_new_city(self):
+        self.context.get_weather()
+        self.context.get_last_week()
+
     def get_avail_actions(self):
         self.avail_actions = {
             '1': {
@@ -176,14 +186,20 @@ class MainMenu(Menu):
                 'payload_args': []
             },
             '5': {
-                'text': '5. Выйти из программы',
+                'text': '5. Изменить город',
+                'payload': self.get_new_city,
+                'payload_args': []
+            },
+            '6': {
+                'text': '6. Выйти из программы',
                 'payload': self.context.set_state,
                 'payload_args': [ExitMenu]
             }
         }
 
     def menu(self):
-        print(f'\nТекущий диапазон: {self.context.stats[0].date.strftime("%d-%m-%Y")} - '
+        print(f'\nТекущий город: {self.context.weather.city}')
+        print(f'Текущий диапазон: {self.context.stats[0].date.strftime("%d-%m-%Y")} - '
               f'{self.context.stats[-1].date.strftime("%d-%m-%Y")}')
         print('Выберите действие:')
         self.get_avail_actions()
