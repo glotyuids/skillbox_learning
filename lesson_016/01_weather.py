@@ -157,11 +157,11 @@ class MainMenu(Menu):
                 'payload': self.context.set_state,
                 'payload_args': [AddToDBMenu]
             },
-            # '2': {
-            #     'text': '2. Получить прогнозы из базы данных',
-            #     'payload': self.context.set_state,
-            #     'payload_args': [GetFromDBMenu]
-            # },
+            '2': {
+                'text': '2. Получить прогнозы из базы данных',
+                'payload': self.context.set_state,
+                'payload_args': [GetFromDBMenu]
+            },
             # '3': {
             #     'text': '3. Создать изображения из полученных прогнозов',
             #     'payload': self.context.set_state,
@@ -235,6 +235,30 @@ class AddToDBMenu(Menu):
                       'Попробуйте ещё раз')
         context.stats = stats
         context.db.add_stats(stats)
+        context.set_state(MainMenu)
+
+
+class GetFromDBMenu(Menu):
+    def menu(self):
+        context = self.context
+        print('\nВведите дату, либо диапазон дат через косую черту')
+        print('в формате дд-мм-гггг/дд-мм-гггг, '
+              'либо введите "назад" для возвращения в главное меню')
+        stats = []
+        while not stats:
+            result = self.set_dates()
+            if not result:
+                continue
+
+            stats = context.db.get_stats(context.weather.city,
+                                         context.start_date,
+                                         context.end_date)
+            if not stats:
+                print('Погода в данном диапазоне дат в базе данных не найдена.\n'
+                      'Попробуйте ещё раз')
+        context.stats = stats
+        self.context.start_date = min([stat.date for stat in stats])
+        self.context.end_date = max([stat.date for stat in stats])
         context.set_state(MainMenu)
 
 
