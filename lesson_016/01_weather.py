@@ -57,13 +57,13 @@ import engine
 
 class Utility:
     def __init__(self, db_url=None):
+        self.wants_exit = False
+        self.state = None
         self.weather = self.get_weather()
         self.db = engine.DatabaseUpdater(db_url or 'sqlite:///weather.db')
         self.start_date = dt.datetime.now().date() - dt.timedelta(days=7)
         self.end_date = dt.datetime.now().date()
         self.stats = None
-        self.state = None
-        self.wants_exit = False
         self.set_state(MainMenu)
 
     def set_state(self, state):
@@ -80,7 +80,7 @@ class Utility:
                 print(exc)
                 print('Проверьте соединение с интернетом')
             except engine.EmptyResponseException as exc:
-                print(exc)
+                print(f'{exc}. Попробуйте ещё раз')
         return weather
 
     def print_weather(self):
@@ -160,7 +160,8 @@ class MainMenu(Menu):
 
 
     def menu(self):
-        print(f'Текущий диапазон: {self.context.stats[0].date} - {self.context.stats[-1].date}')
+        print(f'\nТекущий диапазон: {self.context.stats[0].date.strftime("%d-%m-%Y")} - '
+              f'{self.context.stats[-1].date.strftime("%d-%m-%Y")}')
         print('Выберите действие:')
         self.get_avail_actions()
         self.print_actions()
@@ -174,13 +175,13 @@ class ExitMenu(Menu):
     def get_avail_actions(self):
         self.avail_actions = {
             '1': {
-                'text': f'1. Нет, вернуться назад',
+                'text': '1. Нет, вернуться назад',
                 'enabled': True,
                 'payload': self.context.set_state,
                 'payload_args': [MainMenu]
             },
             '2': {
-                'text': f'2. Да, выйти из программы',
+                'text': '2. Да, выйти из программы',
                 'enabled': True,
                 'payload': self.exit_handler,
                 'payload_args': []
