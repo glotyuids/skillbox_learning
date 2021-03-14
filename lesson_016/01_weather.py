@@ -46,10 +46,11 @@
 # Приконнектится по полученному url-пути к базе данных
 # Инициализировать её через DatabaseProxy()
 # https://peewee.readthedocs.io/en/latest/peewee/database.html#dynamically-defining-a-database
-import os
-import re
+
 from abc import abstractmethod
 import datetime as dt
+import os
+import re
 
 from tabulate import tabulate
 
@@ -180,7 +181,6 @@ class MainMenu(Menu):
                 'payload_args': [ExitMenu]
             }
         }
-
 
     def menu(self):
         print(f'\nТекущий диапазон: {self.context.stats[0].date.strftime("%d-%m-%Y")} - '
