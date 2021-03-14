@@ -46,6 +46,7 @@
 # Приконнектится по полученному url-пути к базе данных
 # Инициализировать её через DatabaseProxy()
 # https://peewee.readthedocs.io/en/latest/peewee/database.html#dynamically-defining-a-database
+import os
 import re
 from abc import abstractmethod
 import datetime as dt
@@ -61,7 +62,8 @@ class Utility:
         self.state = None
         self.weather = self.get_weather()
         self.db = engine.DatabaseUpdater(db_url or 'sqlite:///weather.db')
-        self.start_date = dt.datetime.now().date() - dt.timedelta(days=7)
+        self.img_maker = engine.ImageMaker()
+        self.start_date = dt.datetime.now().date() - dt.timedelta(days=6)
         self.end_date = dt.datetime.now().date()
         self.stats = None
         self.set_state(MainMenu)
@@ -162,11 +164,11 @@ class MainMenu(Menu):
                 'payload': self.context.set_state,
                 'payload_args': [GetFromDBMenu]
             },
-            # '3': {
-            #     'text': '3. Создать изображения из полученных прогнозов',
-            #     'payload': self.context.set_state,
-            #     'payload_args': [GetImagesMenu]
-            # },
+            '3': {
+                'text': '3. Создать изображения из полученных прогнозов',
+                'payload': self.context.set_state,
+                'payload_args': [GetImagesMenu]
+            },
             '4': {
                 'text': '4. Вывести прогноз на консоль',
                 'payload': self.context.print_weather,
@@ -258,6 +260,76 @@ class GetFromDBMenu(Menu):
         self.context.start_date = min([stat.date for stat in stats])
         self.context.end_date = max([stat.date for stat in stats])
         context.set_state(MainMenu)
+
+
+class GetImagesMenu(Menu):
+    def create_cards(self):
+        print('\nКуда будем сохранять изображения? '
+              'Введите путь, либо оставьте пустым, чтобы сохранить в папку cards рядом со скриптом')
+        user_input = input('>: ')
+        if not user_input:
+            path = os.path.join(os.getcwd(), 'cards')
+        else:
+            path = os.path.normpath(user_input)
+        os.makedirs(path, exist_ok=True)
+
+        context = self.context
+        for stat in context.stats:
+            img = context.img_maker.get_image(stat)
+            full_name = os.path.join(path, str(stat.date) + '.png')
+            context.img_maker.save_image(full_name, img)
+        print(f'Все изображения сохранены в {path}')
+
+    def create_calendar(self):
+        print('\nКуда будем сохранять изображения? '
+              'Введите путь, либо оставьте пустым, чтобы сохранить в папку рядом со скриптом')
+        user_input = input('>: ')
+        if not user_input:
+            path = os.getcwd()
+        else:
+            path = os.path.normpath(user_input)
+        os.makedirs(path, exist_ok=True)
+
+        context = self.context
+        start_date = context.start_date
+        end_date = context.end_date
+
+        img = context.img_maker.get_calendar(context.stats)
+        start_year = '' if start_date.year == end_date.year else f'-{start_date.year}'
+        start_month = '' if not start_year and start_date.month == end_date.month else f'-{start_date.month}'
+        file_name = context.weather.city + ' '
+        file_name += f'{context.start_date.day}{start_month}{start_year} - '
+        file_name += context.end_date.strftime("%d-%m-%Y")
+
+        full_name = os.path.join(path, f'{file_name}.png')
+        context.img_maker.save_image(full_name, img)
+        print(f'Календарь сохранён в {full_name}')
+
+
+    def get_avail_actions(self):
+        self.avail_actions = {
+            '1': {
+                'text': '1. Создать отдельные карточки для каждого дня',
+                'payload': self.create_cards,
+                'payload_args': []
+            },
+            '2': {
+                'text': '2. Создать календарь для выбранного диапазона',
+                'payload': self.create_calendar,
+                'payload_args': []
+            },
+            '3': {
+                'text': '3. Вернуться в главное меню',
+                'payload': self.context.set_state,
+                'payload_args': [MainMenu]
+            }
+        }
+
+    def menu(self):
+        self.get_avail_actions()
+        print()
+        self.print_actions()
+        self.handle_input()
 
 
 if __name__ == '__main__':
