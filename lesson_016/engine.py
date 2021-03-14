@@ -4,7 +4,9 @@ import datetime as dt
 from dataclasses import dataclass
 import json
 import locale
+import os
 import re
+import sys
 from tempfile import NamedTemporaryFile
 
 from bs4 import BeautifulSoup
@@ -47,6 +49,16 @@ class Stats:
     @property
     def dict(self):
         return self.__dict__
+
+
+class BlockPrints:
+    def __enter__(self):
+        self._original_stdout = sys.stdout
+        sys.stdout = open(os.devnull, 'w')
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        sys.stdout.close()
+        sys.stdout = self._original_stdout
 
 
 class WeatherMaker:
@@ -170,7 +182,8 @@ class ImageMaker:
 
         # Изображение генерируется во временный файл, передаётся в cv2.imread и уничтожается
         tmp_file = NamedTemporaryFile(suffix='.png')
-        imgkit.from_string(cal, tmp_file.name, options={'crop-w': '864'})
+        with BlockPrints():
+            imgkit.from_string(cal, tmp_file.name, options={'crop-w': '864'})
         img = cv2.imread(tmp_file.name)
         return img
 
