@@ -233,6 +233,7 @@ class AddToDBMenu(Menu):
                 print('Погода в данном диапазоне дат на сервере не найдена.\n'
                       'Попробуйте ещё раз')
         context.stats = stats
+        context.db.add_stats(stats)
         context.set_state(MainMenu)
 
 
