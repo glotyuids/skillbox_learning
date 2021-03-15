@@ -32,6 +32,7 @@ class EmptyResponseException(Exception):
 
 @dataclass
 class Stats:
+    """ Датакласс для хранения прогноза за один день """
     city: str
     date: dt.date
     temp_day: int
@@ -48,10 +49,12 @@ class Stats:
 
     @property
     def dict(self):
+        """ Возвращает поля с данными в виде словаря """
         return self.__dict__
 
 
 class BlockPrints:
+    """ Контекстный менеджер для блокирования принтов в функциях """
     def __enter__(self):
         self._original_stdout = sys.stdout
         sys.stdout = open(os.devnull, 'w')
@@ -62,12 +65,18 @@ class BlockPrints:
 
 
 class WeatherMaker:
-
+    """ Парсер погоды с pogoda.mail.ru """
     def __init__(self, city):
         self.city, self.city_url = '', ''
         self.set_city(city)
 
     def set_city(self, city):
+        """
+        Ищет на сервере передныый город, и берёт из ответа корректное название города
+        и url, по которому запрашивается погода
+
+        :param city: str название города
+        """
         response = requests.get(f'https://pogoda.mail.ru/ext/suggest/?q={city}')
         if response.status_code != 200:
             raise BadResponseException('Response status code is ' + str(response.status_code))
@@ -78,6 +87,13 @@ class WeatherMaker:
         self.city = response[0]['name']
 
     def parse_month(self, date):
+        """
+        Парсит погоду за месяц
+
+        :param date: datetime.date Дата, из которой берутся год и месяц
+
+        :return: [Stats, ] список прогнозов погоды за месяц
+        """
         month_name, year = date.strftime('%B').lower(), date.year
         response = requests.get(f'https://pogoda.mail.ru{self.city_url}{month_name}-{str(year)}/')
         if response.status_code != 200:
@@ -119,6 +135,14 @@ class WeatherMaker:
         return days
 
     def get_range(self, start_date, end_date):
+        """
+        Парсит погоду за заданный период, включая обе даты
+
+        :param start_date: datetime.date Первый день диапазона
+        :param end_date: datetime.date Последний день диапазона
+
+        :return: [Stats, ] список прогнозов погоды за период
+        """
         weather_stats = []
         for month in rrule.rrule(rrule.MONTHLY, dtstart=start_date, until=end_date):
             weather_stats.extend(self.parse_month(month))
@@ -130,6 +154,7 @@ class WeatherMaker:
 
 
 class ImageMaker:
+    """ Генератор картинок """
 
     save_image = cv2.imwrite
 
@@ -187,6 +212,7 @@ class ImageMaker:
 
 
 class CalendarMaker(calendar.HTMLCalendar):
+    """ Генератор html-календаря с погодой """
     def formatday(self, day, weekday, **kwargs):
         """
         Возвращает HTML код ячейки календаря
@@ -195,7 +221,7 @@ class CalendarMaker(calendar.HTMLCalendar):
         :param weekday: день недели
         :param kwargs: в кваргах передаётся stats - список объектов класса Stats
 
-        :return: str
+        :return: str Html код ячейки календаря с прогнозом
         """
         stats = kwargs['stats']
 
@@ -218,10 +244,10 @@ class CalendarMaker(calendar.HTMLCalendar):
         """
         Возвращает HTML код недели из ячеек. Если в неделе только noday, то пустую строку
 
-        :param theweek:
+        :param theweek: [(day, weekday), ] day - номер дня, weekday - номер дня недели
         :param kwargs: в кваргах передаётся stats - список объектов класса Stats
 
-        :return: str
+        :return: str Html код недели с прогнозом
         """
         s = ''.join(self.formatday(d, wd, **kwargs) for (d, wd) in theweek)
         s = '<tr>%s</tr>' % s
@@ -237,7 +263,7 @@ class CalendarMaker(calendar.HTMLCalendar):
         :param withyear: флаг, писать ли в календаре год
         :param kwargs: в кваргах передаётся stats - список объектов класса Stats
 
-        :return: str
+        :return: str Html код календаря на месяц с прогнозом
         """
         stats = kwargs.get('stats', None)
         if not stats:
@@ -274,7 +300,7 @@ class CalendarMaker(calendar.HTMLCalendar):
         :param withyear: флаг, писать ли в заголовке год
         :param kwargs: в кваргах передаётся stats - список объектов класса Stats, оттуда дёргается город
 
-        :return: str
+        :return: str Html код заголовка календаря
         """
         city = kwargs['stats'][0].city
         if withyear:
@@ -289,7 +315,7 @@ class CalendarMaker(calendar.HTMLCalendar):
 
         :param stats: список объектов класса Stats
 
-        :return: str
+        :return: str Полный html код страницы с набором календарей за заданный диапазон дат
         """
         start_date = min(stats, key=lambda stat: stat.date).date
         end_date = max(stats, key=lambda stat: stat.date).date
@@ -305,12 +331,22 @@ class CalendarMaker(calendar.HTMLCalendar):
 
 
 class DatabaseUpdater:
+    """ Класс для работы с БД """
     def __init__(self, db_url):
+        """
+        :param db_url: str Путь к бд.
+                           См. https://peewee.readthedocs.io/en/latest/peewee/playhouse.html#db-url
+        """
         db = connect(db_url)
         db_proxy.initialize(db)
         WeatherStats.create_table()
 
     def add_stats(self, stats):
+        """
+        Добавляет прогноз в базу данных
+
+        :param stats: [Stats, ] список прогнозов погоды
+        """
         stats = [stats, ] if not isinstance(stats, list) else stats
         for stat in stats:
             _ = (WeatherStats
@@ -319,6 +355,15 @@ class DatabaseUpdater:
                  .execute())
 
     def get_stats(self, city, start_date, end_date=None):
+        """
+        Тащит из бд прогноз погоды для выбранного города за выбранный диапазон дат
+
+        :param city: str Город
+        :param start_date: datetime.date Первый день диапазона
+        :param end_date: datetime.date Последний день диапазона
+
+        :return: [WeatherStats, ] список прогнозов погоды
+        """
         if end_date:
             stats = WeatherStats.select().where(
                 (WeatherStats.city == city) &
@@ -335,12 +380,19 @@ class DatabaseUpdater:
 
 @contextmanager
 def setlocale(*args, **kw):
+    """ Контекстный менеджер для смены локали """
     current = locale.setlocale(locale.LC_ALL)
     yield locale.setlocale(*args, **kw)
     locale.setlocale(locale.LC_ALL, current)
 
 
 def view_image(image, name_of_window):
+    """
+    Выводит окно с изображением
+
+    :param image: ndarray/cv2 image Изображение
+    :param name_of_window: str Имя окна
+    """
     cv2.namedWindow(name_of_window, cv2.WINDOW_NORMAL)
     cv2.imshow(name_of_window, image)
     cv2.waitKey(0)
