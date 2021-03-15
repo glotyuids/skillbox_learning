@@ -351,5 +351,3 @@ class GetImagesMenu(Menu):
 if __name__ == '__main__':
     util = Utility()
     util.run()
-
-

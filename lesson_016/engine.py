@@ -155,7 +155,7 @@ class ImageMaker:
                 self.font.loadFontData(fontFileName=field['font'], id=0)
 
                 if field.get('v_center', False):
-                    (text_width, text_height), _ = self.font.getTextSize(text, field['font_size'], -1)
+                    (_, text_height), _ = self.font.getTextSize(text, field['font_size'], -1)
                 else:
                     text_height = 0
 
@@ -200,15 +200,13 @@ class CalendarMaker(calendar.HTMLCalendar):
         stats = kwargs['stats']
 
         if day == 0 or not stats:
-            return '<td class="noday">&nbsp;</td>' \
-                   % {"weekday": self.cssclasses[weekday]}
+            return '<td class="noday">&nbsp;</td>'
 
         stat = next((stat for stat in stats
                      if stat.date == dt.date(kwargs['theyear'], kwargs['themonth'], day)),
                     None)
         if not stat:
-            return '<td class="noday">&nbsp;</td>' \
-                   % {"weekday": self.cssclasses[weekday]}
+            return '<td class="noday">&nbsp;</td>'
 
         params = dict(defaults.units, **stat.dict)
         params.update(day=day,
@@ -347,12 +345,3 @@ def view_image(image, name_of_window):
     cv2.imshow(name_of_window, image)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-
-
-if __name__ == '__main__':
-    start_date = dt.date(2021, 1, 5)
-    end_date = dt.date(2021, 3, 31)
-    weather = WeatherMaker('belgorod')
-    stats = weather.get_range(start_date, end_date)
-    image = ImageMaker().get_calendar(stats)
-    view_image(image, ' ')
