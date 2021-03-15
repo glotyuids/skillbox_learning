@@ -57,7 +57,7 @@ from tabulate import tabulate
 import engine
 
 
-class Utility:
+class UserInterface:
     def __init__(self, db_url=None):
         self.wants_exit = False
         self.state = None
@@ -349,5 +349,5 @@ class GetImagesMenu(Menu):
 
 
 if __name__ == '__main__':
-    util = Utility()
-    util.run()
+    interface = UserInterface()
+    interface.run()
