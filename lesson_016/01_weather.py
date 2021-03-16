@@ -59,6 +59,7 @@ import engine
 
 class UserInterface:
     """ Реализует необходимый функционал для работы консольного интерфейса """
+
     def __init__(self, db_url=None):
         self.wants_exit = False
         self.state = None
@@ -124,6 +125,7 @@ class UserInterface:
 
 class Menu:
     """ Базовый класс для меню """
+
     def __init__(self):
         self.context = None
         self.avail_actions = None
@@ -177,6 +179,7 @@ class Menu:
 
 class MainMenu(Menu):
     """ Главное меню """
+
     def get_new_city(self):
         """
         Запрашивает у пользователя город, задаёт его контексту
@@ -231,6 +234,7 @@ class MainMenu(Menu):
 
 class ExitMenu(Menu):
     """ Меню выхода из программы """
+
     def exit_handler(self):
         """ Хендлер выхода из программы"""
         self.context.wants_exit = True
@@ -258,6 +262,7 @@ class ExitMenu(Menu):
 
 class AddToDBMenu(Menu):
     """ Меню добавления данных в бд """
+
     def menu(self):
         """
         Запрашивает у пользователя диапазон дат,
@@ -284,6 +289,7 @@ class AddToDBMenu(Menu):
 
 class GetFromDBMenu(Menu):
     """ Меню запроса данных из бд """
+
     def menu(self):
         """
         Запрашивает у пользователя диапазон дат, тянет из бд погоду за этот диапазон.
@@ -313,6 +319,7 @@ class GetFromDBMenu(Menu):
 
 class GetImagesMenu(Menu):
     """ Меню генерации картинок """
+
     def create_cards(self):
         """
         Спрашивает у пользователя место для сохранения
@@ -364,7 +371,6 @@ class GetImagesMenu(Menu):
         full_name = os.path.join(path, f'{file_name}.png')
         context.img_maker.save_image(full_name, img)
         print(f'Календарь сохранён в {full_name}')
-
 
     def get_avail_actions(self):
         self.avail_actions = {

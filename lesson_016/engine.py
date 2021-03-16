@@ -161,6 +161,9 @@ class ImageMaker:
     def __init__(self):
         self.font = cv2.freetype.createFreeType2()
         self.im_template = cv2.imread(template.BACKGROUND_IM)
+        # TODO не вижу, работаете ли вы с копией ниже, но было бы здорово изначально брать копию изображения
+        # TODO чтобы случайно нигде не сохранить правки в оригинал
+        # TODO  image_with_line = image_cv2.copy()
 
     def get_image(self, stat):
         """
@@ -249,6 +252,7 @@ class CalendarMaker(calendar.HTMLCalendar):
 
         :return: str Html код недели с прогнозом
         """
+        # TODO 's' - плохой пример нэйминга
         s = ''.join(self.formatday(d, wd, **kwargs) for (d, wd) in theweek)
         s = '<tr>%s</tr>' % s
         s = re.sub(r'<tr>(<td class="noday">&nbsp;<\/td>){7}<\/tr>', '', s)
@@ -274,7 +278,7 @@ class CalendarMaker(calendar.HTMLCalendar):
                     None)
         if not stat:
             return ''
-
+        # TODO v,a - тоже не очень хорошие примеры
         v = []
         a = v.append
         a('<table border="0" cellpadding="0" cellspacing="0" class="%s">' % (
@@ -397,3 +401,5 @@ def view_image(image, name_of_window):
     cv2.imshow(name_of_window, image)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+
+# TODO я бы ещё советовал разделить классы на разные модули, чтобы не хранить всё это в одной куче
