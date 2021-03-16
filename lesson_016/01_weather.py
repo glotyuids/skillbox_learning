@@ -401,3 +401,4 @@ class GetImagesMenu(Menu):
 if __name__ == '__main__':
     interface = UserInterface()
     interface.run()
+#зачёт!
