@@ -1,4 +1,11 @@
-from peewee import Model, DatabaseProxy, CompositeKey, CharField, IntegerField, DateField
+from peewee import (
+    Model,
+    DatabaseProxy,
+    CompositeKey,
+    CharField,
+    IntegerField,
+    DateField
+)
 
 
 db_proxy = DatabaseProxy()
