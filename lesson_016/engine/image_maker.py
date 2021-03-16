@@ -78,7 +78,8 @@ class ImageMaker:
 
         return im_color
 
-    def get_calendar(self, stats):
+    @staticmethod
+    def get_calendar(stats):
         """
         Возвращает cv2 изображение календаря с прогнозом
 
